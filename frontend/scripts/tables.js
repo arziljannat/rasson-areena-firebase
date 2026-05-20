@@ -701,14 +701,11 @@ async function changeRate(id, rateType, value) {
     let table = tables.find(t => String(t.id) === String(id));
     if (!table) return;
 
-    if (rateType === "frame") {
-        table.frameRate = Number(value);
-        table.playType = "frame";
-    } 
-    else if (rateType === "century") {
-        table.centuryRate = Number(value);
-        table.playType = "century";
-    }
+table.playType = rateType;
+
+if (rateType === "century") {
+    table.centuryRate = Number(value);
+}
 
     updateDisplay(id);
 
@@ -724,16 +721,38 @@ async function changeRate(id, rateType, value) {
     });
 }
 function handleRateChange(id, select) {
+
     const value = select.value;
 
     const [type, rate] = value.split("-");
 
-const table =
-tables.find(t => String(t.id) === String(id));
+    const table =
+    tables.find(t => String(t.id) === String(id));
 
-if (!table) return;
+    if (!table) return;
 
-changeRate(id, type, rate);
+    // 🔥 SAVE CURRENT SELECTION
+    table.selectedPlayType = type;
+    table.selectedRate = Number(rate || 0);
+
+    // 🔥 UPDATE UI LIVE
+    updateDisplay(id);
+
+    // 🔥 FIREBASE SAVE
+    updateDoc(doc(window.db, "tables", id), {
+
+        play_type: type,
+
+        selected_rate: Number(rate || 0),
+
+        frame_rate: table.frameRate,
+
+        century_rate: table.centuryRate
+
+    });
+
+    // OLD FUNCTION
+    changeRate(id, type, rate);
 }
 /******************************************************
  * CHECK-IN FUNCTION
@@ -1033,8 +1052,7 @@ minutes * (t.selectedRate || 10);
         let frameMinutes =
         Math.floor(t.playSeconds / 60);
 
-let frameRate = 100;
-
+let frameRate = t.selectedRate || 100;
         let frameCount =
         Math.floor(frameMinutes / 35) + 1;
 
