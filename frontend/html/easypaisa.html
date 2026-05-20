@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EasyPaisa</title>
+
+    <!-- NAVBAR CSS -->
+    <link rel="stylesheet" href="../styles/navbar.css">
+    <link rel="stylesheet" href="../styles/mobile.css">
+
+    <!-- SAME DESIGN AS EXPENSES -->
+    <link rel="stylesheet" href="../styles/expenses.css">
+
+    <!-- NAVBAR -->
+    <script type="module" src="../scripts/load-navbar.js"></script>
+    <script src="../scripts/navbar.js" defer></script>
+
+    <!-- FIREBASE -->
+    <script type="module" src="../scripts/firebase-config.js"></script>
+
+    <!-- PAGE SCRIPT -->
+    <script type="module" src="../scripts/easypaisa.js"></script>
+</head>
+
+<body>
+<div class="page-container">
+
+    <h1 class="page-title">EasyPaisa</h1>
+
+    <!-- ACTION BAR -->
+    <div class="top-actions">
+        <button class="btn-green" onclick="openEasyPopup()">+ Add EasyPaisa</button>
+    </div>
+
+    <!-- TOTAL -->
+    <div class="total-box">
+        <span>Today's EasyPaisa:</span>
+        <b id="todayEasyTotal">0 PKR</b>
+    </div>
+
+    <div class="filter-row admin-only">
+
+    <label class="filter-label">Month:</label>
+
+    <input
+        type="month"
+        id="monthFilter"
+        class="filter-select"
+        onchange="filterEasyByMonth()"
+    >
+
+</div>
+    
+
+    <!-- TABLE -->
+    <div class="table-box">
+        <table class="exp-table">
+            <thead>
+<tr>
+    <th>Date & Time</th>
+    <th>Amount</th>
+    <th>Note</th>
+    <th>Actions</th>
+</tr>
+</thead>
+            <tbody id="easyTable"></tbody>
+        </table>
+    </div>
+
+</div>
+    <!-- ADD EASYPAISA POPUP -->
+<div id="easyPopup" class="popup hide">
+    <div class="popup-card">
+        <h2>Add EasyPaisa</h2>
+
+        <input id="easyAmount" type="number" class="popup-input" placeholder="Amount">
+        <input id="easyNote" class="popup-input" placeholder="Note">
+
+        <div class="popup-actions">
+            <button class="btn-green" onclick="editId ? updateEasy() : saveEasy()">Save</button>
+            <button class="btn-red" onclick="closeEasyPopup()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

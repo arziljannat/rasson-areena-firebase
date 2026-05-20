@@ -1,0 +1,333 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: url('../assets/icon.png') no-repeat center center fixed;
+    background-size: cover;
+    font-family: Arial, sans-serif;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* Stat Box Grid */
+.stats-container {
+    width: 95%;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-gap: 20px;
+    padding: 20px 40px;
+    margin-top: 100px;
+}
+
+.stat-box {
+    background: rgba(0, 0, 0, 0.35);
+    border: 2px solid #00ff9d;
+    border-radius: 15px;
+    box-shadow: 0 0 18px #00ff9d;
+    text-align: center;
+    padding: 15px 5px;
+}
+
+.stat-box h3 {
+    color: #00ffcc;
+    margin: 0;
+    font-size: 18px;
+}
+
+.stat-box p {
+    color: #00ff99;
+    font-size: 22px;
+    margin-top: 5px;
+}
+
+/* Charts Row */
+.charts-container {
+    width: 95%;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 40px;
+    margin-top: 10px;
+}
+
+.chart-box {
+    width: 48%;
+    height: 350px;
+    padding: 15px;
+    border: 2px solid #00ff9d;
+    border-radius: 15px;
+    background: rgba(0, 0, 0, 0.35);
+    box-shadow: 0 0 18px #00ff9d;
+}
+
+.chart-title {
+    text-align: center;
+    color: #00ffcc;
+    margin-bottom: 8px;
+    font-size: 18px;
+}
+.chart-box canvas {
+    height: 240px !important;
+    width: 80% !important;
+}
+
+.stat-box {
+    transition: 0.25s ease-in-out;
+    cursor: pointer;
+}
+
+.stat-box:hover {
+    transform: scale(1.06);
+    box-shadow: 0 0 20px #00ffcc, inset 0 0 15px #00ffcc;
+    border-color: #00ffaa;
+}
+
+.chart-box {
+    transition: 0.35s ease;
+}
+
+.chart-box:hover {
+    transform: scale(1.08);
+    z-index: 10;
+    box-shadow: 0 0 35px #00ffcc;
+}
+
+.chart-box canvas {
+    transition: 0.35s ease;
+}
+
+
+#topTablesList, #topItemsList {
+    color: #00ffcc;
+    padding: 10px;
+    font-size: 14px;
+}
+
+#topTablesList div, #topItemsList div {
+    padding: 5px;
+    border-bottom: 1px dashed #00ffaa;
+}
+
+.chart-box {
+    overflow-y: auto;
+}
+
+
+.chart-box canvas {
+    height: 260px !important;
+    width: 100% !important;
+}
+
+/* Glow effect */
+.chart-box {
+    position: relative;
+}
+
+.chart-box::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 15px;
+    box-shadow: 0 0 25px rgba(0,255,200,0.2);
+    pointer-events: none;
+}
+
+/* Title styling */
+.chart-box h3 {
+    text-align: center;
+    color: #00ffcc;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+.stats-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.stats-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.stat-box {
+    flex: 1;
+    min-width: 200px;
+}
+
+.chart-box {
+    transition: 0.3s ease;
+}
+
+.chart-box:hover {
+    transform: scale(1.08);
+    z-index: 5;
+    box-shadow: 0 0 30px #00ffcc;
+}
+
+/* =========================
+   MONTH FILTER
+========================= */
+
+.month-filter-box{
+    width:95%;
+    margin:20px auto 10px auto;
+
+    display:flex;
+    align-items:center;
+    gap:15px;
+
+    color:#00ffcc;
+    font-size:18px;
+    font-weight:bold;
+}
+
+#dashboardMonthFilter{
+    padding:10px 15px;
+    border-radius:8px;
+    border:1px solid #00ffcc;
+
+    background:#111;
+    color:#00ffcc;
+
+    font-size:16px;
+}
+
+/* =========================================
+   MOBILE DASHBOARD FIX
+========================================= */
+
+@media screen and (max-width:768px){
+
+    body{
+        overflow-y:auto !important;
+    }
+
+    .month-filter-box{
+        width:92% !important;
+        margin-top:25px !important;
+        padding:0 10px !important;
+    }
+
+    .stats-container{
+        width:100% !important;
+        padding:12px !important;
+        margin-top:10px !important;
+    }
+
+    .stats-row{
+        display:flex !important;
+        flex-direction:column !important;
+        gap:14px !important;
+    }
+
+    .stat-box{
+        width:100% !important;
+        min-width:100% !important;
+        padding:18px 12px !important;
+        border-radius:18px !important;
+    }
+
+    .stat-box h3{
+        font-size:18px !important;
+    }
+
+    .stat-box p{
+        font-size:30px !important;
+    }
+
+    .charts-container{
+        width:100% !important;
+        display:flex !important;
+        flex-direction:column !important;
+        padding:12px !important;
+        gap:18px !important;
+    }
+
+    .chart-box{
+        width:100% !important;
+        height:320px !important;
+    }
+
+    .chart-box canvas{
+        width:100% !important;
+        height:240px !important;
+    }
+}
+
+
+/* ======================================
+   TABLE SALES BOXES
+====================================== */
+
+/* STAFF TABLE BOXES */
+
+#staffTableSalesContainer{
+
+    width:95%;
+    margin:20px auto;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fit,minmax(230px,1fr));
+
+    gap:20px;
+}
+
+
+
+#tableSalesContainer{
+
+    width:95%;
+    margin:20px auto;
+
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+
+    gap:20px;
+}
+
+.table-sale-box{
+
+    background:rgba(0,0,0,0.35);
+
+    border:2px solid #00ff9d;
+
+    border-radius:18px;
+
+    padding:18px;
+
+    box-shadow:0 0 18px #00ff9d;
+
+    transition:0.3s ease;
+}
+
+.table-sale-box:hover{
+
+    transform:scale(1.05);
+
+    box-shadow:0 0 28px #00ffcc;
+}
+
+.table-sale-box h2{
+
+    color:#00ffcc;
+
+    margin-top:0;
+
+    text-align:center;
+
+    font-size:24px;
+}
+
+.table-sale-box p{
+
+    color:#00ffaa;
+
+    margin:10px 0;
+
+    font-size:18px;
+
+    text-align:center;
+}

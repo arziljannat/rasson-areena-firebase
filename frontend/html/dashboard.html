@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rasson Dashboard</title>
+
+    <link rel="stylesheet" href="../styles/navbar.css">
+    <link rel="stylesheet" href="../styles/mobile.css">
+    <link rel="stylesheet" href="../styles/dashboard.css">
+
+    
+</head>
+
+<body>
+
+    <div id="navbar-container"></div>
+
+    <script type="module" src="../scripts/firebase-config.js"></script>
+    <script type="module" src="../scripts/load-navbar.js"></script>
+    <script type="module" src="../scripts/navbar.js"></script>
+
+
+   <!-- ADMIN MONTH FILTER -->
+    <div class="admin-only month-filter-box">
+
+        <label>Select Month:</label>
+
+        <input
+            type="month"
+            id="dashboardMonthFilter">
+
+    </div>
+    
+    <!-- STATS -->
+    <div class="stats-container">
+
+    <!-- ROW 1 (3 boxes) -->
+    <div class="stats-row">
+        <div class="stat-box"><h3>Total Tables</h3><p id="totalTables">0</p></div>
+        <div class="stat-box"><h3>Active Tables</h3><p id="activeTables">0</p></div>
+        <div class="stat-box"><h3>Free Tables</h3><p id="freeTables">0</p></div>
+    </div>
+
+    <!-- ROW 2 (4 boxes) -->
+    <div class="stats-row">
+        <div class="stat-box"><h3>Today Sessions</h3><p id="todaySessions">0</p></div>
+        <div class="stat-box"><h3>Completed Sessions</h3><p id="completedSessions">0</p></div>
+        <div class="stat-box"><h3>Unpaid Bills</h3><p id="unpaidBills">0</p></div>
+        <div class="stat-box"><h3>Paid Bills</h3><p id="paidBills">0</p></div>
+    </div>
+
+    <!-- ROW 3 (4 boxes) -->
+    <div class="stats-row">
+    <div class="stat-box"><h3>Today Income</h3><p id="todayIncome">0</p></div>
+    <div class="stat-box"><h3>Today Canteen</h3><p id="todayCanteen">0</p></div>
+    <div class="stat-box"><h3>Today Expenses</h3><p id="todayExpenses">0</p></div>
+    <div class="stat-box"><h3>Today EasyPaisa</h3><p id="todayEasyPaisa">0</p></div>
+    <div class="stat-box"><h3>Net Income</h3><p id="netIncome">0</p></div>
+</div> 
+
+
+
+<!-- STAFF CURRENT OPERATIONAL DAY -->
+<div id="staffTableSalesContainer"></div>
+
+<!-- ROW 4 (4 boxes ADMIN) -->
+<div class="stats-row admin-only">
+    <div class="stat-box"><h3>Monthly Income</h3><p id="monthlyIncome">0</p></div>
+    <div class="stat-box"><h3>Monthly Canteen</h3><p id="monthlycanteen">0</p></div>
+    <div class="stat-box"><h3>Monthly Expenses</h3><p id="monthlyExpenses">0</p></div>
+    <div class="stat-box"><h3>Monthly EasyPaisa</h3><p id="monthlyEasyPaisa">0</p></div>
+    <div class="stat-box"><h3>Net Profit</h3><p id="netProfit">0</p></div>
+</div>
+
+<!-- ROW 5 (3 boxes ADMIN) -->
+<div class="stats-row admin-only">
+    <div class="stat-box"><h3>Monthly Average</h3><p id="monthlyAverage">0</p></div>
+    <div class="stat-box"><h3>Shift1 Monthly</h3><p id="shift1Monthly">0</p></div>
+    <div class="stat-box"><h3>Shift2 Monthly</h3><p id="shift2Monthly">0</p></div>
+</div>
+
+<!-- ADMIN MONTHLY TABLE SALES -->
+<div
+    id="tableSalesContainer"
+    class="admin-only">
+</div>
+    <script type="module" src="../scripts/dashboard.js"></script>
+
+</body>
+</html>

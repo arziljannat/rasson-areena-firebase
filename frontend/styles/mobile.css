@@ -1,0 +1,639 @@
+/* =========================================
+   GLOBAL MOBILE RESPONSIVE
+========================================= */
+
+@media screen and (max-width:768px){
+
+    *{
+        box-sizing:border-box;
+    }
+
+    html,
+    body{
+
+        width:100%;
+        overflow-x:hidden !important;
+
+        background-position:center top !important;
+        background-size:cover !important;
+        background-repeat:no-repeat !important;
+        background-attachment:scroll !important;
+
+        min-height:100vh !important;
+
+        -webkit-overflow-scrolling:touch;
+    }
+
+    /* =====================================
+       NAVBAR
+    ===================================== */
+
+    .navbar{
+
+        padding:12px !important;
+
+        display:flex !important;
+        flex-direction:column !important;
+
+        gap:14px !important;
+    }
+
+    .top-title{
+
+        font-size:28px !important;
+        text-align:center !important;
+        line-height:1.3 !important;
+    }
+
+    .top-tagline{
+
+        font-size:11px !important;
+        text-align:center !important;
+        letter-spacing:2px !important;
+    }
+
+    .nav-wrapper{
+
+        width:100% !important;
+
+        display:flex !important;
+        flex-wrap:wrap !important;
+
+        justify-content:center !important;
+
+        gap:12px !important;
+    }
+
+    .nav-btn,
+    .logout-btn,
+    .nav-select{
+
+        width:47% !important;
+
+        min-height:52px !important;
+
+        font-size:15px !important;
+
+        border-radius:14px !important;
+    }
+
+    #digitalClock{
+
+        width:100% !important;
+
+        font-size:28px !important;
+
+        text-align:center !important;
+
+        padding:16px 10px !important;
+    }
+
+    /* =====================================
+       TITLES
+    ===================================== */
+
+    .page-title,
+    .users-title,
+    .tables-heading,
+    .shift-title,
+    .report-title{
+
+        font-size:26px !important;
+
+        text-align:center !important;
+
+        margin-top:120px !important;
+
+        margin-left:0 !important;
+    }
+
+    /* =====================================
+       TABLES PAGE
+    ===================================== */
+
+    .tables-grid{
+
+        display:flex !important;
+
+        flex-direction:column !important;
+
+        gap:22px !important;
+
+        padding:14px !important;
+    }
+
+    .table-box,
+    .table-card{
+
+        width:100% !important;
+
+        padding:18px !important;
+
+        border-radius:22px !important;
+    }
+
+    .table-buttons,
+    .dual-btn-row,
+    .second-row{
+
+        display:flex !important;
+
+        flex-direction:column !important;
+
+        gap:14px !important;
+
+        width:100% !important;
+
+        margin-top:18px !important;
+    }
+
+    .small-btn,
+    .big-btn,
+    .table-btn,
+    .checkin-btn,
+    .history-btn,
+    .edit-btn,
+    .delete-btn{
+
+        width:100% !important;
+
+        min-height:56px !important;
+
+        font-size:18px !important;
+
+        border-radius:16px !important;
+
+        display:flex !important;
+
+        align-items:center !important;
+
+        justify-content:center !important;
+
+        margin:0 !important;
+    }
+
+    .table-info{
+
+        font-size:18px !important;
+
+        line-height:1.7 !important;
+    }
+
+    /* =====================================
+       FILTERS
+    ===================================== */
+
+    .filter-row,
+    .top-actions,
+    .month-filter-box,
+    .dh-filter-box,
+    .filter-box{
+
+        display:flex !important;
+
+        flex-direction:column !important;
+
+        gap:12px !important;
+
+        align-items:stretch !important;
+    }
+
+    .filter-select,
+    .search-bar,
+    input,
+    select{
+
+        width:100% !important;
+    }
+
+    /* =====================================
+       BUTTONS
+    ===================================== */
+
+    .btn-green,
+    .btn-red,
+    .green-btn,
+    .red-btn,
+    .neon-btn,
+    .login-btn{
+
+        width:100% !important;
+
+        min-height:52px !important;
+
+        font-size:16px !important;
+    }
+
+    /* =====================================
+       POPUP FIX
+    ===================================== */
+
+    .popup,
+    .modal,
+    .popup-overlay{
+
+        position:fixed !important;
+
+        inset:0 !important;
+
+        overflow-y:auto !important;
+
+        overflow-x:hidden !important;
+
+        padding:14px !important;
+
+        align-items:flex-start !important;
+
+        z-index:9999 !important;
+    }
+
+    .popup-box,
+    .popup-card,
+    .popup-content,
+    .modal-content,
+    .history-popup,
+    .table-history-popup,
+    .day-history-popup{
+
+        width:95% !important;
+
+        max-width:95% !important;
+
+        margin:20px auto !important;
+
+        padding:18px !important;
+
+        border-radius:22px !important;
+
+        max-height:85vh !important;
+
+        overflow-y:auto !important;
+
+        overflow-x:auto !important;
+    }
+
+    .popup-actions,
+    .history-actions{
+
+        display:flex !important;
+
+        flex-direction:column !important;
+
+        gap:12px !important;
+
+        margin-top:18px !important;
+    }
+
+    .popup-actions button,
+    .history-actions button{
+
+        width:100% !important;
+
+        min-height:52px !important;
+    }
+
+    /* =====================================
+       HISTORY TABLE FIX
+    ===================================== */
+
+    .history-container,
+    .day-history-container,
+    .table-history-container,
+    .report-table-wrapper,
+    .users-table-wrapper{
+
+        width:100% !important;
+
+        overflow-x:auto !important;
+
+        -webkit-overflow-scrolling:touch;
+    }
+
+    .history-table,
+    .day-history-table,
+    .table-history-table,
+    .summary-table,
+    .users-table,
+    .exp-table,
+    .inv-table,
+    .neon-table{
+
+        width:100% !important;
+
+        min-width:700px !important;
+
+        border-collapse:collapse !important;
+    }
+
+    .history-table th,
+    .history-table td,
+    .day-history-table th,
+    .day-history-table td,
+    .table-history-table th,
+    .table-history-table td,
+    .summary-table th,
+    .summary-table td,
+    .users-table th,
+    .users-table td,
+    .exp-table th,
+    .exp-table td,
+    .inv-table th,
+    .inv-table td{
+
+        white-space:nowrap !important;
+
+        font-size:12px !important;
+
+        padding:8px !important;
+    }
+
+    table{
+
+        font-size:13px !important;
+    }
+
+    /* =====================================
+       REPORT PAGE
+    ===================================== */
+
+    .report-container{
+
+        display:flex !important;
+
+        flex-direction:column !important;
+
+        gap:20px !important;
+    }
+
+    .report-sidebar{
+
+        width:100% !important;
+
+        height:auto !important;
+    }
+
+    .report-content{
+
+        width:100% !important;
+    }
+
+    /* =====================================
+       LOGIN PAGE
+    ===================================== */
+
+    .login-box{
+
+        width:92% !important;
+
+        padding:24px 18px !important;
+    }
+
+    .login-title{
+
+        font-size:24px !important;
+    }
+
+    .login-input{
+
+        width:100% !important;
+
+        height:50px !important;
+
+        font-size:16px !important;
+    }
+
+    /* =====================================
+       SETTINGS
+    ===================================== */
+
+    .settings-container{
+
+        width:92% !important;
+
+        padding:20px !important;
+    }
+
+}
+
+/* =====================================================
+   FINAL HISTORY POPUP FIX
+===================================================== */
+
+@media screen and (max-width:768px){
+
+    #historyPopup,
+    #dayHistoryPopup,
+    #tableHistoryPopup,
+    #shiftSummaryPopup{
+
+        overflow-y:auto !important;
+        overflow-x:hidden !important;
+
+        align-items:flex-start !important;
+
+        padding:10px !important;
+    }
+
+    #historyPopup .popup-box,
+    #dayHistoryPopup .popup-box,
+    #tableHistoryPopup .popup-box,
+    #shiftSummaryPopup .popup-box{
+
+        width:98% !important;
+        max-width:98% !important;
+
+        margin-top:15px !important;
+
+        max-height:92vh !important;
+
+        overflow-y:auto !important;
+        overflow-x:visible !important;
+
+        padding:14px !important;
+
+        border-radius:16px !important;
+    }
+
+    .table-mobile-wrapper{
+
+        width:100% !important;
+
+        overflow-x:scroll !important;
+        overflow-y:hidden !important;
+
+        -webkit-overflow-scrolling:touch !important;
+
+        display:block !important;
+
+        border-radius:12px !important;
+    }
+
+    .table-mobile-wrapper table{
+
+        width:max-content !important;
+
+        min-width:1100px !important;
+
+        border-collapse:collapse !important;
+    }
+
+    .table-mobile-wrapper th,
+    .table-mobile-wrapper td{
+
+        white-space:nowrap !important;
+
+        padding:8px !important;
+
+        font-size:12px !important;
+    }
+
+    #historyPopup .popup-buttons,
+    #dayHistoryPopup .popup-buttons,
+    #tableHistoryPopup .popup-buttons,
+    #shiftSummaryPopup .popup-buttons{
+
+        display:flex !important;
+
+        flex-direction:column !important;
+
+        gap:10px !important;
+    }
+
+    #historyPopup button,
+    #dayHistoryPopup button,
+    #tableHistoryPopup button,
+    #shiftSummaryPopup button{
+
+        width:100% !important;
+
+        min-height:48px !important;
+    }
+
+}
+
+
+/* =====================================================
+   FINAL SUMMARY DATA FIX
+===================================================== */
+
+@media screen and (max-width:768px){
+
+    /* DAY HISTORY TABLES */
+
+    #dayHistoryPopup table,
+    #tableHistoryPopup table,
+    #historyPopup table,
+    #shiftSummaryPopup table{
+
+        display:table !important;
+
+        width:max-content !important;
+
+        min-width:1100px !important;
+
+        border-collapse:collapse !important;
+    }
+
+    #dayHistoryPopup tbody,
+    #tableHistoryPopup tbody,
+    #historyPopup tbody,
+    #shiftSummaryPopup tbody{
+
+        display:table-row-group !important;
+    }
+
+    #dayHistoryPopup tr,
+    #tableHistoryPopup tr,
+    #historyPopup tr,
+    #shiftSummaryPopup tr{
+
+        display:table-row !important;
+    }
+
+    #dayHistoryPopup td,
+    #dayHistoryPopup th,
+    #tableHistoryPopup td,
+    #tableHistoryPopup th,
+    #historyPopup td,
+    #historyPopup th,
+    #shiftSummaryPopup td,
+    #shiftSummaryPopup th{
+
+        display:table-cell !important;
+
+        white-space:nowrap !important;
+
+        font-size:12px !important;
+
+        padding:10px !important;
+
+        visibility:visible !important;
+    }
+
+    /* FORCE HORIZONTAL SCROLL */
+
+    .table-mobile-wrapper{
+
+        overflow-x:auto !important;
+
+        overflow-y:hidden !important;
+
+        display:block !important;
+
+        width:100% !important;
+    }
+
+}
+
+/* =========================================
+   FINAL MOBILE HISTORY FIX
+========================================= */
+
+@media screen and (max-width:768px){
+
+    #dayHistoryPopup .popup-box,
+    #tableHistoryPopup .popup-box,
+    #shiftSummaryPopup .popup-box,
+    #historyPopup .popup-box{
+
+        width:98% !important;
+        max-width:98% !important;
+
+        padding:12px !important;
+
+        overflow-x:auto !important;
+        overflow-y:auto !important;
+
+        max-height:90vh !important;
+    }
+
+    #dayHistoryPopup table,
+    #tableHistoryPopup table,
+    #shiftSummaryPopup table,
+    #historyPopup table{
+
+        width:max-content !important;
+        min-width:1200px !important;
+
+        border-collapse:collapse !important;
+    }
+
+    #dayHistoryPopup th,
+    #dayHistoryPopup td,
+    #tableHistoryPopup th,
+    #tableHistoryPopup td,
+    #shiftSummaryPopup th,
+    #shiftSummaryPopup td,
+    #historyPopup th,
+    #historyPopup td{
+
+        white-space:nowrap !important;
+
+        font-size:13px !important;
+
+        padding:10px !important;
+
+        display:table-cell !important;
+    }
+
+}
