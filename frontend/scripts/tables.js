@@ -556,7 +556,7 @@ sortedTables.forEach(t => {
 ${t.name}
 
 <div class="room-badge">
-${t.tableType?.toUpperCase() || "SINGLE"}
+${t.tableType === "room" ? "ROOM" : "TABLE"}
 </div>
 
 </div>
@@ -736,26 +736,6 @@ const table =
 tables.find(t => String(t.id) === String(id));
 
 if (!table) return;
-
-if (table.tableType !== "room") {
-
-    if (
-        type === "frame" &&
-        Number(rate) === 100
-    ) {
-
-        table.tableType = "single";
-    }
-
-    else if (
-        type === "frame" &&
-        Number(rate) === 200
-    ) {
-
-        table.tableType = "double";
-    }
-
-}
 
 changeRate(id, type, rate);
 }
