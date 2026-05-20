@@ -488,10 +488,16 @@ document.getElementById("createTableBtn").onclick = async () => {
 try {
 
     const tableData = {
-        table_id: name,
-        frame_rate: Number(frame) || 8,
-        century_rate: Number(cen) || 10,
-        branch: BRANCH,
+    table_id: name,
+
+    table_type:
+    document.getElementById("tableTypeInput").value,
+
+    frame_rate: Number(frame) || 8,
+
+    century_rate: Number(cen) || 10,
+
+    branch: BRANCH,
         created_at: new Date().toISOString()
     };
 
@@ -830,10 +836,11 @@ let selectedValue;
 
 if (t.tableType === "room") {
 
-    selectedValue =
-    `room-${t.frameRate}`;
+    selectedValue = currentSelected
+    ? currentSelected.value
+    : `frame-10`;
 
-} else {
+}else {
 
     selectedValue = currentSelected
     ? currentSelected.value
@@ -954,10 +961,11 @@ let selectedValue;
 
 if (t.tableType === "room") {
 
-    selectedValue =
-    `room-${t.frameRate}`;
+    selectedValue = currentSelected
+    ? currentSelected.value
+    : `frame-10`;
 
-} else {
+}else {
 
     selectedValue = currentSelected
     ? currentSelected.value
