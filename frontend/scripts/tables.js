@@ -630,11 +630,11 @@ Frame (Double) - 200 / 30min
 
 </option>
 
-<option value="century-${t.centuryRate}"
+<option value="century-8"
 ${(t.selectedPlayType || "frame") === "century"
 ? "selected" : ""}>
 
-Century - ${t.centuryRate} / min
+Century - 8 / min
 
 </option>
 
