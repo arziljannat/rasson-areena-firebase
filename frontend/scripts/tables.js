@@ -67,8 +67,11 @@ async function autoRefreshUI() {
     renderTables();
 }
 
-const BRANCH = (localStorage.getItem("branch") || "").toLowerCase();
-const ROLE = localStorage.getItem("role"); // admin / staff
+const BRANCH =
+(localStorage.getItem("branch") || "rasson1")
+.toLowerCase();
+
+console.log("🔥 ACTIVE BRANCH:", BRANCH);const ROLE = localStorage.getItem("role"); // admin / staff
 let inventoryItems = [];
 
 // 🔥 HELPER FUNCTIONS (ADD AT TOP)
@@ -478,12 +481,37 @@ document.getElementById("createTableBtn").onclick = async () => {
 
         console.log("SAVING TO FIREBASE...");
 
-        const result = await addDoc(collection(window.db, "tables"), {
-            table_id: name,
-            frame_rate: Number(frame) || 8,
-            century_rate: Number(cen) || 10,
-            branch: BRANCH
-        });
+try {
+
+    const tableData = {
+        table_id: name,
+        frame_rate: Number(frame) || 8,
+        century_rate: Number(cen) || 10,
+        branch: BRANCH,
+        created_at: new Date().toISOString()
+    };
+
+    console.log("🔥 SENDING DATA:", tableData);
+
+    const result = await addDoc(
+        collection(window.db, "tables"),
+        tableData
+    );
+
+    console.log("✅ FIREBASE SAVE SUCCESS");
+    console.log("✅ DOC ID:", result.id);
+
+    alert("Table saved successfully ✅");
+
+} catch (firebaseError) {
+
+    console.error("❌ FIREBASE FULL ERROR:", firebaseError);
+
+    alert(
+        firebaseError.message ||
+        "Firebase save failed ❌"
+    );
+}
 
         console.log("FIREBASE SAVE SUCCESS");
         console.log("DOC ID:", result.id);
