@@ -251,7 +251,8 @@ function listenTablesRealtime() {
 
             playType: t.play_type || "frame",
 
-            tableType: t.table_type || "single",
+tableType: t.table_type || "table",
+
 
 selectedPlayType: t.play_type || "frame",
 
@@ -439,20 +440,15 @@ if (tableTypeInput) {
                 "frameRateInput"
             );
 
-            if (type === "single") {
+if (type === "table") {
 
-                frameInput.value = 100;
-            }
+    frameInput.value = 100;
+}
 
-            else if (type === "double") {
+else if (type === "room") {
 
-                frameInput.value = 200;
-            }
-
-            else if (type === "room") {
-
-                frameInput.value = 10;
-            }
+    frameInput.value = 10;
+}
 
         }
     );
@@ -556,7 +552,7 @@ sortedTables.forEach(t => {
 ${t.name}
 
 <div class="room-badge">
-${t.tableType === "room" ? "ROOM" : "TABLE"}
+${t.tableType === "room" ? "ROOM" : ""}
 </div>
 
 </div>
@@ -1037,10 +1033,7 @@ minutes * (t.selectedRate || 10);
         let frameMinutes =
         Math.floor(t.playSeconds / 60);
 
-        let frameRate =
-        t.tableType === "double"
-        ? 200
-        : 100;
+let frameRate = 100;
 
         let frameCount =
         Math.floor(frameMinutes / 35) + 1;
@@ -1603,8 +1596,8 @@ function editTable(id) {
     document.getElementById("editTableName").value = t.name;
     document.getElementById("editFrameRate").value = t.frameRate;
     document.getElementById("editCenturyRate").value = t.centuryRate;
-    document.getElementById("editTableType").value =
-t.tableType || "single";
+document.getElementById("editTableType").value =
+t.tableType || "table";
 
     document.getElementById("editTablePopup").classList.remove("hidden");
 
