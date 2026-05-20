@@ -23,6 +23,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
+    if (!window.currentDayId) {
+    window.currentDayId = "1";
+}
+
 console.log("🔥 DASHBOARD CURRENT DAY:", window.currentDayId);
 
 await loadOperationalDays();
