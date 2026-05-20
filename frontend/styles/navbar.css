@@ -118,14 +118,44 @@
 }
 
 /* Branch Dropdown */
-.nav-select {
-    background: rgba(0,0,0,0.5);
+.nav-select{
+
+    background: rgba(0,0,0,0.75);
+
     border: 2px solid #00ff66;
-    padding: 8px 12px;
-    color: #00ff66;
-    border-radius: 8px;
-    font-weight: 600;
+
+    color: #ffffff;
+
+    height: 42px;
+
+    min-width: 110px;
+
+    padding: 0 12px;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
     cursor: pointer;
+
+    outline: none;
+
+    box-shadow:
+        0 0 10px rgba(0,255,100,0.5);
+
+    transition: 0.3s ease;
+
+    text-align: center;
+}
+
+.nav-select:hover{
+
+    box-shadow:
+        0 0 18px rgba(0,255,100,0.9);
+
+    transform: translateY(-2px);
 }
 
 /* Logout Button */
