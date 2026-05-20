@@ -561,25 +561,67 @@ ${t.tableType?.toUpperCase() || "SINGLE"}
 
 </div>
 
-<div class="rate-selector"
-${t.tableType === "room"
-? 'style="display:none;"'
-: ""}
->
+<div class="rate-selector">
+
 <select onchange="handleRateChange('${t.id}', this)">
 
-<option value="frame-${t.frameRate}" 
-${(t.selectedPlayType || "frame") === "frame" ? "selected" : ""}>
-Frame (${t.frameRate})
+${t.tableType !== "room" ? `
+
+<option value="frame-100"
+${(t.selectedPlayType || "frame") === "frame"
+&& (t.selectedRate || 100) == 100
+? "selected" : ""}>
+
+Frame (Single) - 100 / 30min
+
 </option>
 
-<option value="century-${t.centuryRate}" 
-${(t.selectedPlayType || "frame") === "century" ? "selected" : ""}>
-Century (${t.centuryRate})
+<option value="frame-200"
+${(t.selectedPlayType || "frame") === "frame"
+&& (t.selectedRate || 100) == 200
+? "selected" : ""}>
+
+Frame (Double) - 200 / 30min
+
 </option>
+
+<option value="century-${t.centuryRate}"
+${(t.selectedPlayType || "frame") === "century"
+? "selected" : ""}>
+
+Century - ${t.centuryRate} / min
+
+</option>
+
+`
+
+:
+
+`
+
+<option value="frame-10"
+${(t.selectedPlayType || "frame") === "frame"
+? "selected" : ""}>
+
+Frame - 10 / min
+
+</option>
+
+<option value="century-10"
+${(t.selectedPlayType || "frame") === "century"
+? "selected" : ""}>
+
+Century - 10 / min
+
+</option>
+
+`
+
+}
 
 </select>
-            </div>
+
+</div>
 
             <div class="timer-box">
                 <div class="timer-line"><span>Check-in:</span><span id="checkin-${t.id}">--:--:--</span></div>
@@ -690,8 +732,32 @@ function handleRateChange(id, select) {
 
     const [type, rate] = value.split("-");
 
-    changeRate(id, type, rate);
+const table =
+tables.find(t => String(t.id) === String(id));
 
+if (!table) return;
+
+if (table.tableType !== "room") {
+
+    if (
+        type === "frame" &&
+        Number(rate) === 100
+    ) {
+
+        table.tableType = "single";
+    }
+
+    else if (
+        type === "frame" &&
+        Number(rate) === 200
+    ) {
+
+        table.tableType = "double";
+    }
+
+}
+
+changeRate(id, type, rate);
 }
 /******************************************************
  * CHECK-IN FUNCTION
