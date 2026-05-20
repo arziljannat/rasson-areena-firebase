@@ -455,30 +455,48 @@ else if (type === "room") {
 }
 
 
-    document.getElementById("createTableBtn").onclick = async () => {
+// 🔥 CREATE TABLE (INSIDE FUNCTION)
+document.getElementById("createTableBtn").onclick = async () => {
+
+    console.log("ADD TABLE CLICKED");
+
+    try {
 
         let name = document.getElementById("tableNameInput").value.trim();
         let frame = document.getElementById("frameRateInput").value;
         let cen = document.getElementById("centuryRateInput").value;
-        let tableType =
-document.getElementById("tableTypeInput").value;
 
-        if (!name) return alert("Enter table name");
+        console.log("TABLE NAME:", name);
+        console.log("FRAME:", frame);
+        console.log("CENTURY:", cen);
+        console.log("BRANCH:", BRANCH);
 
-        // 🔥 FIREBASE SAVE
-await addDoc(collection(window.db, "tables"), {
-    table_id: name,
-    frame_rate: Number(frame) || 8,
-    century_rate: Number(cen) || 10,
+        if (!name) {
+            alert("Enter table name");
+            return;
+        }
 
-    table_type: tableType,
+        console.log("SAVING TO FIREBASE...");
 
-    branch: BRANCH
-});
+        const result = await addDoc(collection(window.db, "tables"), {
+            table_id: name,
+            frame_rate: Number(frame) || 8,
+            century_rate: Number(cen) || 10,
+            branch: BRANCH
+        });
+
+        console.log("FIREBASE SAVE SUCCESS");
+        console.log("DOC ID:", result.id);
 
         document.getElementById("addTablePopup").classList.add("hidden");
-    };
-}
+
+    } catch (err) {
+
+        console.error("ADD TABLE ERROR:", err);
+        alert(err.message);
+
+    }
+};
 
 /******************************************************
  * CREATE DEFAULT TABLES (FIRST TIME ONLY)
