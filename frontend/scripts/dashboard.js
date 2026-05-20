@@ -23,11 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    console.log("🔥 DASHBOARD CURRENT DAY:", window.currentDayId);
-
-    await loadOperationalDays();
-
-    loadDashboardRealtime();
+console.log("🔥 DASHBOARD CURRENT DAY:", window.currentDayId);
 
     // ✅ MONTH FILTER
 const monthInput = document.getElementById("dashboardMonthFilter");
