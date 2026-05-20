@@ -29,9 +29,6 @@ await loadOperationalDays();
 
 loadDashboardRealtime();
 
-// ✅ MONTH FILTER
-const monthInput = document.getElementById("dashboardMonthFilter");
-
     // ✅ MONTH FILTER
 const monthInput = document.getElementById("dashboardMonthFilter");
 
