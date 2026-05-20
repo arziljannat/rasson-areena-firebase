@@ -497,6 +497,7 @@ document.getElementById("createTableBtn").onclick = async () => {
 
     }
 };
+}
 
 /******************************************************
  * CREATE DEFAULT TABLES (FIRST TIME ONLY)
