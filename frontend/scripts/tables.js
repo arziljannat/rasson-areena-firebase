@@ -1,18 +1,22 @@
-
 import {
   collection,
   addDoc,
   getDocs,
+  getDoc,
+  setDoc,
   updateDoc,
+  deleteDoc,
   doc,
   query,
   where,
+  orderBy,
+  limit,
   onSnapshot,
-  deleteDoc
+  serverTimestamp,
+  increment
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-import { increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
 
 // 🔥 CENTRAL DAY SYSTEM (FIREBASE)
 async function initCurrentDay() {
@@ -512,11 +516,6 @@ try {
         "Firebase save failed ❌"
     );
 }
-
-        console.log("FIREBASE SAVE SUCCESS");
-        console.log("DOC ID:", result.id);
-
-        document.getElementById("addTablePopup").classList.add("hidden");
 
     } catch (err) {
 
@@ -1097,19 +1096,36 @@ minutes * (t.selectedRate || 10);
        SINGLE / DOUBLE FRAME SYSTEM
     ===================================== */
 
+else {
+
+    // 🔥 CENTURY SYSTEM
+    if (t.selectedPlayType === "century") {
+
+        let playedMinutes =
+        Math.ceil(t.playSeconds / 60);
+
+        if (playedMinutes < 1) {
+            playedMinutes = 1;
+        }
+
+        t.liveAmount =
+        playedMinutes * (t.selectedRate || 10);
+    }
+
+    // 🔥 FRAME SYSTEM
     else {
 
         let frameMinutes =
         Math.floor(t.playSeconds / 60);
 
-let frameRate = t.selectedRate || 100;
+        let frameRate =
+        t.selectedRate || 100;
+
         let frameCount =
         Math.floor(frameMinutes / 35) + 1;
 
         t.liveAmount =
         frameCount * frameRate;
-
-        /* GRACE WARNING */
 
         const remaining =
         35 - (frameMinutes % 35);
@@ -1120,8 +1136,6 @@ let frameRate = t.selectedRate || 100;
                 tableBox.classList
                 .add("frame-complete");
             }
-
-            /* VOICE */
 
             if (!t.voicePlayed) {
 
@@ -1140,6 +1154,7 @@ let frameRate = t.selectedRate || 100;
             t.voicePlayed = false;
         }
     }
+}
 
     updateDisplay(id);
 
