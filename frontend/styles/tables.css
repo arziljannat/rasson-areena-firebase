@@ -742,3 +742,68 @@ body * {
     justify-content: center;
 }
 
+/* =========================================
+   FRAME COMPLETE BLINK
+========================================= */
+
+@keyframes tableBlink {
+
+    0% {
+        box-shadow:
+            0 0 10px red,
+            inset 0 0 10px red;
+    }
+
+    50% {
+        box-shadow:
+            0 0 35px yellow,
+            inset 0 0 35px yellow;
+    }
+
+    100% {
+        box-shadow:
+            0 0 10px red,
+            inset 0 0 10px red;
+    }
+}
+
+.frame-complete {
+
+    animation: tableBlink 1s infinite;
+
+    border-color: #ff0000 !important;
+}
+
+/* GRACE TIMER */
+.grace-timer {
+
+    color: #ffcc00 !important;
+
+    font-weight: bold;
+
+    font-size: 18px;
+
+    text-align: center;
+
+    margin-top: 8px;
+}
+
+/* ROOM BADGE */
+.room-badge {
+
+    background: #ff8800;
+
+    color: black;
+
+    padding: 4px 10px;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    display: inline-block;
+
+    margin-top: 6px;
+}

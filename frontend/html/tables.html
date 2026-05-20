@@ -44,6 +44,14 @@
         <label>Century Rate:</label>
         <input id="centuryRateInput" type="number">
 
+        <label>Table Type:</label>
+
+<select id="tableTypeInput">
+    <option value="single">Single</option>
+    <option value="double">Double</option>
+    <option value="room">Room</option>
+</select>
+
         <div class="popup-buttons">
             <button id="createTableBtn" class="neon-btn">Create</button>
             <button id="cancelAddBtn" class="neon-btn red">Cancel</button>
@@ -78,6 +86,14 @@
 
         <label>Century Rate:</label>
         <input id="editCenturyRate" type="number">
+
+        <label>Table Type:</label>
+
+<select id="editTableType">
+    <option value="single">Single</option>
+    <option value="double">Double</option>
+    <option value="room">Room</option>
+</select>
 
         <div class="popup-buttons">
             <button id="saveEditBtn" class="neon-btn">Save</button>
@@ -365,6 +381,6 @@ window.db = db;
 
 console.log("Firebase Connected (Tables) ✅");
 </script>
-    
+    <audio id="tableAlertAudio"></audio>
 </body>
 </html>

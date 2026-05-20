@@ -251,6 +251,8 @@ function listenTablesRealtime() {
 
             playType: t.play_type || "frame",
 
+            tableType: t.table_type || "single",
+
 selectedPlayType: t.play_type || "frame",
 
 selectedRate:
@@ -420,21 +422,63 @@ if (ROLE !== "admin" && ROLE !== "superadmin") {
         document.getElementById("addTablePopup").classList.add("hidden");
     };
 
+    const tableTypeInput =
+document.getElementById("tableTypeInput");
+
+if (tableTypeInput) {
+
+    tableTypeInput.addEventListener(
+        "change",
+        () => {
+
+            const type =
+            tableTypeInput.value;
+
+            const frameInput =
+            document.getElementById(
+                "frameRateInput"
+            );
+
+            if (type === "single") {
+
+                frameInput.value = 100;
+            }
+
+            else if (type === "double") {
+
+                frameInput.value = 200;
+            }
+
+            else if (type === "room") {
+
+                frameInput.value = 10;
+            }
+
+        }
+    );
+}
+
+
     document.getElementById("createTableBtn").onclick = async () => {
 
         let name = document.getElementById("tableNameInput").value.trim();
         let frame = document.getElementById("frameRateInput").value;
         let cen = document.getElementById("centuryRateInput").value;
+        let tableType =
+document.getElementById("tableTypeInput").value;
 
         if (!name) return alert("Enter table name");
 
         // 🔥 FIREBASE SAVE
-        await addDoc(collection(window.db, "tables"), {
-            table_id: name,
-            frame_rate: Number(frame) || 8,
-            century_rate: Number(cen) || 10,
-            branch: BRANCH
-        });
+await addDoc(collection(window.db, "tables"), {
+    table_id: name,
+    frame_rate: Number(frame) || 8,
+    century_rate: Number(cen) || 10,
+
+    table_type: tableType,
+
+    branch: BRANCH
+});
 
         document.getElementById("addTablePopup").classList.add("hidden");
     };
@@ -508,9 +552,20 @@ sortedTables.forEach(t => {
         div.classList.add("table-box");
 
         div.innerHTML = `
-            <div class="table-title">${t.name}</div>
+            <div class="table-title">
+${t.name}
 
-<div class="rate-selector">
+<div class="room-badge">
+${t.tableType?.toUpperCase() || "SINGLE"}
+</div>
+
+</div>
+
+<div class="rate-selector"
+${t.tableType === "room"
+? 'style="display:none;"'
+: ""}
+>
 <select onchange="handleRateChange('${t.id}', this)">
 
 <option value="frame-${t.frameRate}" 
@@ -661,9 +716,19 @@ document.querySelector(
 `select[onchange="handleRateChange('${t.id}', this)"]`
 );
 
-let selectedValue = currentSelected
-? currentSelected.value
-: `frame-${t.frameRate}`;
+let selectedValue;
+
+if (t.tableType === "room") {
+
+    selectedValue =
+    `room-${t.frameRate}`;
+
+} else {
+
+    selectedValue = currentSelected
+    ? currentSelected.value
+    : `frame-${t.frameRate}`;
+}
 
 const [selectedType, selectedRate] =
 selectedValue.split("-");
@@ -775,9 +840,19 @@ document.querySelector(
 `select[onchange="handleRateChange('${t.id}', this)"]`
 );
 
-let selectedValue = currentSelected
-? currentSelected.value
-: `frame-${t.frameRate}`;
+let selectedValue;
+
+if (t.tableType === "room") {
+
+    selectedValue =
+    `room-${t.frameRate}`;
+
+} else {
+
+    selectedValue = currentSelected
+    ? currentSelected.value
+    : `frame-${t.frameRate}`;
+}
 
 const [selectedType, selectedRate] =
 selectedValue.split("-");
@@ -874,34 +949,92 @@ playType: t.selectedPlayType || t.playType,
  * TIMER — (1 SEC = 1 MIN CHARGE FIX)
  ******************************************************/
 function runTimer(id) {
-    let t = tables.find(x => String(x.id) === String(id));
 
-    // 🔥 FREEZE FIX
-    if (!t || !t.isRunning || t.afterCheckout) return;
+    let t =
+    tables.find(x => String(x.id) === String(id));
 
-    t.playSeconds = Math.floor((Date.now() - t.checkinTime) / 1000);
+    if (!t || !t.isRunning || t.afterCheckout)
+        return;
 
-    // FIXED BILLING
-    const rate = t.selectedRate || (
-    t.playType === "century"
-        ? t.centuryRate
-        : t.frameRate
-);
-// 🔥 MINIMUM 10 MINUTES BILLING
-let chargeMinutes = Math.ceil(t.playSeconds / 60);
+    t.playSeconds =
+    Math.floor(
+        (Date.now() - t.checkinTime) / 1000
+    );
 
-// ✅ minimum 10 minutes
-if (chargeMinutes < 10) {
-    chargeMinutes = 10;
-}
+    const tableBox =
+    document.querySelector(
+        `button[onclick="checkIn('${t.id}')"]`
+    )?.closest(".table-box");
 
-let rawAmount = chargeMinutes * rate;
+    /* =====================================
+       ROOM SYSTEM
+    ===================================== */
 
-t.liveAmount = smartRoundAmount(rawAmount);
+    if (t.tableType === "room") {
 
+        let minutes =
+        Math.ceil(t.playSeconds / 60);
+
+        if (minutes < 1)
+            minutes = 1;
+
+        t.liveAmount =
+minutes * (t.selectedRate || 10);
+    }
+
+    /* =====================================
+       SINGLE / DOUBLE FRAME SYSTEM
+    ===================================== */
+
+    else {
+
+        let frameMinutes =
+        Math.floor(t.playSeconds / 60);
+
+        let frameRate =
+        t.tableType === "double"
+        ? 200
+        : 100;
+
+        let frameCount =
+        Math.floor(frameMinutes / 35) + 1;
+
+        t.liveAmount =
+        frameCount * frameRate;
+
+        /* GRACE WARNING */
+
+        const remaining =
+        35 - (frameMinutes % 35);
+
+        if (remaining <= 5) {
+
+            if (tableBox) {
+                tableBox.classList
+                .add("frame-complete");
+            }
+
+            /* VOICE */
+
+            if (!t.voicePlayed) {
+
+                playTableVoice(t.name);
+
+                t.voicePlayed = true;
+            }
+
+        } else {
+
+            if (tableBox) {
+                tableBox.classList
+                .remove("frame-complete");
+            }
+
+            t.voicePlayed = false;
+        }
+    }
 
     updateDisplay(id);
-     
 
     setTimeout(() => runTimer(id), 1000);
 }
@@ -1424,6 +1557,8 @@ function editTable(id) {
     document.getElementById("editTableName").value = t.name;
     document.getElementById("editFrameRate").value = t.frameRate;
     document.getElementById("editCenturyRate").value = t.centuryRate;
+    document.getElementById("editTableType").value =
+t.tableType || "single";
 
     document.getElementById("editTablePopup").classList.remove("hidden");
 
@@ -1439,12 +1574,15 @@ async function updateTable() {
     t.name = document.getElementById("editTableName").value.trim();
     t.frameRate = Number(document.getElementById("editFrameRate").value);
     t.centuryRate = Number(document.getElementById("editCenturyRate").value);
+    t.tableType = document.getElementById("editTableType").value;
 
     // 🔥 FIREBASE UPDATE
     await updateDoc(doc(window.db, "tables", editTargetId), {
         table_id: t.name,
         frame_rate: t.frameRate,
-        century_rate: t.centuryRate
+        century_rate: t.centuryRate,
+
+        table_type: t.tableType
     });
 
      
@@ -4443,4 +4581,28 @@ console.log("🔥 HISTORY:", h);
         alert("Delete failed ❌");
     }
 }
+
+function playTableVoice(tableName) {
+
+    if (!window.speechSynthesis)
+        return;
+
+    window.speechSynthesis.cancel();
+
+    const speech =
+    new SpeechSynthesisUtterance(
+        `${tableName} frame completed`
+    );
+
+    speech.lang = "en-US";
+
+    speech.rate = 0.9;
+
+    speech.pitch = 1;
+
+    speech.volume = 1;
+
+    window.speechSynthesis.speak(speech);
+}
+
 //fix deployment issues
