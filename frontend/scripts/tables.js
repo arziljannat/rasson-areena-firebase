@@ -406,7 +406,7 @@ function bindAddTablePopup() {
 
     const addBtn = document.getElementById("addTableBtn");
 
-if (ROLE !== "admin") {
+if (ROLE !== "admin" && ROLE !== "superadmin") {
     addBtn.disabled = true;
     addBtn.style.opacity = "0.4";
     addBtn.style.cursor = "not-allowed";
@@ -560,7 +560,7 @@ Century (${t.centuryRate})
         box.appendChild(div);
 
         // 🔥 ROLE CONTROL (IMPORTANT)
-if (ROLE !== "admin") {
+if (ROLE !== "admin" && ROLE !== "superadmin") {
 
     let editBtn = document.getElementById(`editBtn-${t.id}`);
     let delBtn = document.getElementById(`deleteBtn-${t.id}`);
@@ -1414,7 +1414,7 @@ async function removeItem(tableId, itemId, price, name) {
  * EDIT TABLE POPUP
  ******************************************************/
 function editTable(id) {
-    if (ROLE !== "admin") {
+    if (ROLE !== "admin" && ROLE !== "superadmin") {
         alert("Only admin can edit ❌");
         return;
     }
@@ -1457,7 +1457,7 @@ async function updateTable() {
  * DELETE TABLE POPUP
  ******************************************************/
 function deleteTableOpen(id) {
-    if (ROLE !== "admin") {
+    if (ROLE !== "admin" && ROLE !== "superadmin") {
         alert("Only admin can delete ❌");
         return;
     }
@@ -4346,7 +4346,7 @@ playType:
  ******************************************************/
 async function softDeleteSession(tableId, historyIndex) {
 
-    if (ROLE !== "admin") {
+   if (ROLE !== "admin" && ROLE !== "superadmin") {
         alert("Only admin can delete ❌");
         return;
     }
