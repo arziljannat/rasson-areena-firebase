@@ -71,6 +71,7 @@ const branchInput = document.getElementById("branchCode").value.trim().toLowerCa
         // ==========================
         localStorage.setItem("username", userData.username);
         localStorage.setItem("role", userData.role);
+        localStorage.setItem("branch", "areena");
         localStorage.setItem(
     "branch",
     String(userData.branch || "")
