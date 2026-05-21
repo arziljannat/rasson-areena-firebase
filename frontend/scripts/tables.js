@@ -4943,7 +4943,7 @@ function unlockAudio() {
     if (audioUnlocked) return;
 
 warningAudio = new Audio(
-"/assets/audio/warning1.mp3"
+"/assets/audio/warning.mp3"
 );
     warningAudio.volume = 1;
 
