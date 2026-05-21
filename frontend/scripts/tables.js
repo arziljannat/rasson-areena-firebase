@@ -4916,7 +4916,7 @@ function unlockAudio() {
     if (audioUnlocked) return;
 
 warningAudio = new Audio(
-"../assets/audio/bible images-tornado-warning-siren-2-385672.mp3"
+"../assets/audio/warning.mp3"
 );
     warningAudio.volume = 1;
 
