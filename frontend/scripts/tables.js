@@ -4834,13 +4834,33 @@ function playWarningBeep() {
 
     try {
 
-        if (!warningAudio) return;
+        // 🔥 user interaction check
+        if (!window.userInteracted) {
+            console.log("⛔ User interaction missing");
+            return;
+        }
 
+        // 🔥 create audio if missing
+        if (!warningAudio) {
+
+            warningAudio = new Audio(
+                "/assets/audio/warning.mp3"
+            );
+
+            warningAudio.volume = 1;
+        }
+
+        // 🔥 reset audio
         warningAudio.pause();
 
         warningAudio.currentTime = 0;
 
-        warningAudio.play()
+        // 🔥 clone for repeat play
+        const beep = warningAudio.cloneNode();
+
+        beep.volume = 1;
+
+        beep.play()
             .then(() => {
                 console.log("🔊 Warning beep played");
             })
@@ -4853,11 +4873,18 @@ function playWarningBeep() {
         console.log("Audio error:", err);
     }
 }
-
 // 🔥 USER INTERACTION ENABLE
 window.userInteracted = false;
 
 document.addEventListener("click", () => {
+
+    window.userInteracted = true;
+
+    unlockAudio();
+
+}, { once: true });
+
+document.addEventListener("touchstart", () => {
 
     window.userInteracted = true;
 
