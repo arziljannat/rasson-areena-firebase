@@ -603,8 +603,16 @@ sortedTables.forEach(t => {
         div.classList.add("table-box");
 
         div.innerHTML = `
-            <div class="table-title">
+<div class="table-title">
+
 ${t.name}
+
+<div
+id="warning-${t.id}"
+class="table-warning hidden"
+>
+⚠️ GRACE TIME
+</div>
 
 <div class="room-badge">
 ${t.tableType === "room" ? "ROOM" : ""}
@@ -1138,29 +1146,45 @@ else {
         const remaining =
         35 - (frameMinutes % 35);
 
-        if (remaining <= 5) {
+if (remaining <= 5) {
 
-            if (tableBox) {
-                tableBox.classList
-                .add("frame-complete");
-            }
+    // 🔥 RED WARNING BORDER
+    if (tableBox) {
 
-            if (!t.voicePlayed) {
+        tableBox.classList
+        .add("frame-complete");
+    }
 
-                playTableVoice(t.name);
+    // 🔥 FIRST VOICE ONLY ONCE
+    if (!t.voicePlayed) {
 
-                t.voicePlayed = true;
-            }
+        playTableVoice(t.name);
 
-        } else {
+        t.voicePlayed = true;
+    }
 
-            if (tableBox) {
-                tableBox.classList
-                .remove("frame-complete");
-            }
+    // 🔥 EVERY 5 SECOND WARNING SOUND
+    if (t.playSeconds % 5 === 0) {
 
-            t.voicePlayed = false;
-        }
+        playWarningBeep();
+    }
+
+    // 🔥 SHOW WARNING TEXT
+    showTableWarning(t.id);
+
+} else {
+
+    if (tableBox) {
+
+        tableBox.classList
+        .remove("frame-complete");
+    }
+
+    t.voicePlayed = false;
+
+    // 🔥 HIDE WARNING
+    hideTableWarning(t.id);
+}
     }
 }
 
@@ -4715,27 +4739,46 @@ console.log("🔥 HISTORY:", h);
     }
 }
 
-function playTableVoice(tableName) {
+function playWarningBeep() {
 
-    if (!window.speechSynthesis)
-        return;
+    try {
 
-    window.speechSynthesis.cancel();
+        const audio = new Audio(
+            "https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
+        );
 
-    const speech =
-    new SpeechSynthesisUtterance(
-        `${tableName} frame completed`
+        audio.volume = 1;
+
+        audio.play();
+
+    } catch (err) {
+
+        console.log(err);
+    }
+}
+
+function showTableWarning(id) {
+
+    const el =
+    document.getElementById(
+        `warning-${id}`
     );
 
-    speech.lang = "en-US";
+    if (el) {
+        el.classList.remove("hidden");
+    }
+}
 
-    speech.rate = 0.9;
+function hideTableWarning(id) {
 
-    speech.pitch = 1;
+    const el =
+    document.getElementById(
+        `warning-${id}`
+    );
 
-    speech.volume = 1;
-
-    window.speechSynthesis.speak(speech);
+    if (el) {
+        el.classList.add("hidden");
+    }
 }
 
 //fix deployment issues
