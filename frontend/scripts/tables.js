@@ -1150,60 +1150,91 @@ else {
     // 🔥 FRAME SYSTEM
     else {
 
-        let frameMinutes =
-        Math.floor(t.playSeconds / 60);
+// 🔥 FRAME SYSTEM (30 MIN + 5 MIN GRACE)
 
-        let frameRate =
-        t.selectedRate || 100;
+let playedMinutes =
+Math.floor(t.playSeconds / 60);
 
-  let frameCount =
-Math.floor(frameMinutes / 5) + 1;
+let frameRate =
+t.selectedRate || 100;
 
-        t.liveAmount =
-        frameCount * frameRate;
+// 🔥 1 FRAME = 35 MIN
+// 30 MIN PLAY
+// 5 MIN GRACE
 
-const remaining =
-5 - (frameMinutes % 5);
+let cycleMinutes = 35;
 
-// 🔥 ONLY AFTER 5 MINUTES
-if (frameMinutes > 0 && remaining <= 1) {
+// 🔥 FRAME COUNT
+let frameCount =
+Math.floor(playedMinutes / cycleMinutes) + 1;
 
-    // 🔥 RED WARNING BORDER
+t.liveAmount =
+frameCount * frameRate;
+
+// 🔥 CURRENT CYCLE
+let currentCycleMinute =
+playedMinutes % cycleMinutes;
+
+// 🔥 GRACE TIME
+let inGraceTime =
+currentCycleMinute >= 30;
+
+// 🔥 AUTO NEXT FRAME
+if (currentCycleMinute >= 35) {
+
+    frameCount =
+    Math.floor(
+        playedMinutes / cycleMinutes
+    ) + 1;
+
+    t.liveAmount =
+    frameCount * frameRate;
+}
+
+// 🔥 WARNING SYSTEM
+if (inGraceTime) {
+
+    // 🔥 RED BORDER
     if (tableBox) {
 
         tableBox.classList
         .add("frame-complete");
     }
 
-    // 🔥 FIRST VOICE ONLY ONCE
+    // 🔥 WARNING TEXT
+    showTableWarning(t.id);
+
+    // 🔥 VOICE ONLY ONCE
     if (!t.voicePlayed) {
 
-        playTableVoice(t.name);
+        playTableVoice(
+            `${t.name} grace time started`
+        );
 
         t.voicePlayed = true;
     }
 
-    // 🔥 EVERY 5 SECOND WARNING SOUND
-    if (t.playSeconds % 5 === 0) {
+    // 🔥 FIRE ALARM EVERY 5 SEC
+    if (
+        t.playSeconds > 0 &&
+        t.playSeconds % 5 === 0
+    ) {
 
         playWarningBeep();
     }
 
-    // 🔥 SHOW WARNING TEXT
-    showTableWarning(t.id);
-
 } else {
 
+    // 🔥 REMOVE WARNING
     if (tableBox) {
 
         tableBox.classList
         .remove("frame-complete");
     }
 
-    t.voicePlayed = false;
-
-    // 🔥 HIDE WARNING
     hideTableWarning(t.id);
+
+    t.voicePlayed = false;
 }
     }
 }
@@ -4768,8 +4799,17 @@ function playWarningBeep() {
             return;
         }
 
-        const audio = new Audio(
-"https://actions.google.com/sounds/v1/alarms/fire_alarm.ogg"        );
+const audio = new Audio(
+"https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"
+);
+
+audio.volume = 3;
+
+audio.playbackRate = 1;
+
+audio.play().catch(err => {
+    console.log("Beep blocked:", err);
+});
 
         audio.volume = 1;
 
