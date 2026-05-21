@@ -1219,7 +1219,7 @@ if (
     document.createElement("img");
 
     gif.src =
-    "../assets/alert-gif.gif";
+    "/assets/alert.gif";
 
     gif.className =
     "alert-gif";
@@ -4916,7 +4916,7 @@ function unlockAudio() {
     if (audioUnlocked) return;
 
 warningAudio = new Audio(
-"../assets/audio/warning.mp3"
+"/assets/audio/warning.mp3"
 );
     warningAudio.volume = 1;
 
