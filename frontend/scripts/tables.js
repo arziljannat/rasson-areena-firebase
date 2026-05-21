@@ -1164,7 +1164,9 @@ Math.floor(frameMinutes / 5) + 1;
 
 const remaining =
 5 - (frameMinutes % 5);
-if (remaining <= 5) {
+
+// 🔥 ONLY AFTER 5 MINUTES
+if (frameMinutes > 0 && remaining <= 1) {
 
     // 🔥 RED WARNING BORDER
     if (tableBox) {
@@ -4767,8 +4769,7 @@ function playWarningBeep() {
         }
 
         const audio = new Audio(
-            "https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
-        );
+"https://actions.google.com/sounds/v1/alarms/fire_alarm.ogg"        );
 
         audio.volume = 1;
 
