@@ -4799,4 +4799,25 @@ function hideTableWarning(id) {
     }
 }
 
+function playTableVoice(tableName) {
+
+    try {
+
+        const msg =
+        new SpeechSynthesisUtterance(
+            `${tableName} frame completed`
+        );
+
+        msg.volume = 1;
+        msg.rate = 1;
+        msg.pitch = 1;
+
+        window.speechSynthesis.speak(msg);
+
+    } catch (err) {
+
+        console.log("Voice error:", err);
+    }
+}
+
 //fix deployment issues
