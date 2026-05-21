@@ -602,6 +602,7 @@ sortedTables.forEach(t => {
 
         const div = document.createElement("div");
         div.classList.add("table-box");
+div.setAttribute("data-table-id", t.id);
 
         div.innerHTML = `
 <div class="table-title">
@@ -1204,6 +1205,27 @@ if (inGraceTime) {
 
     // 🔥 WARNING TEXT
     showTableWarning(t.id);
+    // 🔥 ALERT GIF SHOW
+const tableCard = document.querySelector(
+`[data-table-id="${t.id}"]`
+);
+
+if (
+    tableCard &&
+    !tableCard.querySelector(".alert-gif")
+) {
+
+    const gif =
+    document.createElement("img");
+
+    gif.src =
+    "../assets/alert-gif.gif";
+
+    gif.className =
+    "alert-gif";
+
+    tableCard.appendChild(gif);
+}
 
     // 🔥 VOICE ONLY ONCE
     if (!t.voicePlayed) {
@@ -1234,6 +1256,23 @@ if (inGraceTime) {
     }
 
     hideTableWarning(t.id);
+    // 🔥 REMOVE ALERT GIF
+const tableCard = document.querySelector(
+`[data-table-id="${t.id}"]`
+);
+
+if (tableCard) {
+
+    const existingGif =
+    tableCard.querySelector(
+        ".alert-gif"
+    );
+
+    if (existingGif) {
+
+        existingGif.remove();
+    }
+}
 
     t.voicePlayed = false;
 }
@@ -4876,9 +4915,7 @@ function unlockAudio() {
 
     if (audioUnlocked) return;
 
-    warningAudio = new Audio(
-        "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3"
-    );
+    warningAudio = new Audio("..assests/audio/bible_images-tornado-warning-siren-2-385672");
 
     warningAudio.volume = 1;
 

@@ -807,3 +807,29 @@ body * {
 
     margin-top: 6px;
 }
+
+.alert-gif {
+    position: absolute;
+    top: -70px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 80px;
+    z-index: 9999;
+    pointer-events: none;
+    animation: bounceAlert 1s infinite;
+}
+
+@keyframes bounceAlert {
+    0% {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    50% {
+        transform: translateX(-50%) translateY(-10px);
+    }
+
+    100% {
+        transform: translateX(-50%) translateY(0);
+    }
+}
