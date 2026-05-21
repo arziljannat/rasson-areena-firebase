@@ -660,6 +660,7 @@ Century - 8 / min
 
 <option value="frame-10"
 ${(t.selectedPlayType || "frame") === "frame"
+&& (t.selectedRate || 10) == 10
 ? "selected" : ""}>
 
 Frame - 10 / min
@@ -668,6 +669,7 @@ Frame - 10 / min
 
 <option value="century-10"
 ${(t.selectedPlayType || "frame") === "century"
+&& (t.selectedRate || 10) == 10
 ? "selected" : ""}>
 
 Century - 10 / min
@@ -1137,15 +1139,14 @@ else {
         let frameRate =
         t.selectedRate || 100;
 
-        let frameCount =
-        Math.floor(frameMinutes / 35) + 1;
+  let frameCount =
+Math.floor(frameMinutes / 5) + 1;
 
         t.liveAmount =
         frameCount * frameRate;
 
-        const remaining =
-        35 - (frameMinutes % 35);
-
+const remaining =
+5 - (frameMinutes % 5);
 if (remaining <= 5) {
 
     // 🔥 RED WARNING BORDER
