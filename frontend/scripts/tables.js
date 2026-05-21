@@ -4761,19 +4761,35 @@ function playWarningBeep() {
 
     try {
 
+        // 🔥 browser interaction check
+        if (!window.userInteracted) {
+            return;
+        }
+
         const audio = new Audio(
             "https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
         );
 
         audio.volume = 1;
 
-        audio.play();
+        audio.play().catch(err => {
+            console.log("Beep blocked:", err);
+        });
 
     } catch (err) {
 
         console.log(err);
     }
 }
+
+// 🔥 USER INTERACTION ENABLE
+window.userInteracted = false;
+
+document.addEventListener("click", () => {
+
+    window.userInteracted = true;
+
+}, { once: true });
 
 function showTableWarning(id) {
 
