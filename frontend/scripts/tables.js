@@ -766,11 +766,23 @@ async function changeRate(id, rateType, value) {
     let table = tables.find(t => String(t.id) === String(id));
     if (!table) return;
 
-table.playType = rateType;
+    table.playType = rateType;
 
-if (rateType === "century") {
-    table.centuryRate = Number(value);
-}
+    // ✅ ROOM FIX
+    if (table.tableType === "room") {
+
+        table.selectedPlayType = rateType;
+        table.selectedRate = Number(value);
+
+    } else {
+
+        if (rateType === "century") {
+            table.centuryRate = Number(value);
+        }
+
+        table.selectedPlayType = rateType;
+        table.selectedRate = Number(value);
+    }
 
     updateDisplay(id);
 
@@ -778,10 +790,15 @@ if (rateType === "century") {
         updateButtons(id, "running");
     }
 
-    // 🔥 SAVE TO FIREBASE
+    // 🔥 FIREBASE SAVE
     await updateDoc(doc(window.db, "tables", id), {
-        play_type: table.playType,
+
+        play_type: table.selectedPlayType,
+
+        selected_rate: table.selectedRate,
+
         frame_rate: table.frameRate,
+
         century_rate: table.centuryRate
     });
 }
