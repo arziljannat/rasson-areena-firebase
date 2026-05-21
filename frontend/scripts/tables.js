@@ -15,7 +15,8 @@ import {
   serverTimestamp,
   increment
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
+let warningAudio = null;
+let audioUnlocked = false;
 
 
 // 🔥 CENTRAL DAY SYSTEM (FIREBASE)
@@ -4786,40 +4787,31 @@ console.log("🔥 HISTORY:", h);
 
         console.error(err);
 
-        alert("Delete failed ❌");
-    }
-}
+   }
+}        alert("Delete failed ❌");
+ 
 
 function playWarningBeep() {
 
     try {
 
-        // 🔥 browser interaction check
-        if (!window.userInteracted) {
-            return;
-        }
+        if (!warningAudio) return;
 
-const audio = new Audio(
-"https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"
-);
+        warningAudio.pause();
 
-audio.volume = 3;
+        warningAudio.currentTime = 0;
 
-audio.playbackRate = 1;
-
-audio.play().catch(err => {
-    console.log("Beep blocked:", err);
-});
-
-        audio.volume = 1;
-
-        audio.play().catch(err => {
-            console.log("Beep blocked:", err);
-        });
+        warningAudio.play()
+            .then(() => {
+                console.log("🔊 Warning beep played");
+            })
+            .catch(err => {
+                console.log("Beep blocked:", err);
+            });
 
     } catch (err) {
 
-        console.log(err);
+        console.log("Audio error:", err);
     }
 }
 
@@ -4829,6 +4821,8 @@ window.userInteracted = false;
 document.addEventListener("click", () => {
 
     window.userInteracted = true;
+
+    unlockAudio();
 
 }, { once: true });
 
@@ -4877,4 +4871,34 @@ function playTableVoice(tableName) {
     }
 }
 
+
+function unlockAudio() {
+
+    if (audioUnlocked) return;
+
+    warningAudio = new Audio(
+        "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3"
+    );
+
+    warningAudio.volume = 1;
+
+    // 🔥 preload
+    warningAudio.load();
+
+    // 🔥 silent play for unlock
+    warningAudio.play()
+        .then(() => {
+
+            warningAudio.pause();
+            warningAudio.currentTime = 0;
+
+            audioUnlocked = true;
+
+            console.log("✅ Audio unlocked");
+
+        })
+        .catch(err => {
+            console.log("Audio unlock failed:", err);
+        });
+}
 //fix deployment issues
