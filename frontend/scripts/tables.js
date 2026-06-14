@@ -1175,22 +1175,24 @@ t.selectedRate || 100;
 // 25 MIN PLAY
 // 5 MIN GRACE
 
-let cycleMinutes = 25;
+// 30 minute frame
+let frameMinutes = 30;
 
-// 🔥 FRAME COUNT
+// frame count
 let frameCount =
-Math.floor(playedMinutes / cycleMinutes) + 1;
+Math.floor(playedMinutes / frameMinutes) + 1;
 
+// amount
 t.liveAmount =
 frameCount * frameRate;
 
-// 🔥 CURRENT CYCLE
+// current frame minute
 let currentCycleMinute =
-playedMinutes % cycleMinutes;
+playedMinutes % frameMinutes;
 
-// 🔥 GRACE TIME
+// 25 → 29 grace
 let inGraceTime =
-currentCycleMinute >= 5;
+currentCycleMinute >= 25;
 
 // 🔥 AUTO NEXT FRAME
 if (currentCycleMinute >= 30) {
