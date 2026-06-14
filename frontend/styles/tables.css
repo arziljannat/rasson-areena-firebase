@@ -849,37 +849,34 @@ body * {
 
 
 .table-box{
+   position:relative !important;
     position:relative;
     overflow:visible;
 }
 
 /* WALL BREAK EFFECT */
 .table-box.crack::before{
-       width:220px;
+
+    content:"";
+    position:absolute;
+
+    width:220px;
     height:220px;
 
     left:50%;
-   top:140px;
+    top:140px;
 
     transform:translate(-50%,-50%);
-    content:"";
-    position:absolute;
-    width:220px;
-height:220px;
 
-left:50%;
-top:50%;
-
-margin-left:-110px;
-margin-top:-110px;
     background:url("../assets/wall-crack.png")
     center center no-repeat;
+
     background-size:contain;
+
     z-index:99998;
     pointer-events:none;
 
-animation:
-crackExplosion .5s ease-out forwards;
+    animation: crackExplosion .5s ease-out forwards;
 }
 
 @keyframes crackExplosion{
