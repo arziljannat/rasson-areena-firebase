@@ -1146,7 +1146,7 @@ if (t.tableType === "room") {
         smartRoundAmount(
             t.liveAmount
         );
-}
+
 
     /* =====================================
        SINGLE / DOUBLE FRAME SYSTEM
