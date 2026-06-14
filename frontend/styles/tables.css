@@ -767,6 +767,13 @@ body * {
     }
 }
 
+.frame-complete {
+
+    animation: tableBlink 1s infinite;
+
+    border-color: #ff0000 !important;
+}
+
 /* GRACE TIMER */
 .grace-timer {
 
@@ -827,4 +834,17 @@ body * {
     }
 }
 
-v
+.alert-gif{
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    
+    width: 120px;
+    height: 120px;
+
+    object-fit: contain;
+    z-index: 9999;
+
+    pointer-events: none;
+}
