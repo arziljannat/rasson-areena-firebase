@@ -1230,27 +1230,7 @@ if (inGraceTime) {
 
     // 🔥 WARNING TEXT
     showTableWarning(t.id);
-    // 🔥 ALERT GIF SHOW
-const tableCard = document.querySelector(
-`[data-table-id="${t.id}"]`
-);
 
-if (
-    tableCard &&
-    !tableCard.querySelector(".alert-gif")
-) {
-
-    const gif =
-    document.createElement("img");
-
-    gif.src =
-    "/assets/alert.gif";
-
-    gif.className =
-    "alert-gif";
-
-    tableCard.appendChild(gif);
-}
 
     // 🔥 VOICE ONLY ONCE
     if (!t.voicePlayed) {
@@ -1281,23 +1261,7 @@ if (
     }
 
     hideTableWarning(t.id);
-    // 🔥 REMOVE ALERT GIF
-const tableCard = document.querySelector(
-`[data-table-id="${t.id}"]`
-);
 
-if (tableCard) {
-
-    const existingGif =
-    tableCard.querySelector(
-        ".alert-gif"
-    );
-
-    if (existingGif) {
-
-        existingGif.remove();
-    }
-}
 
     t.voicePlayed = false;
 }
@@ -4924,9 +4888,11 @@ function showTableWarning(id) {
         `warning-${id}`
     );
 
-    if (el) {
-        el.classList.remove("hidden");
-    }
+    if (!el) return;
+
+    el.innerHTML = "⚠ TIME UP ⚠";
+
+    el.classList.remove("hidden");
 }
 
 function hideTableWarning(id) {
