@@ -665,7 +665,7 @@ ${(t.selectedPlayType || "frame") === "frame"
 && (t.selectedRate || 10) == 10
 ? "selected" : ""}>
 
-Frame - 10 / min
+Frame - 14 / min
 
 </option>
 
@@ -674,7 +674,7 @@ ${(t.selectedPlayType || "frame") === "century"
 && (t.selectedRate || 10) == 10
 ? "selected" : ""}>
 
-Century - 10 / min
+Century - 14 / min
 
 </option>
 
