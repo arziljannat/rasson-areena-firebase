@@ -1237,19 +1237,29 @@ const timerBox = document.querySelector(
 
 if (
     timerBox &&
-    !timerBox.querySelector(".alert-gif")
+    t.playSeconds > 0 &&
+    t.playSeconds % 5 === 0
 ) {
+
+    const oldGif =
+    timerBox.querySelector(".alert-gif");
+
+    if (oldGif) {
+        oldGif.remove();
+    }
 
     const gif =
     document.createElement("img");
 
-    gif.src =
-    "/assets/alert.gif";
+    gif.src = "/assets/alert.gif";
 
-    gif.className =
-    "alert-gif";
+    gif.className = "alert-gif";
 
     timerBox.appendChild(gif);
+
+    setTimeout(() => {
+        gif.remove();
+    }, 1500);
 }
 
     // 🔥 VOICE ONLY ONCE
