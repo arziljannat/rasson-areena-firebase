@@ -1122,30 +1122,24 @@ if (t.tableType === "room") {
     let minutes =
     Math.ceil(t.playSeconds / 60);
 
-    // Minimum 10 minutes charge
-    if (minutes <= 10) {
-
-        t.liveAmount = 140;
-    }
-
-    // 11 to 59 minutes
-    else if (minutes < 60) {
-
-        t.liveAmount = minutes * 14;
-    }
-
-    // Exactly 60 minutes
-    else if (minutes === 60) {
+    // 🔥 Minimum 1 Hour Policy
+    if (minutes <= 60) {
 
         t.liveAmount = 800;
     }
 
-    // Above 60 minutes
+    // 🔥 After 1 Hour
     else {
 
         t.liveAmount =
-            800 + ((minutes - 60) * 14);
+        800 + ((minutes - 60) * 14);
     }
+
+    t.liveAmount =
+    smartRoundAmount(
+        t.liveAmount
+    );
+}
 
     // Smart rounding
     t.liveAmount =
