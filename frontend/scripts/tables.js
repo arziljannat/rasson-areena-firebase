@@ -1231,12 +1231,12 @@ if (inGraceTime) {
     // 🔥 WARNING TEXT
     showTableWarning(t.id);
     // 🔥 ALERT GIF SHOW
-const tableBox = document.querySelector(
+const tableCard = document.querySelector(
 `[data-table-id="${t.id}"]`
 );
 
 if (
-    tableBox &&
+    tableCard &&
     t.playSeconds > 0 &&
     t.playSeconds % 5 === 0
 ) {
@@ -1292,14 +1292,14 @@ if (
 
     hideTableWarning(t.id);
     // 🔥 REMOVE ALERT GIF
-const tableBox = document.querySelector(
+const tableCard = document.querySelector(
 `[data-table-id="${t.id}"]`
 );
 
-if (tableBox) {
+if (tableCard) {
 
     const existingGif =
-    tableBox.querySelector(
+    tableCard.querySelector(
         ".alert-gif"
     );
 
