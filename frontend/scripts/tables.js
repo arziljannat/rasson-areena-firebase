@@ -1122,13 +1122,11 @@ if (t.tableType === "room") {
     let minutes =
     Math.ceil(t.playSeconds / 60);
 
-    // 🔥 Minimum 1 Hour Policy
     if (minutes <= 60) {
 
         t.liveAmount = 800;
     }
 
-    // 🔥 After 1 Hour
     else {
 
         t.liveAmount =
@@ -1141,18 +1139,12 @@ if (t.tableType === "room") {
     );
 }
 
-    // Smart rounding
-    t.liveAmount =
-        smartRoundAmount(
-            t.liveAmount
-        );
-
+else {
 
     /* =====================================
        SINGLE / DOUBLE FRAME SYSTEM
     ===================================== */
 
-else {
 
     // 🔥 CENTURY SYSTEM
     if (t.selectedPlayType === "century") {
