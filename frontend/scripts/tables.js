@@ -1189,7 +1189,7 @@ t.selectedRate || 100;
 // 25 MIN PLAY
 // 5 MIN GRACE
 
-let cycleMinutes = 5;
+let cycleMinutes = 25;
 
 // 🔥 FRAME COUNT
 let frameCount =
@@ -1204,7 +1204,7 @@ playedMinutes % cycleMinutes;
 
 // 🔥 GRACE TIME
 let inGraceTime =
-currentCycleMinute >= 3;
+currentCycleMinute >= 5;
 
 // 🔥 AUTO NEXT FRAME
 if (currentCycleMinute >= 30) {
@@ -1238,7 +1238,7 @@ const tableCard = document.querySelector(
 if (
     tableCard &&
     t.playSeconds > 0 &&
-    t.playSeconds % 5 === 0
+    t.playSeconds % 30 === 0
 ) {
 
     const oldGif =
