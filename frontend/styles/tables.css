@@ -859,14 +859,13 @@ body * {
     inset:-30px;
     background:url("../assets/wall-crack.png")
     center center no-repeat;
-
     background-size:contain;
-
     z-index:99998;
-
     pointer-events:none;
 
-    animation:crackAppear .5s ease-out forwards;
+    animation:
+    crackAppear .3s ease-out,
+    wallBreak .8s ease-out forwards;
 }
 
 @keyframes crackAppear{
@@ -880,10 +879,6 @@ body * {
         opacity:1;
         transform:scale(1);
     }
-}
-
-.table-box.crack::before{
-    animation:wallBreak .8s ease-out forwards;
 }
 
 @keyframes wallBreak{
