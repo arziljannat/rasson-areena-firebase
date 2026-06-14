@@ -871,39 +871,29 @@ body * {
     pointer-events:none;
 
 animation:
-crackExplosion 1.5s
-cubic-bezier(.17,.89,.32,1.3)
-forwards;
+crackExplosion .5s ease-out forwards;
 }
 
 @keyframes crackExplosion{
 
     0%{
         opacity:0;
-        transform:
-        scale(.05);
-    }
-
-    20%{
-        opacity:1;
-        transform:
-        scale(2.8);
+        transform:translate(-50%,-50%) scale(0);
     }
 
     40%{
-        transform:
-        scale(1.8);
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1.3);
     }
 
-    60%{
-        transform:
-        scale(2.3);
+    70%{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1.1);
     }
 
     100%{
         opacity:1;
-        transform:
-        scale(1);
+        transform:translate(-50%,-50%) scale(1);
     }
 }
 
@@ -924,10 +914,11 @@ forwards;
     translate(-50%,-50%)
     scale(.05);
 
-    animation:
-    wallExplosion 1.5s
-    cubic-bezier(.17,.89,.32,1.3)
-    forwards;
+animation:
+wallExplosion 1.2s
+cubic-bezier(.17,.89,.32,1.3)
+.55s
+forwards;
 }
 
 @keyframes wallExplosion{
