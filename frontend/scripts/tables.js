@@ -1248,6 +1248,8 @@ if (
         oldGif.remove();
     }
 
+tableBox.classList.add("crack");
+  
     const gif =
     document.createElement("img");
 
@@ -1257,9 +1259,13 @@ if (
 
     tableBox.appendChild(gif);
 
-    setTimeout(() => {
-        gif.remove();
-    }, 1500);
+setTimeout(() => {
+
+    gif.remove();
+
+    tableBox.classList.remove("crack");
+
+}, 1500);
 }
 
     // 🔥 VOICE ONLY ONCE
