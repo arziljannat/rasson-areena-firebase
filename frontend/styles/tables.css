@@ -835,7 +835,8 @@ body * {
 }
 
 /* TIMER BOX KO RELATIVE KARO */
-.timer-box{
+/* CARD KO RELATIVE KARO */
+.table-box{
     position: relative;
     overflow: visible;
 }
@@ -845,49 +846,39 @@ body * {
     position:absolute;
 
     left:50%;
-    top:50%;
+    top:42%;
 
-    width:260px;
+    width:420px;
 
     pointer-events:none;
 
-    z-index:9999;
+    z-index:99999;
 
     transform:translate(-50%,-50%) scale(0);
 
-    animation:burstOut 1.2s ease-out forwards;
+    animation:burstOut 1.5s ease-out forwards;
 }
 
 /* PHAR KAR BAHAR AANE WALA EFFECT */
 @keyframes burstOut{
 
     0%{
-        transform:
-        translate(-50%,-50%)
-        scale(0);
-
+        transform:translate(-50%,-50%) scale(0);
         opacity:0;
     }
 
-    20%{
-        transform:
-        translate(-50%,-50%)
-        scale(2.2);
-
+    15%{
+        transform:translate(-50%,-50%) scale(3);
         opacity:1;
     }
 
-    60%{
-        transform:
-        translate(-50%,-50%)
-        scale(1.5);
+    35%{
+        transform:translate(-50%,-50%) scale(2.4);
+        opacity:1;
     }
 
     100%{
-        transform:
-        translate(-50%,-50%)
-        scale(1);
-
-        opacity:0;
+        transform:translate(-50%,-50%) scale(1);
+        opacity:1;
     }
 }
