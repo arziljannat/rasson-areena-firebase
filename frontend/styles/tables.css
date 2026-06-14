@@ -767,11 +767,48 @@ body * {
     }
 }
 
-.frame-complete {
+.frame-complete{
 
-    animation: tableBlink 1s infinite;
+    animation:
+        dangerPulse 1.2s infinite,
+        dangerShake .25s infinite;
 
-    border-color: #ff0000 !important;
+    border:3px solid #ff0000 !important;
+}
+
+@keyframes dangerPulse{
+
+    0%{
+        box-shadow:
+        0 0 10px #ff0000,
+        0 0 20px #ff0000;
+    }
+
+    50%{
+        box-shadow:
+        0 0 35px #ff0000,
+        0 0 80px #ff3300,
+        0 0 120px #ff6600;
+    }
+
+    100%{
+        box-shadow:
+        0 0 10px #ff0000,
+        0 0 20px #ff0000;
+    }
+}
+
+@keyframes dangerShake{
+
+    0%{ transform:translateX(0); }
+
+    25%{ transform:translateX(-2px); }
+
+    50%{ transform:translateX(2px); }
+
+    75%{ transform:translateX(-2px); }
+
+    100%{ transform:translateX(0); }
 }
 
 /* GRACE TIMER */
@@ -808,31 +845,7 @@ body * {
     margin-top: 6px;
 }
 
-.alert-gif {
-    position: absolute;
-    top: -70px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 80px;
-    z-index: 9999;
-    pointer-events: none;
-    animation: bounceAlert 1s infinite;
-}
 
-@keyframes bounceAlert {
-    0% {
-        transform: translateX(-50%) translateY(0);
-    }
-
-    50% {
-        transform: translateX(-50%) translateY(-10px);
-    }
-
-    100% {
-        transform: translateX(-50%) translateY(0);
-    }
-}
 
 .table-box{
     position:relative;
@@ -882,8 +895,8 @@ body * {
 .alert-gif{
     position:absolute;
     left:50%;
-    top:50%;
-    width:450px;
+    top:45%;
+    width:650px;
     pointer-events:none;
     z-index:99999;
     opacity:0;
