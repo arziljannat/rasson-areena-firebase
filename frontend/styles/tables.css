@@ -784,12 +784,13 @@ body * {
         0 0 20px #ff0000;
     }
 
-    50%{
-        box-shadow:
-        0 0 35px #ff0000,
-        0 0 80px #ff3300,
-        0 0 120px #ff6600;
-    }
+50%{
+    box-shadow:
+    0 0 25px #ff0000,
+    0 0 50px #ff3300,
+    0 0 90px #ff6600,
+    0 0 140px #ff0000;
+}
 
     100%{
         box-shadow:
@@ -858,12 +859,19 @@ body * {
     height:220px;
 
     left:50%;
-    top:50%;
+   top:140px;
 
     transform:translate(-50%,-50%);
     content:"";
     position:absolute;
-    inset:-10px;
+    width:220px;
+height:220px;
+
+left:50%;
+top:50%;
+
+margin-left:-110px;
+margin-top:-110px;
     background:url("../assets/wall-crack.png")
     center center no-repeat;
     background-size:contain;
@@ -902,7 +910,7 @@ crackExplosion .5s ease-out forwards;
     position:absolute;
 
     left:50%;
-    top:50%;
+    top:140px;
 
     width:220px;
 
