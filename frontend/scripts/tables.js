@@ -1231,13 +1231,13 @@ if (inGraceTime) {
     // 🔥 WARNING TEXT
     showTableWarning(t.id);
     // 🔥 ALERT GIF SHOW
-const tableCard = document.querySelector(
-`[data-table-id="${t.id}"]`
+const timerBox = document.querySelector(
+`[data-table-id="${t.id}"] .timer-box`
 );
 
 if (
-    tableCard &&
-    !tableCard.querySelector(".alert-gif")
+    timerBox &&
+    !timerBox.querySelector(".alert-gif")
 ) {
 
     const gif =
@@ -1249,7 +1249,7 @@ if (
     gif.className =
     "alert-gif";
 
-    tableCard.appendChild(gif);
+    timerBox.appendChild(gif);
 }
 
     // 🔥 VOICE ONLY ONCE
@@ -1282,14 +1282,14 @@ if (
 
     hideTableWarning(t.id);
     // 🔥 REMOVE ALERT GIF
-const tableCard = document.querySelector(
-`[data-table-id="${t.id}"]`
+const timerBox = document.querySelector(
+`[data-table-id="${t.id}"] .timer-box`
 );
 
-if (tableCard) {
+if (timerBox) {
 
     const existingGif =
-    tableCard.querySelector(
+    timerBox.querySelector(
         ".alert-gif"
     );
 
