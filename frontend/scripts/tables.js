@@ -1281,15 +1281,9 @@ setTimeout(() => {
     }
 
     // 🔥 FIRE ALARM EVERY 5 SEC
-    if (
-        t.playSeconds > 0 &&
-        t.playSeconds % 5 === 0
-    ) {
 
-        playWarningBeep();
-    }
 
-} else {
+else {
 
     // 🔥 REMOVE WARNING
     if (tableBox) {
