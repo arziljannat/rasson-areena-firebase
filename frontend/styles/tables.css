@@ -842,19 +842,20 @@ body * {
 
 /* ALERT GIF */
 .alert-gif{
-    position: absolute;
+    position:absolute;
 
-    left: 50%;
-    top: 50%;
+    left:50%;
+    top:50%;
 
-    transform: translate(-50%, -50%) scale(0);
+    width:260px;
 
-    width: 220px;
-    pointer-events: none;
+    pointer-events:none;
 
-    z-index: 999;
+    z-index:9999;
 
-    animation: burstOut 0.8s ease-out forwards;
+    transform:translate(-50%,-50%) scale(0);
+
+    animation:burstOut 1.2s ease-out forwards;
 }
 
 /* PHAR KAR BAHAR AANE WALA EFFECT */
@@ -862,25 +863,31 @@ body * {
 
     0%{
         transform:
-        translate(-50%, -50%)
-        scale(0.2);
+        translate(-50%,-50%)
+        scale(0);
 
         opacity:0;
     }
 
-    40%{
+    20%{
         transform:
-        translate(-50%, -50%)
-        scale(1.4);
+        translate(-50%,-50%)
+        scale(2.2);
 
         opacity:1;
     }
 
+    60%{
+        transform:
+        translate(-50%,-50%)
+        scale(1.5);
+    }
+
     100%{
         transform:
-        translate(-50%, -50%)
+        translate(-50%,-50%)
         scale(1);
 
-        opacity:1;
+        opacity:0;
     }
 }
