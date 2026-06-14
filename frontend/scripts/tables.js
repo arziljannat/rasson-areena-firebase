@@ -1283,7 +1283,7 @@ setTimeout(() => {
     // 🔥 FIRE ALARM EVERY 5 SEC
 
 
-else {
+}else {
 
     // 🔥 REMOVE WARNING
     if (tableBox) {
