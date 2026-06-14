@@ -834,17 +834,53 @@ body * {
     }
 }
 
+/* TIMER BOX KO RELATIVE KARO */
+.timer-box{
+    position: relative;
+    overflow: visible;
+}
+
+/* ALERT GIF */
 .alert-gif{
     position: absolute;
-    top: -20px;
+
     left: 50%;
-    transform: translateX(-50%);
-    
-    width: 120px;
-    height: 120px;
+    top: 50%;
 
-    object-fit: contain;
-    z-index: 9999;
+    transform: translate(-50%, -50%) scale(0);
 
+    width: 220px;
     pointer-events: none;
+
+    z-index: 999;
+
+    animation: burstOut 0.8s ease-out forwards;
+}
+
+/* PHAR KAR BAHAR AANE WALA EFFECT */
+@keyframes burstOut{
+
+    0%{
+        transform:
+        translate(-50%, -50%)
+        scale(0.2);
+
+        opacity:0;
+    }
+
+    40%{
+        transform:
+        translate(-50%, -50%)
+        scale(1.4);
+
+        opacity:1;
+    }
+
+    100%{
+        transform:
+        translate(-50%, -50%)
+        scale(1);
+
+        opacity:1;
+    }
 }
