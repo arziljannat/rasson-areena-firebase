@@ -1117,17 +1117,42 @@ function runTimer(id) {
        ROOM SYSTEM
     ===================================== */
 
-    if (t.tableType === "room") {
+if (t.tableType === "room") {
 
-        let minutes =
-        Math.ceil(t.playSeconds / 60);
+    let minutes =
+    Math.ceil(t.playSeconds / 60);
 
-        if (minutes < 1)
-            minutes = 1;
+    // Minimum 10 minutes charge
+    if (minutes <= 10) {
+
+        t.liveAmount = 140;
+    }
+
+    // 11 to 59 minutes
+    else if (minutes < 60) {
+
+        t.liveAmount = minutes * 14;
+    }
+
+    // Exactly 60 minutes
+    else if (minutes === 60) {
+
+        t.liveAmount = 800;
+    }
+
+    // Above 60 minutes
+    else {
 
         t.liveAmount =
-minutes * (t.selectedRate || 10);
+            800 + ((minutes - 60) * 14);
     }
+
+    // Smart rounding
+    t.liveAmount =
+        smartRoundAmount(
+            t.liveAmount
+        );
+}
 
     /* =====================================
        SINGLE / DOUBLE FRAME SYSTEM
