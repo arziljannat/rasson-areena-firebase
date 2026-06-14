@@ -1249,6 +1249,8 @@ if (
     }
 
 tableBox.classList.add("crack");
+  playWarningBeep();
+  
   
     const gif =
     document.createElement("img");
