@@ -834,51 +834,99 @@ body * {
     }
 }
 
-/* TIMER BOX KO RELATIVE KARO */
-/* CARD KO RELATIVE KARO */
 .table-box{
-    position: relative;
-    overflow: visible;
+    position:relative;
+    overflow:visible;
 }
 
-/* ALERT GIF */
-.alert-gif{
+/* WALL BREAK EFFECT */
+.table-box::before{
+    content:"";
     position:absolute;
-
     left:50%;
-    top:42%;
-
-    width:420px;
-
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:0;
+    height:0;
+    border-radius:50%;
+    background:rgba(255,0,0,.35);
+    opacity:0;
     pointer-events:none;
-
-    z-index:99999;
-
-    transform:translate(-50%,-50%) scale(0);
-
-    animation:burstOut 1.5s ease-out forwards;
+    z-index:9998;
 }
 
-/* PHAR KAR BAHAR AANE WALA EFFECT */
-@keyframes burstOut{
+.table-box.crack::before{
+    animation:wallBreak .8s ease-out forwards;
+}
 
+@keyframes wallBreak{
     0%{
-        transform:translate(-50%,-50%) scale(0);
+        width:0;
+        height:0;
         opacity:0;
     }
 
-    15%{
-        transform:translate(-50%,-50%) scale(3);
-        opacity:1;
-    }
-
-    35%{
-        transform:translate(-50%,-50%) scale(2.4);
+    40%{
+        width:120px;
+        height:120px;
         opacity:1;
     }
 
     100%{
-        transform:translate(-50%,-50%) scale(1);
+        width:250px;
+        height:250px;
+        opacity:0;
+    }
+}
+
+.alert-gif{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:450px;
+    pointer-events:none;
+    z-index:99999;
+    opacity:0;
+
+    transform:
+        translate(-50%,-50%)
+        scale(.1)
+        rotate(-20deg);
+
+    animation:movieBurst 1.4s ease-out forwards;
+}
+
+@keyframes movieBurst{
+
+    0%{
+        opacity:0;
+        transform:
+        translate(-50%,-50%)
+        scale(.1)
+        rotate(-20deg);
+    }
+
+    25%{
         opacity:1;
+        transform:
+        translate(-50%,-50%)
+        scale(2.8)
+        rotate(8deg);
+    }
+
+    55%{
+        opacity:1;
+        transform:
+        translate(-50%,-50%)
+        scale(2.2)
+        rotate(-4deg);
+    }
+
+    100%{
+        opacity:1;
+        transform:
+        translate(-50%,-50%)
+        scale(1)
+        rotate(0deg);
     }
 }
