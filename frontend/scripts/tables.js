@@ -1160,11 +1160,11 @@ Math.floor(t.playSeconds / 60);
 let frameRate =
 t.selectedRate || 100;
 
-// 🔥 1 FRAME = 35 MIN
-// 30 MIN PLAY
+// 🔥 1 FRAME = 30 MIN
+// 25 MIN PLAY
 // 5 MIN GRACE
 
-let cycleMinutes = 35;
+let cycleMinutes = 30;
 
 // 🔥 FRAME COUNT
 let frameCount =
@@ -1179,10 +1179,10 @@ playedMinutes % cycleMinutes;
 
 // 🔥 GRACE TIME
 let inGraceTime =
-currentCycleMinute >= 30;
+currentCycleMinute >= 25;
 
 // 🔥 AUTO NEXT FRAME
-if (currentCycleMinute >= 35) {
+if (currentCycleMinute >= 30) {
 
     frameCount =
     Math.floor(
