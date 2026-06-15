@@ -1140,7 +1140,6 @@ if (t.tableType === "room") {
 }
 
 
-}
 
 else {
 
