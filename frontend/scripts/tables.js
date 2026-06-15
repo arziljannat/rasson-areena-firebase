@@ -4937,22 +4937,18 @@ function playWarningBeep() {
         }
 
         // 🔥 reset audio
-        warningAudio.pause();
+ warningAudio.pause();
+warningAudio.currentTime = 0;
 
-        warningAudio.currentTime = 0;
+warningAudio.volume = 1;
 
-        // 🔥 clone for repeat play
-        const beep = warningAudio.cloneNode();
-
-        beep.volume = 1;
-
-        beep.play()
-            .then(() => {
-                console.log("🔊 Warning beep played");
-            })
-            .catch(err => {
-                console.log("Beep blocked:", err);
-            });
+warningAudio.play()
+.then(() => {
+    console.log("🔊 Warning beep played");
+})
+.catch(err => {
+    console.log("Beep blocked:", err);
+});
 
     } catch (err) {
 
