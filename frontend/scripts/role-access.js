@@ -12,7 +12,7 @@ function applyRoleAccess() {
     if (!ROLE) return;
 
     // USERS PAGE (ADMIN ONLY)
-    if (ROLE !== "admin" && ROLE !== "super_admin") {
+    if (ROLE !== "admin" && ROLE !== "superadmin") {
         hideClass("users-page-only");
     }
 
@@ -64,7 +64,7 @@ function secureFunctions() {
 
             window[fn] = function () {
 
-                if (ROLE === "admin" || ROLE === "super_admin") {
+                if (ROLE === "admin" || ROLE === "superadmin") {
                     return original();
                 }
 
