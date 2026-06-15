@@ -1139,6 +1139,69 @@ if (t.tableType === "room") {
     smartRoundAmount(
         t.liveAmount
     );
+
+  // 🔥 ROOM ALARM SYSTEM
+
+const roomAlertStart = 58 * 60; // 58 min
+
+if (t.playSeconds >= roomAlertStart) {
+
+    showTableWarning(t.id);
+
+    if (tableBox) {
+        tableBox.classList.add("frame-complete");
+    }
+
+    // 🔥 every 30 sec alert
+    if (t.playSeconds % 30 === 0) {
+
+        const oldGif =
+        tableBox?.querySelector(".alert-gif");
+
+        if (oldGif) {
+            oldGif.remove();
+        }
+
+        playWarningBeep();
+
+        const gif =
+        document.createElement("img");
+
+        gif.src = "/assets/alert.gif";
+
+        gif.className = "alert-gif";
+
+        tableBox?.appendChild(gif);
+
+        setTimeout(() => {
+
+            gif.remove();
+
+        }, 1500);
+    }
+
+    // 🔥 voice only once
+    if (!t.roomVoicePlayed) {
+
+        playTableVoice(
+            `${t.name} room time alert`
+        );
+
+        t.roomVoicePlayed = true;
+    }
+
+} else {
+
+    hideTableWarning(t.id);
+
+    if (tableBox) {
+        tableBox.classList.remove("frame-complete");
+    }
+
+    t.roomVoicePlayed = false;
+}
+
+  
 }
 
 
@@ -4968,13 +5031,13 @@ function hideTableWarning(id) {
     }
 }
 
-function playTableVoice(tableName) {
+function playTableVoice(message) {
 
     try {
 
         const msg =
         new SpeechSynthesisUtterance(
-            `${tableName} frame completed`
+            message
         );
 
         msg.volume = 1;
