@@ -5035,13 +5035,18 @@ function playTableVoice(message) {
 
     try {
 
+        window.speechSynthesis.cancel();
+
         const msg =
         new SpeechSynthesisUtterance(
             message
         );
 
         msg.volume = 1;
-        msg.rate = 1;
+
+        // 🔥 Slow & clear voice
+        msg.rate = 0.7;
+
         msg.pitch = 1;
 
         window.speechSynthesis.speak(msg);
