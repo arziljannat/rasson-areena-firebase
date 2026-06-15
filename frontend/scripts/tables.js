@@ -613,7 +613,9 @@ ${t.name}
 id="warning-${t.id}"
 class="table-warning hidden"
 >
+<span id="warning-text-${t.id}">
 ⚠️ GRACE TIME
+</span>
 </div>
 
 <div class="room-badge">
@@ -4925,8 +4927,32 @@ function showTableWarning(id) {
         `warning-${id}`
     );
 
+    const textEl =
+    document.getElementById(
+        `warning-text-${id}`
+    );
+
+    const table =
+    tables.find(
+        t => String(t.id) === String(id)
+    );
+
     if (el) {
         el.classList.remove("hidden");
+    }
+
+    if (textEl && table) {
+
+        if (table.tableType === "room") {
+
+            textEl.innerText =
+            "⚠️ ROOM TIME ALERT";
+
+        } else {
+
+            textEl.innerText =
+            "⚠️ GRACE TIME";
+        }
     }
 }
 
