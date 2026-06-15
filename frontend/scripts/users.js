@@ -19,7 +19,7 @@ let selectedId = null;
 // ==========================
 // ACCESS CONTROL
 // ==========================
-if (role !== "admin" && role !== "super_admin") {
+if (role !== "admin" && role !== "superadmin") {
     alert("Access Denied");
     window.location.href = "dashboard.html";
 }
