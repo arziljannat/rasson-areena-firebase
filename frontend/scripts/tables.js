@@ -4925,11 +4925,6 @@ function playWarningBeep() {
 
     try {
 
-        // 🔥 user interaction check
-        if (!window.userInteracted) {
-            console.log("⛔ User interaction missing");
-            return;
-        }
 
         // 🔥 create audio if missing
         if (!warningAudio) {
@@ -4965,23 +4960,9 @@ function playWarningBeep() {
     }
 }
 // 🔥 USER INTERACTION ENABLE
-window.userInteracted = false;
 
-document.addEventListener("click", () => {
-
-    window.userInteracted = true;
-
-    unlockAudio();
-
-}, { once: true });
-
-document.addEventListener("touchstart", () => {
-
-    window.userInteracted = true;
-
-    unlockAudio();
-
-}, { once: true });
+document.addEventListener("pointerdown", unlockAudio);
+document.addEventListener("keydown", unlockAudio);
 
 function showTableWarning(id) {
 
@@ -5062,9 +5043,17 @@ function unlockAudio() {
 
     if (audioUnlocked) return;
 
-warningAudio = new Audio(
-"/assets/audio/warning.mp3"
-);
+if (!warningAudio) {
+
+    warningAudio = new Audio(
+        "/assets/audio/warning.mp3"
+    );
+
+    warningAudio.preload = "auto";
+    warningAudio.volume = 1;
+}  
+
+
     warningAudio.volume = 1;
 
     // 🔥 preload
