@@ -4961,9 +4961,17 @@ function playWarningBeep() {
 }
 // 🔥 USER INTERACTION ENABLE
 
-document.addEventListener("pointerdown", unlockAudio);
-document.addEventListener("keydown", unlockAudio);
+window.userInteracted = false;
 
+document.addEventListener("pointerdown", () => {
+    window.userInteracted = true;
+    unlockAudio();
+});
+
+document.addEventListener("keydown", () => {
+    window.userInteracted = true;
+    unlockAudio();
+});
 function showTableWarning(id) {
 
     const el =
