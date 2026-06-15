@@ -1267,8 +1267,11 @@ const tableCard = document.querySelector(
 if (
     tableCard &&
     t.playSeconds > 0 &&
-    t.playSeconds % 30 === 0
+    t.playSeconds % 30 === 0 &&
+    !t.alertPlayed
 ) {
+
+    t.alertPlayed = true;
 
     const oldGif =
     tableBox.querySelector(".alert-gif");
@@ -1277,10 +1280,10 @@ if (
         oldGif.remove();
     }
 
-tableBox.classList.add("crack");
-  playWarningBeep();
-  
-  
+    tableBox.classList.add("crack");
+
+    playWarningBeep();
+
     const gif =
     document.createElement("img");
 
@@ -1290,15 +1293,19 @@ tableBox.classList.add("crack");
 
     tableBox.appendChild(gif);
 
-setTimeout(() => {
+    setTimeout(() => {
 
-    gif.remove();
+        gif.remove();
 
-    tableBox.classList.remove("crack");
+        tableBox.classList.remove("crack");
 
-}, 1500);
+    }, 1500);
 }
 
+  if (t.playSeconds % 30 !== 0) {
+    t.alertPlayed = false;
+}
+  
     // 🔥 VOICE ONLY ONCE
     if (!t.voicePlayed) {
 
