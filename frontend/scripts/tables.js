@@ -1139,6 +1139,48 @@ if (t.tableType === "room") {
     );
 }
 
+  // 🔥 ROOM ALERT SYSTEM
+if (
+    minutes === 58 ||
+    minutes === 59 ||
+    minutes === 60
+) {
+
+    const tableCard = document.querySelector(
+        `[data-table-id="${t.id}"]`
+    );
+
+    if (tableCard) {
+
+        const oldGif =
+        tableCard.querySelector(".alert-gif");
+
+        if (oldGif) {
+            oldGif.remove();
+        }
+
+        tableCard.classList.add("crack");
+
+        playWarningBeep();
+
+        const gif =
+        document.createElement("img");
+
+        gif.src = "/assets/alert.gif";
+        gif.className = "alert-gif";
+
+        tableCard.appendChild(gif);
+
+        setTimeout(() => {
+
+            gif.remove();
+
+            tableCard.classList.remove("crack");
+
+        }, 1500);
+    }
+}
+
 else {
 
     /* =====================================
