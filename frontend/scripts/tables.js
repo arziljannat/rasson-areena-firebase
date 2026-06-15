@@ -662,7 +662,7 @@ Century - 8 / min
 
 `
 
-<option value="frame-10"
+<option value="frame-14"
 ${(t.selectedPlayType || "frame") === "frame"
 && (t.selectedRate || 10) == 10
 ? "selected" : ""}>
@@ -671,7 +671,7 @@ Frame - 14 / min
 
 </option>
 
-<option value="century-10"
+<option value="century-14"
 ${(t.selectedPlayType || "frame") === "century"
 && (t.selectedRate || 10) == 10
 ? "selected" : ""}>
@@ -1143,8 +1143,12 @@ if (t.tableType === "room") {
   // 🔥 ROOM ALARM SYSTEM
 
 const roomAlertStart = 58 * 60; // 58 min
+const roomAlertEnd   = 60 * 60; // 60 min
 
-if (t.playSeconds >= roomAlertStart) {
+if (
+    t.playSeconds >= roomAlertStart &&
+    t.playSeconds < roomAlertEnd
+) {
 
     showTableWarning(t.id);
 
