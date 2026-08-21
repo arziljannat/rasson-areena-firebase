@@ -109,23 +109,24 @@ body * {
 
 
 /* ============================================================
-   TABLE GRID
-   5 CARDS IN FIRST ROW
+   TABLE / ROOM CENTERED GRID
+   5 CARDS FIRST ROW
+   REMAINING CARDS CENTERED
 ============================================================ */
 
 .tables-grid {
-    width: 100%;
-    max-width: 1800px;
-
+    width: fit-content;
+    max-width: 100%;
     margin: 0 auto;
 
     display: grid;
 
     grid-template-columns:
-        repeat(5, minmax(240px, 1fr));
+        repeat(5, 300px);
 
     gap: 25px;
 
+    justify-content: center;
     justify-items: center;
     align-items: start;
 }
