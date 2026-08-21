@@ -1094,6 +1094,48 @@ playType: t.selectedPlayType || t.playType,
     updateButtons(id, "afterCheckout");
     updateDisplay(id);
 }
+
+
+/******************************************************
+ * 🔔 TABLE 15-MINUTE MINI VOICE ALARM
+ * Only for TABLES — Rooms are ignored
+ ******************************************************/
+function playTable15MinuteAlarm(t) {
+
+    if (!t || t.tableType === "room") return;
+    if (!t.isRunning || t.afterCheckout) return;
+
+    const totalMinutes = Math.floor(t.playSeconds / 60);
+
+    if (totalMinutes <= 0) return;
+
+    // 🔔 Only every 15 minutes
+    if (totalMinutes % 15 !== 0) return;
+
+    // 🔒 Prevent the same 15-minute alarm from repeating
+    const alarmKey =
+        `table15Alarm_${t.name}_${t.checkinTime}_${totalMinutes}`;
+
+    if (localStorage.getItem(alarmKey) === "played") {
+        return;
+    }
+
+    // 🔊 Voice
+    playTableVoice(
+        `Attention! ${t.name}. ${totalMinutes} minutes.`
+    );
+
+    // 🔒 Save locally so refresh does not repeat the same alarm
+    localStorage.setItem(alarmKey, "played");
+
+    console.log(
+        `🔔 15-MINUTE ALARM: ${t.name} - ${totalMinutes} minutes`
+    );
+}
+
+
+
+
 /******************************************************
  * TIMER — (1 SEC = 1 MIN CHARGE FIX)
  ******************************************************/
@@ -1109,6 +1151,12 @@ function runTimer(id) {
     Math.floor(
         (Date.now() - t.checkinTime) / 1000
     );
+
+  // 🔔 15-MINUTE MINI ALARM
+// Existing table/room alarm logic ko touch nahi karta
+if (t.tableType !== "room") {
+    playTable15MinuteAlarm(t);
+}
 
     const tableBox =
     document.querySelector(
