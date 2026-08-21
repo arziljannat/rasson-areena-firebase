@@ -4978,34 +4978,52 @@ function playWarningBeep() {
 
     try {
 
+        // 🔊 Har alarm ke liye NEW audio object
+        const alarmAudio =
+            new Audio("/assets/audio/warning.mp3");
 
-        // 🔥 create audio if missing
-        if (!warningAudio) {
+        alarmAudio.preload = "auto";
+        alarmAudio.volume = 1;
 
-            warningAudio = new Audio(
-                "/assets/audio/warning.mp3"
-            );
+        // 🔊 Play only — pause/reset nahi karna
+        const playPromise = alarmAudio.play();
 
-            warningAudio.volume = 1;
+        if (playPromise !== undefined) {
+
+            playPromise
+                .then(() => {
+
+                    console.log("🔊 Warning beep played");
+
+                })
+                .catch(err => {
+
+                    console.log(
+                        "⚠️ Warning sound blocked:",
+                        err
+                    );
+
+                });
+
         }
 
-        // 🔥 reset audio
- warningAudio.pause();
-warningAudio.currentTime = 0;
+        // 🧹 Sound khatam hone ke baad object release
+        alarmAudio.addEventListener(
+            "ended",
+            () => {
 
-warningAudio.volume = 1;
+                alarmAudio.remove();
 
-warningAudio.play()
-.then(() => {
-    console.log("🔊 Warning beep played");
-})
-.catch(err => {
-    console.log("Beep blocked:", err);
-});
+            },
+            { once: true }
+        );
 
     } catch (err) {
 
-        console.log("Audio error:", err);
+        console.log(
+            "⚠️ Warning audio error:",
+            err
+        );
     }
 }
 // 🔥 USER INTERACTION ENABLE
@@ -5096,40 +5114,70 @@ function playTableVoice(message) {
 }
 
 
+let audioUnlocking = false;
+
 function unlockAudio() {
 
+    // Already unlocked
     if (audioUnlocked) return;
 
-if (!warningAudio) {
+    // Unlock already in progress
+    if (audioUnlocking) return;
 
-    warningAudio = new Audio(
-        "/assets/audio/warning.mp3"
-    );
+    audioUnlocking = true;
 
-    warningAudio.preload = "auto";
-    warningAudio.volume = 1;
-}  
+    try {
 
+        // 🔊 Separate unlock audio
+        const unlockSound =
+            new Audio("/assets/audio/warning.mp3");
 
-    warningAudio.volume = 1;
+        unlockSound.preload = "auto";
 
-    // 🔥 preload
-    warningAudio.load();
+        // 🔇 Unlock ke waqt sound sunai nahi dega
+        unlockSound.volume = 0;
 
-    // 🔥 silent play for unlock
-    warningAudio.play()
-        .then(() => {
+        const playPromise =
+            unlockSound.play();
 
-            warningAudio.pause();
-            warningAudio.currentTime = 0;
+        if (playPromise !== undefined) {
 
-            audioUnlocked = true;
+            playPromise
+                .then(() => {
 
-            console.log("✅ Audio unlocked");
+                    audioUnlocked = true;
+                    audioUnlocking = false;
 
-        })
-        .catch(err => {
-            console.log("Audio unlock failed:", err);
-        });
+                    console.log(
+                        "✅ Audio unlocked"
+                    );
+
+                    // Audio ko naturally stop hone do
+                    unlockSound.pause();
+                    unlockSound.currentTime = 0;
+
+                })
+                .catch(err => {
+
+                    audioUnlocking = false;
+
+                    console.log(
+                        "⚠️ Audio unlock failed:",
+                        err
+                    );
+
+                });
+
+        }
+
+    } catch (err) {
+
+        audioUnlocking = false;
+
+        console.log(
+            "⚠️ Audio unlock error:",
+            err
+        );
+    }
 }
 //fix deployment issues
