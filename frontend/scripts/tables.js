@@ -2091,338 +2091,336 @@ async function deleteTableConfirm() {
 }
 
 /******************************************************
- * OPEN HISTORY POPUP (FULL FIX)
+ * OPEN HISTORY POPUP — CLEAN FINAL VERSION
  ******************************************************/
 function openHistory(id) {
 
-    let t = tables.find(x => String(x.id) === String(id));
-
-  // ==========================================
-// 🔥 HISTORY SUMMARY COUNTERS
-// ==========================================
-
-const historyList = Array.isArray(t.history)
-    ? t.history
-    : [];
-
-
-// ==========================================
-// SHIFT 1 / SHIFT 2
-// ==========================================
-
-const shift1History =
-    historyList.filter(
-        h => Number(h.shiftNumber || 1) === 1
+    const t = tables.find(
+        x => String(x.id) === String(id)
     );
 
-const shift2History =
-    historyList.filter(
-        h => Number(h.shiftNumber || 1) === 2
-    );
+    if (!t) {
+        console.error("❌ Table not found:", id);
+        return;
+    }
 
+    const body =
+        document.getElementById("historyTableBody");
 
-// ==========================================
-// 🎮 TOTAL GAME
-// ==========================================
+    const title =
+        document.getElementById("historyTableTitle");
 
-const shift1Game =
-    shift1History.length;
+    if (!body) {
+        console.error("❌ historyTableBody not found");
+        return;
+    }
 
-const shift2Game =
-    shift2History.length;
+    if (title) {
+        title.innerText = `History - ${t.name}`;
+    }
 
-
-// ==========================================
-// 👤 GUEST PLAY
-// Booking nahi = Guest
-// ==========================================
-
-const shift1Guest =
-    shift1History.filter(
-        h => !h.fromBooking
-    ).length;
-
-const shift2Guest =
-    shift2History.filter(
-        h => !h.fromBooking
-    ).length;
-
-
-// ==========================================
-// 📅 BOOKING PLAY
-// ==========================================
-
-const shift1Booking =
-    shift1History.filter(
-        h => h.fromBooking
-    ).length;
-
-const shift2Booking =
-    shift2History.filter(
-        h => h.fromBooking
-    ).length;
-
-
-// ==========================================
-// 💰 PAID
-// ==========================================
-
-const shift1Paid =
-    shift1History.filter(
-        h => h.paid
-    ).length;
-
-const shift2Paid =
-    shift2History.filter(
-        h => h.paid
-    ).length;
-
-
-// ==========================================
-// ⚠️ UNPAID
-// ==========================================
-
-const shift1Unpaid =
-    shift1History.filter(
-        h => !h.paid
-    ).length;
-
-const shift2Unpaid =
-    shift2History.filter(
-        h => !h.paid
-    ).length;
-
-
-// ==========================================
-// 💵 PAID AMOUNT
-// ==========================================
-
-const shift1PaidAmount =
-    shift1History
-        .filter(h => h.paid)
-        .reduce(
-            (sum, h) =>
-                sum + Number(h.total || 0),
-            0
-        );
-
-const shift2PaidAmount =
-    shift2History
-        .filter(h => h.paid)
-        .reduce(
-            (sum, h) =>
-                sum + Number(h.total || 0),
-            0
-        );
-
-
-// ==========================================
-// 💸 UNPAID AMOUNT
-// ==========================================
-
-const shift1UnpaidAmount =
-    shift1History
-        .filter(h => !h.paid)
-        .reduce(
-            (sum, h) =>
-                sum + Number(h.total || 0),
-            0
-        );
-
-const shift2UnpaidAmount =
-    shift2History
-        .filter(h => !h.paid)
-        .reduce(
-            (sum, h) =>
-                sum + Number(h.total || 0),
-            0
-        );
-
-
-// ==========================================
-// 🔥 UPDATE SUMMARY BOXES
-// ==========================================
-
-// TOTAL GAME
-document.getElementById(
-    "historyShift1Game"
-).textContent = shift1Game;
-
-document.getElementById(
-    "historyShift2Game"
-).textContent = shift2Game;
-
-
-// GUEST
-document.getElementById(
-    "historyShift1Guest"
-).textContent = shift1Guest;
-
-document.getElementById(
-    "historyShift2Guest"
-).textContent = shift2Guest;
-
-
-// BOOKING
-document.getElementById(
-    "historyShift1Booking"
-).textContent = shift1Booking;
-
-document.getElementById(
-    "historyShift2Booking"
-).textContent = shift2Booking;
-
-
-// PAID
-document.getElementById(
-    "historyShift1Paid"
-).textContent = shift1Paid;
-
-document.getElementById(
-    "historyShift2Paid"
-).textContent = shift2Paid;
-
-document.getElementById(
-    "historyShift1PaidAmount"
-).textContent =
-    `Rs. ${shift1PaidAmount.toLocaleString()}`;
-
-document.getElementById(
-    "historyShift2PaidAmount"
-).textContent =
-    `Rs. ${shift2PaidAmount.toLocaleString()}`;
-
-
-// UNPAID
-document.getElementById(
-    "historyShift1Unpaid"
-).textContent = shift1Unpaid;
-
-document.getElementById(
-    "historyShift2Unpaid"
-).textContent = shift2Unpaid;
-
-document.getElementById(
-    "historyShift1UnpaidAmount"
-).textContent =
-    `Rs. ${shift1UnpaidAmount.toLocaleString()}`;
-
-document.getElementById(
-    "historyShift2UnpaidAmount"
-).textContent =
-    `Rs. ${shift2UnpaidAmount.toLocaleString()}`;
-
-    let body = document.getElementById("historyTableBody");
-  document.getElementById("historyTableTitle").innerText =
-`History - ${t.name}`;
     body.innerHTML = "";
 
-// 🔥 SORT COPY — ORIGINAL HISTORY ARRAY KO MODIFY NAHI KARNA
-const sortedHistory = [...t.history].sort((a, b) => {
-    return Number(b.checkout || 0) - Number(a.checkout || 0);
-});
-    
-    if (t.history.length === 0) {
+    // ==========================================
+    // 🔥 HISTORY COPY — ORIGINAL ARRAY TOUCH NAHI
+    // ==========================================
+
+    const historyList = Array.isArray(t.history)
+        ? [...t.history]
+        : [];
+
+    // Latest checkout first
+    historyList.sort((a, b) => {
+        return Number(b.checkout || 0)
+             - Number(a.checkout || 0);
+    });
+
+    // ==========================================
+    // EMPTY HISTORY
+    // ==========================================
+
+    if (historyList.length === 0) {
+
         body.innerHTML = `
-            <tr><td colspan="10" style="text-align:center;">No history found.</td></tr>
+            <tr>
+                <td colspan="10"
+                    style="text-align:center;">
+                    No history found.
+                </td>
+            </tr>
         `;
+
     } else {
-        sortedHistory.forEach((h, index) => {
+
+        // ==========================================
+        // 🔥 RENDER HISTORY
+        // ==========================================
+
+        historyList.forEach((h, index) => {
+
             body.innerHTML += `
                 <tr>
-                    <td>${index + 1}</td>
-                    <td>${formatTime(h.checkin)}</td>
-                    <td>${formatTime(h.checkout)}</td>
-                    <td>${formatSeconds(h.playSeconds)}</td>
-                    <td>${h.rate}</td>
-                    
-                    <td>${h.originalAmount || h.amount || 0}</td>
-                    
-                    <td>${h.discount || 0}</td>
-                    
-                    <td>${h.canteenAmount || 0}</td>
-                    
-                    <td>${h.total || 0}</td>
-                                          <td>
-    ${h.paid
-        ? `<button class="paid-btn" disabled>PAID</button>`
-        : `<button class="unpaid-btn" onclick="openBillFromHistory('${id}', '${h.sessionId}')">UNPAID</button>`
-    }
-</td>
 
-<td>
-${ROLE === "admin"
-? `
-<input 
-type="checkbox"
-class="historyDeleteCheck"
-value="${index}"
->
-`
-: "-"
-}
-</td>
+                    <td>${index + 1}</td>
+
+                    <td>
+                        ${formatTime(h.checkin)}
+
+                        ${
+                            h.fromBooking
+                            ? `
+                                <div style="
+                                    margin-top:4px;
+                                    display:inline-block;
+                                    background:#d4af37;
+                                    color:#000;
+                                    padding:2px 7px;
+                                    border-radius:5px;
+                                    font-size:10px;
+                                    font-weight:bold;
+                                ">
+                                    BOOKING
+                                </div>
+                              `
+                            : ""
+                        }
+                    </td>
+
+                    <td>
+                        ${formatTime(h.checkout)}
+                    </td>
+
+                    <td>
+                        ${formatSeconds(
+                            h.playSeconds || 0
+                        )}
+                    </td>
+
+                    <td>
+                        ${h.rate || 0}
+                    </td>
+
+                    <td>
+                        ${
+                            h.originalAmount ||
+                            h.amount ||
+                            0
+                        }
+                    </td>
+
+                    <td>
+                        ${h.discount || 0}
+                    </td>
+
+                    <td>
+                        ${h.canteenAmount || 0}
+                    </td>
+
+                    <td>
+
+                        ${
+                            h.fromBooking &&
+                            Number(h.bookingAdvance || 0) > 0
+
+                            ? `
+                                <div>
+                                    ${
+                                        h.totalBillAmount ||
+                                        h.total ||
+                                        0
+                                    }
+                                </div>
+
+                                <small
+                                    style="color:#00ff9d;">
+                                    Advance:
+                                    Rs ${
+                                        h.bookingAdvance || 0
+                                    }
+                                </small>
+
+                                <br>
+
+                                <small
+                                    style="color:#ffd700;">
+                                    Remaining:
+                                    Rs ${
+                                        h.remainingPayment || 0
+                                    }
+                                </small>
+                              `
+
+                            : `${h.total || 0}`
+                        }
+
+                    </td>
+
+                    <td>
+
+                        ${
+                            h.paid
+
+                            ? `
+                                <button
+                                    class="paid-btn"
+                                    disabled>
+                                    PAID
+                                </button>
+                              `
+
+                            : `
+                                <button
+                                    class="unpaid-btn"
+                                    onclick="
+                                        openBillFromHistory(
+                                            '${id}',
+                                            '${h.sessionId}'
+                                        )
+                                    ">
+                                    UNPAID
+                                </button>
+                              `
+                        }
+
+                    </td>
+
+                    <td>
+
+                        ${
+                            ROLE === "admin"
+
+                            ? `
+                                <input
+                                    type="checkbox"
+                                    class="historyDeleteCheck"
+                                    value="${h.sessionId || ""}">
+                              `
+
+                            : "-"
+                        }
+
+                    </td>
 
                 </tr>
             `;
         });
     }
 
-    document.getElementById("historyPopup").classList.remove("hidden");
+    // ==========================================
+    // OPEN POPUP
+    // ==========================================
 
-    document.getElementById("closeHistoryBtn").onclick =
-        () => document.getElementById("historyPopup").classList.add("hidden");
+    const popup =
+        document.getElementById("historyPopup");
 
-  const deleteBtn = document.getElementById("deleteSelectedHistoryBtn");
+    if (popup) {
+        popup.classList.remove("hidden");
+    }
 
-// 🔥 only admin
-if (ROLE === "admin") {
+    // ==========================================
+    // CLOSE BUTTON
+    // ==========================================
 
-    deleteBtn.classList.remove("hidden");
+    const closeBtn =
+        document.getElementById("closeHistoryBtn");
 
-    deleteBtn.onclick = async () => {
+    if (closeBtn) {
 
-        const checks = document.querySelectorAll(
-            ".historyDeleteCheck:checked"
+        closeBtn.onclick = () => {
+
+            document
+                .getElementById("historyPopup")
+                ?.classList
+                .add("hidden");
+
+        };
+    }
+
+    // ==========================================
+    // DELETE SELECTED
+    // ==========================================
+
+    const deleteBtn =
+        document.getElementById(
+            "deleteSelectedHistoryBtn"
         );
 
-        if (checks.length === 0) {
-            alert("Select history first ❌");
-            return;
-        }
+    if (!deleteBtn) return;
 
-        const ok = confirm(
-            `Delete ${checks.length} sessions ?`
-        );
+    if (ROLE === "admin") {
 
-        if (!ok) return;
+        deleteBtn.classList.remove("hidden");
 
-        // reverse delete important
-        const indexes = [...checks]
-            .map(c => Number(c.value))
-            .sort((a,b) => b - a);
+        deleteBtn.onclick = async () => {
 
-// 🔥 FAST MULTIPLE DELETE
-for (const i of indexes) {
-    await softDeleteSession(id, i);
-}
+            const checks =
+                document.querySelectorAll(
+                    ".historyDeleteCheck:checked"
+                );
 
-// 🔥 ONLY ONE REFRESH
-await rebuildHistoryFromSessions();
+            if (checks.length === 0) {
 
-renderTables();
+                alert(
+                    "Select history first ❌"
+                );
 
-openHistory(id);
+                return;
+            }
 
-// 🔥 ONLY ONE SUCCESS ALERT
-alert(`${indexes.length} sessions deleted successfully ✅`);
-    };
+            const ok = confirm(
+                `Delete ${checks.length} sessions ?`
+            );
 
-} else {
+            if (!ok) return;
 
-    deleteBtn.classList.add("hidden");
-}
-  
+            const sessionIds = [
+                ...checks
+            ]
+            .map(c => c.value)
+            .filter(Boolean);
+
+            // ======================================
+            // 🔥 EXACT SESSION DELETE
+            // ======================================
+
+            for (const sessionId of sessionIds) {
+
+                const hIndex =
+                    t.history.findIndex(
+                        h =>
+                            String(h.sessionId) ===
+                            String(sessionId)
+                    );
+
+                if (hIndex >= 0) {
+
+                    await softDeleteSession(
+                        id,
+                        hIndex
+                    );
+                }
+            }
+
+            // ======================================
+            // REFRESH
+            // ======================================
+
+            await rebuildHistoryFromSessions();
+
+            renderTables();
+
+            openHistory(id);
+
+            alert(
+                `${sessionIds.length} sessions deleted successfully ✅`
+            );
+        };
+
+    } else {
+
+        deleteBtn.classList.add("hidden");
+
+    }
 }
 
 function openBillFromHistory(tableId, sessionId) {
