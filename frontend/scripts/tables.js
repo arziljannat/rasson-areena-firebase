@@ -2318,7 +2318,7 @@ document.getElementById(
     body.innerHTML = "";
 
 // 🔥 SORT COPY — ORIGINAL HISTORY ARRAY KO MODIFY NAHI KARNA
-const historyList = [...t.history].sort((a, b) => {
+const sortedHistory = [...t.history].sort((a, b) => {
     return Number(b.checkout || 0) - Number(a.checkout || 0);
 });
     
@@ -2327,7 +2327,7 @@ const historyList = [...t.history].sort((a, b) => {
             <tr><td colspan="10" style="text-align:center;">No history found.</td></tr>
         `;
     } else {
-        historyList.forEach((h, index) => {
+        sortedHistory.forEach((h, index) => {
             body.innerHTML += `
                 <tr>
                     <td>${index + 1}</td>
@@ -5672,6 +5672,8 @@ async function rebuildSpecificDayHistory(dayId) {
         if (!t) return;
 
         t.history.push({
+
+          sessionId: docSnap.id,
 
             checkin: new Date(s.start_time).getTime(),
             checkout: new Date(s.end_time).getTime(),
