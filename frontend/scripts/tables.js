@@ -2141,16 +2141,84 @@ function openHistory(id) {
     // ORIGINAL ARRAY KO MODIFY NAHI KARNA
     // ==========================================
 
-    const historyList = Array.isArray(t.history)
-        ? [...t.history]
-        : [];
+// ==========================================
+// 🔥 HISTORY COPY + DUPLICATE PROTECTION
+// ==========================================
 
-    // Latest checkout first
-    historyList.sort((a, b) => {
-        return Number(b.checkout || 0)
-             - Number(a.checkout || 0);
-    });
+let historyList = Array.isArray(t.history)
+    ? [...t.history]
+    : [];
 
+// 🔥 EXACT SAME SESSION ID DUPLICATE REMOVE
+const sessionIds = new Set();
+
+historyList = historyList.filter(h => {
+
+    if (h.sessionId) {
+
+        const key =
+            String(h.sessionId);
+
+        if (sessionIds.has(key)) {
+            console.warn(
+                "⚠️ DUPLICATE HISTORY HIDDEN:",
+                key
+            );
+            return false;
+        }
+
+        sessionIds.add(key);
+    }
+
+    return true;
+});
+
+
+// ==========================================
+// 🔥 EXACT SAME BILL DUPLICATE PROTECTION
+// ==========================================
+
+const billKeys = new Set();
+
+historyList = historyList.filter(h => {
+
+    const key = [
+        h.checkin || 0,
+        h.checkout || 0,
+        h.playSeconds || 0,
+        h.originalAmount || h.amount || 0,
+        h.discount || 0,
+        h.canteenAmount || 0,
+        h.total || 0,
+        h.paid ? 1 : 0
+    ].join("|");
+
+    if (billKeys.has(key)) {
+
+        console.warn(
+            "⚠️ DUPLICATE BILL HIDDEN:",
+            key
+        );
+
+        return false;
+    }
+
+    billKeys.add(key);
+
+    return true;
+});
+
+
+// ==========================================
+// 🔥 LATEST CHECKOUT FIRST
+// ==========================================
+
+historyList.sort((a, b) => {
+
+    return Number(b.checkout || 0)
+         - Number(a.checkout || 0);
+
+});
     // ==========================================
     // EMPTY HISTORY
     // ==========================================
@@ -2270,14 +2338,16 @@ function openHistory(id) {
                                 </button>
                               `
                             : `
-                                <button
-                                    class="unpaid-btn"
-                                    onclick="openBillFromHistory(
-                                        '${id}',
-                                        ${t.history.indexOf(h)}
-                                    )">
-                                    UNPAID
-                                </button>
+                          <button
+                              class="unpaid-btn"
+                              onclick="
+                                  openBillFromHistory(
+                                      '${id}',
+                                      '${h.sessionId}'
+                                  )
+                              ">
+                              UNPAID
+                          </button>
                               `
                         }
                     </td>
@@ -2289,7 +2359,7 @@ function openHistory(id) {
                                 <input
                                     type="checkbox"
                                     class="historyDeleteCheck"
-                                    value="${t.history.indexOf(h)}"
+                                    value="${h.sessionId || ""}"
                                 >
                               `
                             : "-"
@@ -5639,15 +5709,41 @@ if (sessionDayId && sessionDayId !== currentDayId) {
     return;
 }
 
-        let t = tables.find(x => x.name === s.table_id);
+let t = tables.find(x => x.name === s.table_id);
 
-        if (!t) {
-            console.log("⛔ TABLE NOT FOUND:", s.table_id);
-            return;
-        }
+if (!t) {
+    console.log("⛔ TABLE NOT FOUND:", s.table_id);
+    return;
+}
 
-        t.history.push({
-            checkin: new Date(s.start_time).getTime(),
+// 🔥 EXACT FIREBASE SESSION ID
+const sessionId = docSnap.id;
+
+// 🔥 DUPLICATE SESSION PROTECTION
+const alreadyExists = t.history.some(
+    h => String(h.sessionId) === String(sessionId)
+);
+
+if (alreadyExists) {
+    console.warn(
+        "⚠️ DUPLICATE SESSION SKIPPED:",
+        sessionId,
+        t.name
+    );
+    return;
+}
+
+t.history.push({
+
+    // 🔥 VERY IMPORTANT
+    sessionId: sessionId,
+
+    // 🔥 SHIFT
+    shiftNumber:
+        Number(s.shift_number || 1),
+
+    checkin:
+        new Date(s.start_time).getTime(),
             checkout: new Date(s.end_time).getTime(),
 
             playSeconds: s.final_seconds || 0,
