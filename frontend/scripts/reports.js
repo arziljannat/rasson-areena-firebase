@@ -5,6 +5,7 @@ import {
     where
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+const REPORT_BRANCH = "areena";
 
 function getDates() {
     let fromInput = document.getElementById("fromDate").value;
@@ -50,8 +51,7 @@ async function loadOperationalDays() {
 
     operationalDays = {};
 
-    const branch =
-        localStorage.getItem("branch");
+const branch = REPORT_BRANCH;
 
     const snap =
         await getDocs(
@@ -960,8 +960,7 @@ async function loadCanteenReport() {
     let dates = getDates();
     if (!dates) return;
 
-    let branch =
-        localStorage.getItem("branch");
+let branch = REPORT_BRANCH;
 
     let box =
         document.getElementById("reportOutput");
@@ -1070,8 +1069,8 @@ function printReportThermal() {
     <body>
 
         <div class="center">
-            <h3>Rasson Snooker Academy</h3>
-            <small>${localStorage.getItem("branch")}</small>
+            <h3>Rasson Snooker Areena</h3>
+            <small>${REPORT_BRANCH}</small>
         </div>
 
         <hr>
@@ -1102,8 +1101,7 @@ async function loadInventoryReport() {
     let dates = getDates();
     if (!dates) return;
 
-    let branch =
-        localStorage.getItem("branch");
+let branch = REPORT_BRANCH;
 
     let box =
         document.getElementById("reportOutput");
