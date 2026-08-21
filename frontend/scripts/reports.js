@@ -51,90 +51,207 @@ async function loadOperationalDays() {
 
     operationalDays = {};
 
-const branch = REPORT_BRANCH;
+    const branch = REPORT_BRANCH;
 
-    const snap =
-        await getDocs(
-            collection(window.db, "days")
-        );
+    console.log("📊 REPORT BRANCH:", branch);
+
+    const snap = await getDocs(
+        query(
+            collection(window.db, "days"),
+            where("branch", "==", branch)
+        )
+    );
+
+    console.log(
+        "📊 REPORT DAYS FIREBASE COUNT:",
+        snap.size
+    );
 
     snap.forEach(docSnap => {
 
-        const d =
-            docSnap.data();
+        const d = docSnap.data();
 
-        // ==============================
-        // BRANCH FILTER
-        // ==============================
-
-        if (
-            String(d.branch || "").trim() !==
-            String(branch || "").trim()
-        ) {
-            return;
-        }
-
-        const dayId =
-            String(
-                d.day_id ||
-                docSnap.id ||
-                ""
-            );
+        const dayId = String(
+            d.day_id ||
+            docSnap.id ||
+            ""
+        ).trim();
 
         if (!dayId) return;
 
-        // ==============================
-        // OPERATIONAL DAY DATE
-        // SHIFT 1 START PRIMARY
-        // ==============================
 
-        let rawDate =
-            d.shift1?.startMs ||
+        // ==========================================
+        // 🔥 ACTUAL OPERATIONAL DATE
+        // ==========================================
+
+        let date = null;
+
+
+        // 1️⃣ SHIFT 1 START
+        const shift1StartMs = Number(
             d.shift1?.start_ms ||
-            d.start_time ||
-            d.startTime ||
-            d.created_at ||
-            d.date;
-
-        if (!rawDate) return;
-
-        let date;
+            d.shift1?.startMs ||
+            0
+        );
 
         if (
-            typeof rawDate === "object" &&
-            rawDate?.seconds
+            shift1StartMs > 1000000000000
         ) {
 
-            date =
-                new Date(
-                    rawDate.seconds * 1000
+            date = new Date(
+                shift1StartMs
+            );
+
+        }
+
+
+        // 2️⃣ SHIFT 2 START
+        if (!date) {
+
+            const shift2StartMs = Number(
+                d.shift2?.start_ms ||
+                d.shift2?.startMs ||
+                0
+            );
+
+            if (
+                shift2StartMs > 1000000000000
+            ) {
+
+                date = new Date(
+                    shift2StartMs
                 );
 
-        } else {
-
-            date =
-                new Date(rawDate);
+            }
         }
+
+
+        // 3️⃣ SAVED DATE
+        if (!date && d.date) {
+
+            const testDate =
+                new Date(d.date);
+
+            if (
+                !isNaN(
+                    testDate.getTime()
+                )
+            ) {
+
+                date = testDate;
+
+            }
+        }
+
+
+        // 4️⃣ START TIME
+        if (!date && d.start_time) {
+
+            const testDate =
+                new Date(d.start_time);
+
+            if (
+                !isNaN(
+                    testDate.getTime()
+                )
+            ) {
+
+                date = testDate;
+
+            }
+        }
+
+
+        // 5️⃣ CREATED AT
+        if (!date && d.created_at) {
+
+            const testDate =
+                new Date(d.created_at);
+
+            if (
+                !isNaN(
+                    testDate.getTime()
+                )
+            ) {
+
+                date = testDate;
+
+            }
+        }
+
+
+        // 6️⃣ DAY ID TIMESTAMP
+        if (!date) {
+
+            const dayIdNumber =
+                Number(dayId);
+
+            if (
+                Number.isFinite(dayIdNumber) &&
+                dayIdNumber > 1000000000000
+            ) {
+
+                date =
+                    new Date(dayIdNumber);
+
+            }
+        }
+
+
+        // ==========================================
+        // INVALID DATE
+        // ==========================================
 
         if (
+            !date ||
             isNaN(date.getTime())
         ) {
+
+            console.warn(
+                "⚠️ REPORT INVALID DAY:",
+                {
+                    dayId,
+                    branch: d.branch,
+                    date: d.date,
+                    shift1: d.shift1,
+                    shift2: d.shift2
+                }
+            );
+
             return;
         }
+
+
+        // ==========================================
+        // SAVE DAY
+        // ==========================================
 
         operationalDays[dayId] = {
 
             raw: d,
 
-            startDate: date,
+            firestoreDocId:
+                docSnap.id,
 
-            month: date.getMonth(),
+            startDate:
+                date
 
-            year: date.getFullYear(),
-
-            day: date.getDate()
         };
+
     });
+
+
+    console.log(
+        "📊 REPORT DAYS LOADED:",
+        operationalDays
+    );
+
+    console.log(
+        "📊 REPORT DAY COUNT:",
+        Object.keys(
+            operationalDays
+        ).length
+    );
 }
 
 
@@ -362,96 +479,111 @@ async function loadReport() {
             ) {
                 return;
             }
+// ==========================================
+// RASSON ARENA COMBINED DATA
+// ==========================================
 
-            // ======================================
-            // SHIFT 1
-            // ======================================
+const combinedCollection =
+    Number(
+        combined.gameCollection || 0
+    );
 
-            const shift1Collection =
-                Number(
-                    s1.gameCollection || 0
-                );
+const combinedBalance =
+    Number(
+        combined.gameBalance || 0
+    );
 
-            const shift1Balance =
-                Number(
-                    s1.gameBalance || 0
-                );
+const combinedDiscount =
+    Number(
+        combined.discount || 0
+    );
 
-            const shift1Discount =
-                Number(
-                    s1.discount || 0
-                );
+const combinedExpense =
+    Number(
+        combined.expenses || 0
+    );
 
-            const shift1Expense =
-                Number(
-                    s1.expenses || 0
-                );
+const easypaisa =
+    Number(
+        combined.easypaisa || 0
+    );
 
-            // ======================================
-            // SHIFT 2
-            // ======================================
+const closingCash =
+    Number(
+        combined.closingCash || 0
+    );
 
-            const shift2Collection =
-                Number(
-                    s2.gameCollection || 0
-                );
 
-            const shift2Balance =
-                Number(
-                    s2.gameBalance || 0
-                );
+// ==========================================
+// SHIFT DATA
+// AGAR AVAILABLE HO TO SHOW KARO
+// ==========================================
 
-            const shift2Discount =
-                Number(
-                    s2.discount || 0
-                );
+const shift1Collection =
+    Number(
+        s1.gameCollection || 0
+    );
 
-            const shift2Expense =
-                Number(
-                    s2.expenses || 0
-                );
+const shift2Collection =
+    Number(
+        s2.gameCollection || 0
+    );
 
-            // ======================================
-            // TOTALS
-            // ======================================
+const shift1Balance =
+    Number(
+        s1.gameBalance || 0
+    );
 
-            const totalCollection =
-                shift1Collection +
-                shift2Collection;
+const shift2Balance =
+    Number(
+        s2.gameBalance || 0
+    );
 
-            const totalBalance =
-                shift1Balance +
-                shift2Balance;
+const shift1Discount =
+    Number(
+        s1.discount || 0
+    );
 
-            const totalDiscount =
-                shift1Discount +
-                shift2Discount;
+const shift2Discount =
+    Number(
+        s2.discount || 0
+    );
 
-            const totalExpense =
-                shift1Expense +
-                shift2Expense;
+const shift1Expense =
+    Number(
+        s1.expenses || 0
+    );
 
-            // ======================================
-            // EASYPAISA
-            // ======================================
+const shift2Expense =
+    Number(
+        s2.expenses || 0
+    );
 
-            const easypaisa =
-                Number(
-                    combined.easypaisa || 0
-                );
 
-            // ======================================
-            // FINAL CLOSING CASH
-            //
-            // SAME AS ARENA DAY HISTORY
-            // ======================================
+// ==========================================
+// TOTALS
+// ==========================================
 
-            const finalClosingCash =
-                totalCollection -
-                totalBalance -
-                totalDiscount -
-                totalExpense -
-                easypaisa;
+const totalCollection =
+    combinedCollection;
+
+const totalBalance =
+    combinedBalance;
+
+const totalDiscount =
+    combinedDiscount;
+
+const totalExpense =
+    combinedExpense;
+
+
+// ==========================================
+// FINAL CLOSING CASH
+// AREENA DAY HISTORY
+// ==========================================
+
+const finalClosingCash =
+    closingCash;
 
             // ======================================
             // COMBINED TIMING
