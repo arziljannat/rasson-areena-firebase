@@ -1039,6 +1039,21 @@ century_rate: t.centuryRate,
 }
 }
 
+// ======================================================
+// 🔥 EXPOSE TABLE FUNCTIONS TO HTML ONCLICK
+// ======================================================
+window.checkIn = checkIn;
+window.checkOut = checkOut;
+window.showBill = showBill;
+window.openHistory = openHistory;
+window.editTable = editTable;
+window.deleteTableOpen = deleteTableOpen;
+window.openCanteen = openCanteen;
+window.openTableShift = openTableShift;
+window.handleRateChange = handleRateChange;
+
+
+
 
 
 /******************************************************
