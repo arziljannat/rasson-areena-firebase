@@ -1263,3 +1263,243 @@ body * {
     }
 
 }
+
+/* =========================================================
+   HISTORY SUMMARY CARDS
+   RASSON AREENA
+========================================================= */
+
+#historyPopup .history-summary-counters{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+    gap:14px;
+
+    width:100%;
+
+    margin-bottom:20px;
+
+}
+
+
+#historyPopup .history-summary-box{
+
+    min-height:125px;
+
+    padding:14px;
+
+    box-sizing:border-box;
+
+    border-radius:16px;
+
+    background:
+        rgba(0,0,0,.45);
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:flex-start;
+
+    text-align:center;
+
+    transition:.25s;
+
+}
+
+
+#historyPopup .history-summary-box:hover{
+
+    transform:translateY(-3px);
+
+}
+
+
+/* GREEN */
+
+#historyPopup
+.history-summary-box.green{
+
+    border:2px solid #00ff88;
+
+    box-shadow:
+        0 0 18px rgba(0,255,136,.30);
+
+}
+
+
+/* GOLD */
+
+#historyPopup
+.history-summary-box.gold{
+
+    border:2px solid #ffd700;
+
+    box-shadow:
+        0 0 18px rgba(255,215,0,.30);
+
+}
+
+
+/* RED */
+
+#historyPopup
+.history-summary-box.red{
+
+    border:2px solid #ff4444;
+
+    box-shadow:
+        0 0 18px rgba(255,60,60,.30);
+
+}
+
+
+/* CARD TITLE */
+
+#historyPopup .history-card-title{
+
+    font-size:18px;
+
+    font-weight:800;
+
+    margin-bottom:12px;
+
+    color:#00ffcc;
+
+}
+
+
+/* SHIFT HEADERS */
+
+#historyPopup .history-card-head{
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:10px;
+
+    font-size:12px;
+
+    color:#aaa;
+
+    margin-bottom:5px;
+
+}
+
+
+/* NUMBERS */
+
+#historyPopup .history-card-values{
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:10px;
+
+}
+
+
+#historyPopup .history-card-values strong{
+
+    font-size:28px;
+
+    color:#fff;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,.5);
+
+}
+
+
+/* AMOUNTS */
+
+#historyPopup .history-card-amount{
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:10px;
+
+    margin-top:5px;
+
+}
+
+
+#historyPopup .history-card-amount span{
+
+    font-size:12px;
+
+    color:#00ff99;
+
+    font-weight:bold;
+
+}
+
+
+/* TABLE */
+
+#historyPopup .table-mobile-wrapper{
+
+    width:100%;
+
+    overflow-x:auto;
+
+    overflow-y:auto;
+
+    flex:1;
+
+}
+
+
+#historyPopup .history-table{
+
+    width:100%;
+
+    min-width:1050px;
+
+}
+
+
+/* MOBILE */
+
+@media(max-width:1200px){
+
+    #historyPopup .history-summary-counters{
+
+        grid-template-columns:
+        repeat(2, minmax(0,1fr));
+
+    }
+
+}
+
+
+@media(max-width:700px){
+
+    #historyPopup .history-summary-counters{
+
+        grid-template-columns:1fr;
+
+    }
+
+    #historyPopup .history-summary-box{
+
+        min-height:110px;
+
+    }
+
+}
