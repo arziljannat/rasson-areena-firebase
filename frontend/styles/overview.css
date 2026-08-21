@@ -1,213 +1,622 @@
-body{
+/* =========================================
+   OVERVIEW PAGE
+========================================= */
 
-    margin:0;
-    padding:0;
+body {
+
+    margin: 0;
+    padding: 0;
 
     background:
-    url('../assets/icon.png')
-    no-repeat center center fixed;
+        url('../assets/icon.png')
+        no-repeat center center fixed;
 
-    background-size:cover;
+    background-size: cover;
 
-    font-family:Arial,sans-serif;
+    font-family: Arial, sans-serif;
 
-    overflow-x:hidden;
+    overflow-x: hidden;
 }
 
-/* MAIN CONTAINER */
 
-#overviewContainer{
+/* =========================================
+   MAIN CONTAINER
+========================================= */
 
-    width:95%;
-    margin:120px auto 40px auto;
+#overviewContainer {
 
-    display:flex;
-    flex-direction:column;
+    width: min(1400px, 94%);
 
-    gap:45px;
+    margin: 210px auto 60px auto;
+
+    position: relative;
+
+    z-index: 2;
 }
 
-/* BRANCH CARD */
 
-.branch-card{
+/* =========================================
+   OVERVIEW PAGE
+========================================= */
 
-    width:100%;
+.overview-page {
+
+    width: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 45px;
 }
 
-/* BRANCH TITLE */
 
-.branch-title{
+/* =========================================
+   HEADER
+========================================= */
 
-    text-align:center;
+.overview-header {
 
-    color:#00ffcc;
+    width: 100%;
 
-    font-size:38px;
+    text-align: center;
 
-    font-weight:bold;
+    margin-bottom: 5px;
+}
 
-    margin-bottom:20px;
+.overview-header h1 {
+
+    margin: 0;
+
+    color: #00ffcc;
+
+    font-size: 46px;
+
+    font-weight: 900;
+
+    letter-spacing: 2px;
 
     text-shadow:
-    0 0 15px #00ffcc;
+        0 0 10px #00ffcc,
+        0 0 25px #00ffcc;
 }
 
-/* TOP STATS */
+.overview-header p {
 
-.branch-stats{
+    margin: 10px 0 0;
 
-    display:grid;
+    color: #ffffff;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    letter-spacing: 5px;
+
+    text-shadow:
+        0 0 10px #000;
+}
+
+
+/* =========================================
+   TOP STAT CARDS
+========================================= */
+
+.overview-stats {
+
+    width: 100%;
+
+    display: grid;
 
     grid-template-columns:
-    repeat(3,1fr);
+        repeat(3, minmax(0, 1fr));
 
-    gap:20px;
-
-    margin-bottom:25px;
+    gap: 25px;
 }
 
-.stat-box{
+
+.stat-box {
+
+    min-height: 120px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    box-sizing: border-box;
+
+    padding: 20px;
 
     background:
-    rgba(0,0,0,0.35);
+        rgba(0, 0, 0, 0.55);
 
-    border:2px solid #00ff9d;
+    border:
+        2px solid #00ff9d;
 
-    border-radius:18px;
+    border-radius: 20px;
 
-    padding:20px;
-
-    text-align:center;
+    text-align: center;
 
     box-shadow:
-    0 0 20px #00ff9d;
+        0 0 12px rgba(0, 255, 157, 0.8),
+        inset 0 0 20px rgba(0, 255, 157, 0.08);
+
+    backdrop-filter: blur(4px);
 }
 
-.stat-box h3{
 
-    color:#00ffcc;
+.stat-box h3 {
 
-    margin:0;
+    margin: 0;
 
-    font-size:24px;
+    color: #00ffcc;
+
+    font-size: 21px;
+
+    letter-spacing: 1px;
+
+    text-shadow:
+        0 0 10px #00ffcc;
 }
 
-.stat-box p{
 
-    color:#00ff99;
+.stat-box p {
 
-    font-size:30px;
+    margin: 10px 0 0;
 
-    margin-top:10px;
+    color: #ffffff;
 
-    font-weight:bold;
+    font-size: 34px;
+
+    font-weight: 900;
+
+    text-shadow:
+        0 0 12px #00ff99;
 }
 
-/* TABLE GRID */
 
-.tables-grid{
+/* =========================================
+   SECTIONS
+========================================= */
 
-    display:grid;
+.overview-section {
+
+    width: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+}
+
+
+.rooms-section {
+
+    margin-top: 5px;
+}
+
+
+/* =========================================
+   SECTION HEADINGS
+========================================= */
+
+.section-heading {
+
+    width: 100%;
+
+    margin: 0 0 28px;
+
+    text-align: center;
+
+    color: #00ffcc;
+
+    font-size: 36px;
+
+    font-weight: 900;
+
+    letter-spacing: 4px;
+
+    text-shadow:
+        0 0 10px #00ffcc,
+        0 0 25px #00ffcc;
+
+    position: relative;
+}
+
+
+.section-heading::after {
+
+    content: "";
+
+    display: block;
+
+    width: 180px;
+
+    height: 2px;
+
+    margin: 12px auto 0;
+
+    background: #00ffcc;
+
+    box-shadow:
+        0 0 10px #00ffcc,
+        0 0 20px #00ffcc;
+}
+
+
+/* =========================================
+   TABLES GRID
+   5 FIRST ROW
+   4 SECOND ROW CENTERED
+========================================= */
+
+.overview-tables-grid {
+
+    width: 100%;
+
+    display: grid;
 
     grid-template-columns:
-    repeat(auto-fit,minmax(180px,1fr));
+        repeat(5, minmax(150px, 1fr));
 
-    gap:18px;
+    gap: 22px;
+
+    justify-content: center;
+
+    align-items: center;
 }
 
-/* TABLE BOX */
 
-.table-box{
+/* =========================================
+   ROOMS GRID
+========================================= */
 
-    border-radius:18px;
+.overview-rooms-grid {
 
-    padding:18px;
+    width: 100%;
 
-    text-align:center;
+    display: flex;
 
-    font-weight:bold;
+    flex-wrap: wrap;
 
-    transition:0.25s;
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 22px;
 }
 
-/* FREE */
 
-.table-free{
+/* =========================================
+   RESOURCE CARD
+========================================= */
+
+.overview-resource-box {
+
+    min-height: 110px;
+
+    box-sizing: border-box;
+
+    padding: 20px;
+
+    border-radius: 18px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    text-align: center;
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.overview-resource-box:hover {
+
+    transform: translateY(-5px) scale(1.02);
+}
+
+
+/* =========================================
+   FREE
+========================================= */
+
+.resource-free {
 
     background:
-    rgba(0,80,0,0.35);
+        rgba(0, 80, 0, 0.42);
 
-    border:2px solid #00ff66;
+    border:
+        2px solid #00ff66;
 
-    color:#00ff99;
+    color: #00ff99;
 
     box-shadow:
-    0 0 18px #00ff66;
+        0 0 16px #00ff66,
+        inset 0 0 15px rgba(0, 255, 102, 0.08);
 }
 
-/* ACTIVE */
 
-.table-active{
+/* =========================================
+   ACTIVE
+========================================= */
+
+.resource-active {
 
     background:
-    rgba(120,0,0,0.35);
+        rgba(120, 0, 0, 0.48);
 
-    border:2px solid #ff2a2a;
+    border:
+        2px solid #ff2a2a;
 
-    color:#ff6b6b;
+    color: #ff6b6b;
 
     box-shadow:
-    0 0 18px #ff2a2a;
+        0 0 18px #ff2a2a,
+        inset 0 0 15px rgba(255, 42, 42, 0.08);
 
-    animation:pulse 1.2s infinite;
+    animation:
+        overviewPulse 1.2s infinite;
 }
 
-@keyframes pulse{
 
-    0%{
-        transform:scale(1);
+@keyframes overviewPulse {
+
+    0% {
+        transform: scale(1);
     }
 
-    50%{
-        transform:scale(1.03);
+    50% {
+        transform: scale(1.025);
     }
 
-    100%{
-        transform:scale(1);
+    100% {
+        transform: scale(1);
     }
+
 }
 
-.table-box h2{
 
-    margin:0 0 10px 0;
+/* =========================================
+   RESOURCE TEXT
+========================================= */
 
-    font-size:24px;
+.overview-resource-box h2 {
+
+    margin: 0 0 10px;
+
+    font-size: 25px;
+
+    font-weight: 900;
 }
 
-.table-box p{
 
-    margin:5px 0;
+.overview-resource-box p {
 
-    font-size:18px;
+    margin: 0;
+
+    font-size: 17px;
+
+    font-weight: 900;
+
+    letter-spacing: 2px;
 }
 
-/* MOBILE */
 
-@media(max-width:768px){
+/* =========================================
+   TABLE ROW CENTERING
+   9 TABLES = 5 + 4
+========================================= */
 
-    .branch-title{
+.overview-tables-grid
+.overview-resource-box:nth-child(6) {
 
-        font-size:28px;
+    grid-column: 1;
+}
+
+
+/*
+   Center second row of 4 cards.
+
+   With 5 columns:
+   card 6 -> column 1
+   card 7 -> column 2
+   card 8 -> column 3
+   card 9 -> column 4
+
+   We shift the second row by half a column
+   using a pseudo layout approach below.
+*/
+
+.overview-tables-grid {
+
+    grid-template-columns:
+        repeat(10, minmax(0, 1fr));
+}
+
+
+/* First 5 cards */
+
+.overview-tables-grid
+.overview-resource-box:nth-child(-n+5) {
+
+    grid-column: span 2;
+}
+
+
+/* Second 4 cards */
+
+.overview-tables-grid
+.overview-resource-box:nth-child(n+6) {
+
+    grid-column: span 2;
+}
+
+
+/* Put second row in center */
+
+.overview-tables-grid
+.overview-resource-box:nth-child(6) {
+
+    grid-column: 2 / span 2;
+}
+
+.overview-tables-grid
+.overview-resource-box:nth-child(7) {
+
+    grid-column: 4 / span 2;
+}
+
+.overview-tables-grid
+.overview-resource-box:nth-child(8) {
+
+    grid-column: 6 / span 2;
+}
+
+.overview-tables-grid
+.overview-resource-box:nth-child(9) {
+
+    grid-column: 8 / span 2;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 900px) {
+
+    #overviewContainer {
+
+        width: 92%;
+
+        margin-top: 180px;
+
     }
 
-    .branch-stats{
 
-        grid-template-columns:1fr;
+    .overview-header h1 {
+
+        font-size: 32px;
+
     }
 
-    .tables-grid{
+
+    .overview-header p {
+
+        font-size: 14px;
+
+        letter-spacing: 3px;
+
+    }
+
+
+    .overview-stats {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .section-heading {
+
+        font-size: 30px;
+
+    }
+
+
+    .overview-tables-grid {
 
         grid-template-columns:
-        repeat(2,1fr);
+            repeat(2, minmax(0, 1fr));
+
+        gap: 16px;
+
     }
+
+
+    .overview-tables-grid
+    .overview-resource-box {
+
+        grid-column: auto !important;
+
+    }
+
+
+    .overview-rooms-grid {
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    #overviewContainer {
+
+        width: 92%;
+
+        margin-top: 160px;
+
+    }
+
+
+    .overview-header h1 {
+
+        font-size: 25px;
+
+        letter-spacing: 1px;
+
+    }
+
+
+    .section-heading {
+
+        font-size: 25px;
+
+        letter-spacing: 2px;
+
+    }
+
+
+    .overview-resource-box {
+
+        min-height: 90px;
+
+        padding: 14px;
+
+    }
+
+
+    .overview-resource-box h2 {
+
+        font-size: 20px;
+
+    }
+
+
+    .overview-resource-box p {
+
+        font-size: 14px;
+
+    }
+
 }
