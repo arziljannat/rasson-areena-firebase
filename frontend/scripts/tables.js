@@ -1156,32 +1156,6 @@ selected_play_type: t.selectedPlayType || t.playType,
     day_id: window.currentDayId
 });
 }
-  // 🔥 SAVE HISTORY (MAIN FIX)
-t.history.push({
-    checkin: t.checkinTime,
-    checkout: t.checkoutTime,
-    playSeconds: t.finalSeconds,
-    originalAmount: t.finalAmount,
-
-discount: t.discount || 0,
-
-amount:
-    t.finalAmount - (t.discount || 0),
-    canteenAmount: t.canteenTotal,
-    total:
-(
-    t.finalAmount -
-    (t.discount || 0)
-)
-+
-t.canteenTotal,
-    paid: false,
-    paidTime: null,
-    rate: t.selectedRate || 0,
-
-playType: t.selectedPlayType || t.playType,
-    canteenItems: { ...t.canteenItems }
-});
 
     // 🔥 HISTORY SAVE (CORRECT PLACE)
     if (!t.history) t.history = [];
@@ -2118,8 +2092,11 @@ function openHistory(id) {
         return;
     }
 
-    const body = document.getElementById("historyTableBody");
-    const title = document.getElementById("historyTableTitle");
+    const body =
+        document.getElementById("historyTableBody");
+
+    const title =
+        document.getElementById("historyTableTitle");
 
     if (!body) {
         console.error("❌ historyTableBody not found");
@@ -2130,211 +2107,230 @@ function openHistory(id) {
         title.innerText = `History - ${t.name}`;
     }
 
-    // ==================================================
-    // 🔥 COPY HISTORY — ORIGINAL ARRAY TOUCH NAHI KARNA
-    // ==================================================
+    // =====================================================
+    // 🔥 BUILD CLEAN HISTORY
+    // ONE FIREBASE SESSION = ONE BILL
+    // =====================================================
 
-    let historyList = Array.isArray(t.history)
+    let rawHistory = Array.isArray(t.history)
         ? [...t.history]
         : [];
 
-    // ==================================================
-    // 🔥 DUPLICATE SESSION REMOVE
-    // ==================================================
-
     const seenSessions = new Set();
 
-    historyList = historyList.filter(h => {
+    const historyList = [];
 
+    for (const h of rawHistory) {
+
+        // ---------------------------------------------
+        // SESSION ID MUST EXIST
+        // ---------------------------------------------
         if (!h.sessionId) {
-            return true;
+            console.warn(
+                "⚠️ HISTORY WITHOUT SESSION ID SKIPPED:",
+                h
+            );
+            continue;
         }
 
-        const key = String(h.sessionId);
+        const sessionId =
+            String(h.sessionId);
 
-        if (seenSessions.has(key)) {
+        // ---------------------------------------------
+        // EXACT FIREBASE SESSION DUPLICATE
+        // ---------------------------------------------
+        if (seenSessions.has(sessionId)) {
             console.warn(
                 "⚠️ DUPLICATE SESSION HIDDEN:",
-                key
+                sessionId
             );
-            return false;
+            continue;
         }
 
-        seenSessions.add(key);
+        seenSessions.add(sessionId);
 
-        return true;
+        historyList.push(h);
+    }
+
+    // =====================================================
+    // 🔥 SORT ONLY COPY
+    // ORIGINAL t.history KO TOUCH NAHI KARNA
+    // =====================================================
+
+    historyList.sort((a, b) => {
+
+        return Number(b.checkout || 0)
+             - Number(a.checkout || 0);
+
     });
 
+    // =====================================================
+    // 🔥 SHIFT FILTER
+    // =====================================================
 
-
-
-
-  
-    // ==================================================
-    // 🔥 SORT — LATEST FIRST
-    // ==================================================
-
-    historyList.sort((a, b) =>
-        Number(b.checkout || 0) -
-        Number(a.checkout || 0)
-    );
-
-    // ==================================================
-    // 🔥 SHIFT SPLIT
-    // ==================================================
-
-    const shift1History = historyList.filter(
-        h => Number(h.shiftNumber || 1) === 1
-    );
-
-    const shift2History = historyList.filter(
-        h => Number(h.shiftNumber || 1) === 2
-    );
-
-    // ==================================================
-    // 🎮 TOTAL GAME
-    // ==================================================
-
-    const shift1Game = shift1History.length;
-    const shift2Game = shift2History.length;
-
-    // ==================================================
-    // 👤 GUEST PLAY
-    // ==================================================
-
-    const shift1Guest = shift1History.filter(
-        h => h.fromBooking !== true
-    ).length;
-
-    const shift2Guest = shift2History.filter(
-        h => h.fromBooking !== true
-    ).length;
-
-    // ==================================================
-    // 📅 BOOKING PLAY
-    // ==================================================
-
-    const shift1Booking = shift1History.filter(
-        h => h.fromBooking === true
-    ).length;
-
-    const shift2Booking = shift2History.filter(
-        h => h.fromBooking === true
-    ).length;
-
-    // ==================================================
-    // 💰 PAID
-    // ==================================================
-
-    const shift1Paid = shift1History.filter(
-        h => h.paid === true
-    ).length;
-
-    const shift2Paid = shift2History.filter(
-        h => h.paid === true
-    ).length;
-
-    // ==================================================
-    // ⚠️ UNPAID
-    // ==================================================
-
-    const shift1Unpaid = shift1History.filter(
-        h => h.paid !== true
-    ).length;
-
-    const shift2Unpaid = shift2History.filter(
-        h => h.paid !== true
-    ).length;
-
-    // ==================================================
-    // 💵 PAID AMOUNT
-    // ==================================================
-
-    const shift1PaidAmount = shift1History
-        .filter(h => h.paid === true)
-        .reduce(
-            (sum, h) =>
-                sum + Number(h.total || 0),
-            0
+    const shift1History =
+        historyList.filter(
+            h => Number(h.shiftNumber || 1) === 1
         );
 
-    const shift2PaidAmount = shift2History
-        .filter(h => h.paid === true)
-        .reduce(
-            (sum, h) =>
-                sum + Number(h.total || 0),
-            0
+    const shift2History =
+        historyList.filter(
+            h => Number(h.shiftNumber || 1) === 2
         );
 
-    // ==================================================
-    // 💸 UNPAID AMOUNT
-    // ==================================================
+    // =====================================================
+    // 🔥 SUMMARY
+    // =====================================================
 
-    const shift1UnpaidAmount = shift1History
-        .filter(h => h.paid !== true)
-        .reduce(
-            (sum, h) =>
-                sum + Number(h.total || 0),
-            0
-        );
+    const shift1Game =
+        shift1History.length;
 
-    const shift2UnpaidAmount = shift2History
-        .filter(h => h.paid !== true)
-        .reduce(
-            (sum, h) =>
-                sum + Number(h.total || 0),
-            0
-        );
+    const shift2Game =
+        shift2History.length;
 
-    // ==================================================
+    const shift1Guest =
+        shift1History.filter(
+            h => !h.fromBooking
+        ).length;
+
+    const shift2Guest =
+        shift2History.filter(
+            h => !h.fromBooking
+        ).length;
+
+    const shift1Booking =
+        shift1History.filter(
+            h => h.fromBooking
+        ).length;
+
+    const shift2Booking =
+        shift2History.filter(
+            h => h.fromBooking
+        ).length;
+
+    const shift1Paid =
+        shift1History.filter(
+            h => h.paid === true
+        ).length;
+
+    const shift2Paid =
+        shift2History.filter(
+            h => h.paid === true
+        ).length;
+
+    const shift1Unpaid =
+        shift1History.filter(
+            h => h.paid !== true
+        ).length;
+
+    const shift2Unpaid =
+        shift2History.filter(
+            h => h.paid !== true
+        ).length;
+
+    const shift1PaidAmount =
+        shift1History
+            .filter(h => h.paid === true)
+            .reduce(
+                (sum, h) =>
+                    sum + Number(h.total || 0),
+                0
+            );
+
+    const shift2PaidAmount =
+        shift2History
+            .filter(h => h.paid === true)
+            .reduce(
+                (sum, h) =>
+                    sum + Number(h.total || 0),
+                0
+            );
+
+    const shift1UnpaidAmount =
+        shift1History
+            .filter(h => h.paid !== true)
+            .reduce(
+                (sum, h) =>
+                    sum + Number(h.total || 0),
+                0
+            );
+
+    const shift2UnpaidAmount =
+        shift2History
+            .filter(h => h.paid !== true)
+            .reduce(
+                (sum, h) =>
+                    sum + Number(h.total || 0),
+                0
+            );
+
+    // =====================================================
     // 🔥 UPDATE TOP CARDS
-    // ==================================================
+    // =====================================================
 
-    document.getElementById("historyShift1Game").textContent =
-        shift1Game;
+    document.getElementById(
+        "historyShift1Game"
+    ).textContent = shift1Game;
 
-    document.getElementById("historyShift2Game").textContent =
-        shift2Game;
+    document.getElementById(
+        "historyShift2Game"
+    ).textContent = shift2Game;
 
-    document.getElementById("historyShift1Guest").textContent =
-        shift1Guest;
+    document.getElementById(
+        "historyShift1Guest"
+    ).textContent = shift1Guest;
 
-    document.getElementById("historyShift2Guest").textContent =
-        shift2Guest;
+    document.getElementById(
+        "historyShift2Guest"
+    ).textContent = shift2Guest;
 
-    document.getElementById("historyShift1Booking").textContent =
-        shift1Booking;
+    document.getElementById(
+        "historyShift1Booking"
+    ).textContent = shift1Booking;
 
-    document.getElementById("historyShift2Booking").textContent =
-        shift2Booking;
+    document.getElementById(
+        "historyShift2Booking"
+    ).textContent = shift2Booking;
 
-    document.getElementById("historyShift1Paid").textContent =
-        shift1Paid;
+    document.getElementById(
+        "historyShift1Paid"
+    ).textContent = shift1Paid;
 
-    document.getElementById("historyShift2Paid").textContent =
-        shift2Paid;
+    document.getElementById(
+        "historyShift2Paid"
+    ).textContent = shift2Paid;
 
-    document.getElementById("historyShift1PaidAmount").textContent =
+    document.getElementById(
+        "historyShift1PaidAmount"
+    ).textContent =
         `Rs. ${shift1PaidAmount.toLocaleString()}`;
 
-    document.getElementById("historyShift2PaidAmount").textContent =
+    document.getElementById(
+        "historyShift2PaidAmount"
+    ).textContent =
         `Rs. ${shift2PaidAmount.toLocaleString()}`;
 
-    document.getElementById("historyShift1Unpaid").textContent =
-        shift1Unpaid;
+    document.getElementById(
+        "historyShift1Unpaid"
+    ).textContent = shift1Unpaid;
 
-    document.getElementById("historyShift2Unpaid").textContent =
-        shift2Unpaid;
+    document.getElementById(
+        "historyShift2Unpaid"
+    ).textContent = shift2Unpaid;
 
-    document.getElementById("historyShift1UnpaidAmount").textContent =
+    document.getElementById(
+        "historyShift1UnpaidAmount"
+    ).textContent =
         `Rs. ${shift1UnpaidAmount.toLocaleString()}`;
 
-    document.getElementById("historyShift2UnpaidAmount").textContent =
+    document.getElementById(
+        "historyShift2UnpaidAmount"
+    ).textContent =
         `Rs. ${shift2UnpaidAmount.toLocaleString()}`;
 
-    // ==================================================
-    // 🔥 RENDER HISTORY
-    // ==================================================
+    // =====================================================
+    // 🔥 TABLE
+    // =====================================================
 
     body.innerHTML = "";
 
@@ -2342,7 +2338,7 @@ function openHistory(id) {
 
         body.innerHTML = `
             <tr>
-                <td colspan="10"
+                <td colspan="11"
                     style="text-align:center;">
                     No history found.
                 </td>
@@ -2353,16 +2349,22 @@ function openHistory(id) {
 
         historyList.forEach((h, index) => {
 
+            const sessionId =
+                String(h.sessionId);
+
             body.innerHTML += `
+
                 <tr>
 
-                    <td>${index + 1}</td>
+                    <td>
+                        ${index + 1}
+                    </td>
 
                     <td>
                         ${formatTime(h.checkin)}
 
                         ${
-                            h.fromBooking === true
+                            h.fromBooking
                             ? `
                                 <div style="
                                     margin-top:4px;
@@ -2379,6 +2381,7 @@ function openHistory(id) {
                               `
                             : ""
                         }
+
                     </td>
 
                     <td>
@@ -2412,317 +2415,460 @@ function openHistory(id) {
                     </td>
 
                     <td>
-                        ${h.total || 0}
+                        ${
+                            h.total ||
+                            (
+                                Number(
+                                    h.amount || 0
+                                ) +
+                                Number(
+                                    h.canteenAmount || 0
+                                )
+                            )
+                        }
                     </td>
 
                     <td>
+
                         ${
                             h.paid === true
-                            ? `<button class="paid-btn" disabled>PAID</button>`
+
+                            ? `
+                                <button
+                                    class="paid-btn"
+                                    disabled>
+                                    PAID
+                                </button>
+                              `
+
                             : `
                                 <button
-  onclick="openBillFromHistory(
-      '${id}',
-      '${h.sessionId}'
-  )">
+                                    class="unpaid-btn"
+                                    onclick="openBillFromHistory(
+                                        '${String(id)}',
+                                        '${sessionId}'
+                                    )">
                                     UNPAID
                                 </button>
                               `
                         }
+
                     </td>
 
                     <td>
+
                         ${
                             ROLE === "admin"
+
                             ? `
                                 <input
                                     type="checkbox"
                                     class="historyDeleteCheck"
-                                    value="${t.history.indexOf(h)}"
+                                    data-session-id="${sessionId}"
                                 >
                               `
+
                             : "-"
                         }
+
                     </td>
 
                 </tr>
+
             `;
         });
     }
 
-    // ==================================================
-    // 🔥 OPEN POPUP
-    // ==================================================
+    // =====================================================
+    // 🔥 SHOW POPUP
+    // =====================================================
 
     document
         .getElementById("historyPopup")
         .classList.remove("hidden");
 
-    // ==================================================
+    // =====================================================
     // CLOSE
-    // ==================================================
+    // =====================================================
 
     const closeBtn =
-        document.getElementById("closeHistoryBtn");
+        document.getElementById(
+            "closeHistoryBtn"
+        );
 
     if (closeBtn) {
-        closeBtn.onclick = () =>
+
+        closeBtn.onclick = () => {
+
             document
                 .getElementById("historyPopup")
                 .classList.add("hidden");
+
+        };
     }
 
-    // ==================================================
-    // DELETE SELECTED
-    // ==================================================
+    // =====================================================
+    // DELETE BUTTON
+    // =====================================================
 
     const deleteBtn =
         document.getElementById(
             "deleteSelectedHistoryBtn"
         );
 
-    if (deleteBtn) {
+    if (!deleteBtn) return;
 
-        if (ROLE === "admin") {
+    if (ROLE === "admin") {
 
-            deleteBtn.classList.remove("hidden");
+        deleteBtn.classList.remove("hidden");
 
-            deleteBtn.onclick = async () => {
+        deleteBtn.onclick = async () => {
 
-                const checks =
-                    document.querySelectorAll(
-                        ".historyDeleteCheck:checked"
+            const checks =
+                document.querySelectorAll(
+                    ".historyDeleteCheck:checked"
+                );
+
+            if (checks.length === 0) {
+                alert("Select history first ❌");
+                return;
+            }
+
+            const ok = confirm(
+                `Delete ${checks.length} sessions ?`
+            );
+
+            if (!ok) return;
+
+            for (const check of checks) {
+
+                const sessionId =
+                    check.dataset.sessionId;
+
+                const index =
+                    t.history.findIndex(
+                        h =>
+                            String(h.sessionId)
+                            === String(sessionId)
                     );
 
-                if (checks.length === 0) {
-                    alert("Select history first ❌");
-                    return;
+                if (index !== -1) {
+                    await softDeleteSession(
+                        id,
+                        index
+                    );
                 }
+            }
 
-                const ok = confirm(
-                    `Delete ${checks.length} sessions ?`
-                );
+            await rebuildHistoryFromSessions();
 
-                if (!ok) return;
+            renderTables();
 
-                const indexes = [...checks]
-                    .map(c => Number(c.value))
-                    .sort((a, b) => b - a);
+            openHistory(id);
 
-                for (const i of indexes) {
-                    await softDeleteSession(id, i);
-                }
+            alert(
+                `${checks.length} sessions deleted successfully ✅`
+            );
+        };
 
-                await rebuildHistoryFromSessions();
+    } else {
 
-                renderTables();
+        deleteBtn.classList.add("hidden");
 
-                openHistory(id);
-
-                alert(
-                    `${indexes.length} sessions deleted successfully ✅`
-                );
-            };
-
-        } else {
-
-            deleteBtn.classList.add("hidden");
-        }
     }
 }
 
-
 function openBillFromHistory(tableId, sessionId) {
 
-    const t = tables.find(
-        x => String(x.id) === String(tableId)
-    );
+    const t =
+        tables.find(
+            x => String(x.id) === String(tableId)
+        );
 
     if (!t) {
-        console.error("❌ Table not found:", tableId);
+
+        console.error(
+            "❌ Table not found:",
+            tableId
+        );
+
         return;
     }
 
-    // 🔥 EXACT SESSION ID SE HISTORY RECORD FIND
-    const h = t.history.find(
-        x => String(x.sessionId) === String(sessionId)
-    );
+    if (!Array.isArray(t.history)) {
+
+        console.error(
+            "❌ Table history missing:",
+            tableId
+        );
+
+        return;
+    }
+
+    // ==========================================
+    // EXACT FIREBASE SESSION
+    // ==========================================
+
+    const h =
+        t.history.find(
+            x =>
+                String(x.sessionId) ===
+                String(sessionId)
+        );
 
     if (!h) {
+
         console.error(
             "❌ History session not found:",
-            sessionId
+            {
+                tableId,
+                sessionId,
+                history: t.history
+            }
         );
+
+        alert("History session not found ❌");
+
         return;
     }
 
-    // Safety
+    // ==========================================
+    // ALREADY PAID
+    // ==========================================
+
     if (h.paid === true) {
-        console.warn("⚠️ This bill is already paid.");
+
+        alert(
+            "This bill is already paid ✅"
+        );
+
         return;
     }
 
-    let academy =
+    // ==========================================
+    // BILL VALUES
+    // ==========================================
+
+    const academy =
         localStorage.getItem("academyName") ||
         "Rasson Snooker Academy";
 
-    let branch = BRANCH || "Rasson1";
+    const branch =
+        BRANCH || "Rasson1";
 
-    let checkin =
+    const checkin =
         h.checkin
-            ? formatTime(h.checkin)
-            : "--";
+        ? formatTime(h.checkin)
+        : "--";
 
-    let checkout =
+    const checkout =
         h.checkout
-            ? formatTime(h.checkout)
-            : "--";
+        ? formatTime(h.checkout)
+        : "--";
 
-    let playtime =
-        formatSeconds(h.playSeconds || 0);
+    const playtime =
+        formatSeconds(
+            h.playSeconds || 0
+        );
 
-    let bill =
-        document.getElementById("billDetails");
+    const originalAmount =
+        Number(
+            h.originalAmount ||
+            h.amount ||
+            0
+        );
 
-    if (!bill) {
-        console.error("❌ billDetails element missing");
-        return;
-    }
+    const discount =
+        Number(
+            h.discount || 0
+        );
 
-    console.log(
-        "🔥 OPEN HISTORY BILL:",
-        {
-            tableId,
-            sessionId,
-            table: t.name,
-            total: h.total,
-            paid: h.paid
-        }
-    );
+    const gameAmount =
+        Number(
+            h.amount || 0
+        );
+
+    const canteenTotal =
+        Number(
+            h.canteenAmount || 0
+        );
+
+    const finalTotal =
+        gameAmount +
+        canteenTotal;
 
     // ==========================================
     // CANTEEN
     // ==========================================
 
     const canteenItems =
-        Object.values(h.canteenItems || {});
+        Object.values(
+            h.canteenItems || {}
+        );
 
     let canteenHTML = "";
-    let canteenTotal = 0;
 
-    canteenItems.forEach(item => {
+    if (canteenItems.length === 0) {
 
-        const qty =
-            Number(item.qty || 0);
+        canteenHTML =
+            `<div>No canteen items</div>`;
 
-        const price =
-            Number(item.price || 0);
+    } else {
 
-        const total =
-            qty * price;
+        canteenHTML =
+            canteenItems
+                .map(item => {
 
-        canteenTotal += total;
+                    const name =
+                        item.name ||
+                        item.item ||
+                        "Item";
 
-        canteenHTML += `
-            <div style="
-                display:flex;
-                justify-content:space-between;
-            ">
-                <span>${item.name} x${qty}</span>
-                <span>${total}</span>
-            </div>
-        `;
-    });
+                    const qty =
+                        Number(
+                            item.qty ||
+                            item.quantity ||
+                            1
+                        );
 
-    if (!canteenHTML) {
-        canteenHTML = "<p>No items</p>";
+                    const amount =
+                        Number(
+                            item.amount ||
+                            item.total ||
+                            item.price ||
+                            0
+                        );
+
+                    return `
+                        <div
+                            style="
+                                display:flex;
+                                justify-content:space-between;
+                            "
+                        >
+                            <span>
+                                ${name} x${qty}
+                            </span>
+
+                            <span>
+                                Rs ${amount}
+                            </span>
+                        </div>
+                    `;
+
+                })
+                .join("");
     }
-
-    // ==========================================
-    // BILL CALCULATION
-    // ==========================================
-
-    const originalAmount =
-        Number(h.originalAmount || h.amount || 0);
-
-    const discount =
-        Number(h.discount || 0);
-
-    const gameAmount =
-        originalAmount - discount;
-
-    const finalTotal =
-        gameAmount + canteenTotal;
 
     // ==========================================
     // BILL HTML
     // ==========================================
 
+    const bill =
+        document.getElementById(
+            "billDetails"
+        );
+
+    if (!bill) {
+
+        console.error(
+            "❌ billDetails element not found"
+        );
+
+        return;
+    }
+
     bill.innerHTML = `
-        <div style="
-            width:300px;
-            margin:auto;
-            font-family:monospace;
-            color:#000;
-            background:#fff;
-            padding:15px;
-            border-radius:10px;
-        ">
+
+        <div
+            style="
+                width:300px;
+                margin:auto;
+                font-family:monospace;
+                color:#000;
+                background:#fff;
+                padding:15px;
+                border-radius:10px;
+            "
+        >
 
             <center>
+
                 <img
                     src="../assets/bill-logo.png"
                     style="width:120px;"
                 >
 
-                <h2>${academy}</h2>
-                <div>${branch}</div>
+                <h2>
+                    ${academy}
+                </h2>
+
+                <div>
+                    ${branch}
+                </div>
+
             </center>
 
             <hr>
 
             <div>
-                <b>Table:</b> ${t.name}
+                <b>Table:</b>
+                ${t.name}
             </div>
 
             <div>
-                <b>Check-in:</b> ${checkin}
+                <b>Check-in:</b>
+                ${checkin}
             </div>
 
             <div>
-                <b>Check-out:</b> ${checkout}
+                <b>Check-out:</b>
+                ${checkout}
             </div>
 
             <div>
-                <b>Play Time:</b> ${playtime}
+                <b>Play Time:</b>
+                ${playtime}
             </div>
 
             <hr>
 
             <h3>GAME</h3>
 
-            <div style="
-                display:flex;
-                justify-content:space-between;
-            ">
+            <div
+                style="
+                    display:flex;
+                    justify-content:space-between;
+                "
+            >
                 <span>Original</span>
-                <span>Rs ${originalAmount}</span>
+                <span>
+                    Rs ${originalAmount}
+                </span>
             </div>
 
-            <div style="
-                display:flex;
-                justify-content:space-between;
-            ">
+            <div
+                style="
+                    display:flex;
+                    justify-content:space-between;
+                "
+            >
                 <span>Discount</span>
-                <span>Rs ${discount}</span>
+                <span>
+                    Rs ${discount}
+                </span>
             </div>
 
-            <div style="
-                display:flex;
-                justify-content:space-between;
-            ">
+            <div
+                style="
+                    display:flex;
+                    justify-content:space-between;
+                "
+            >
                 <b>Game Total</b>
-                <b>Rs ${gameAmount}</b>
+                <b>
+                    Rs ${gameAmount}
+                </b>
             </div>
 
             <hr>
@@ -2733,25 +2879,35 @@ function openBillFromHistory(tableId, sessionId) {
 
             <hr>
 
-            <div style="
-                display:flex;
-                justify-content:space-between;
-                font-size:20px;
-            ">
+            <div
+                style="
+                    display:flex;
+                    justify-content:space-between;
+                    font-size:20px;
+                "
+            >
                 <b>TOTAL</b>
-                <b>Rs ${finalTotal}</b>
+
+                <b>
+                    Rs ${finalTotal}
+                </b>
             </div>
 
             <hr>
 
             <center>
+
                 <img
                     src="../assets/QR-bill.png"
                     style="width:100px;"
                 >
 
                 <br>
-                <small>Scan & Pay</small>
+
+                <small>
+                    Scan & Pay
+                </small>
+
             </center>
 
         </div>
@@ -2761,94 +2917,106 @@ function openBillFromHistory(tableId, sessionId) {
     // SHOW BILL POPUP
     // ==========================================
 
-    document
-        .getElementById("billPopup")
-        .classList
-        .remove("hidden");
+    const billPopup =
+        document.getElementById(
+            "billPopup"
+        );
+
+    if (billPopup) {
+
+        billPopup
+            .classList
+            .remove("hidden");
+    }
 
     // ==========================================
-    // 🔥 CLOSE BUTTON — IMPORTANT
+    // CLOSE
     // ==========================================
 
-    document
-        .getElementById("cancelBillBtn")
-        .onclick = () => {
+    const cancelBillBtn =
+        document.getElementById(
+            "cancelBillBtn"
+        );
 
-            document
-                .getElementById("billPopup")
-                .classList
-                .add("hidden");
+    if (cancelBillBtn) {
 
-        };
+        cancelBillBtn.onclick =
+            () => {
+
+                billPopup
+                    ?.classList
+                    .add("hidden");
+
+            };
+    }
 
     // ==========================================
-    // PAID BUTTON
+    // PAID
     // ==========================================
 
-    document
-        .getElementById("paidBtn")
-        .onclick = async () => {
+    const paidBtn =
+        document.getElementById(
+            "paidBtn"
+        );
 
-            // exact session dobara find
-            const currentTable =
-                tables.find(
-                    x =>
-                        String(x.id) ===
-                        String(tableId)
-                );
+    if (!paidBtn) {
 
-            if (!currentTable) return;
+        console.error(
+            "❌ paidBtn not found"
+        );
 
-            const currentHistory =
-                currentTable.history.find(
-                    x =>
-                        String(x.sessionId) ===
+        return;
+    }
+
+    // Remove previous handler
+    paidBtn.onclick = null;
+
+    paidBtn.onclick =
+        async () => {
+
+            try {
+
+                // EXACT SESSION ID
+                await updateDoc(
+                    doc(
+                        window.db,
+                        "sessions",
                         String(sessionId)
+                    ),
+                    {
+                        paid: true,
+                        paid_time:
+                            new Date().toISOString()
+                    }
                 );
 
-            if (!currentHistory) {
-                alert("History session not found ❌");
-                return;
-            }
+                // Refresh local history
+                await rebuildHistoryFromSessions();
 
-            if (currentHistory.paid === true) {
-                alert("This bill is already paid ✅");
-                return;
-            }
+                // Close bill
+                billPopup
+                    ?.classList
+                    .add("hidden");
 
-            currentHistory.paid = true;
-            currentHistory.paidTime = Date.now();
+                // Refresh history popup
+                openHistory(tableId);
 
-            // 🔥 EXACT FIREBASE DOCUMENT
-            await updateDoc(
-                doc(
-                    window.db,
-                    "sessions",
+                console.log(
+                    "✅ BILL PAID:",
                     sessionId
-                ),
-                {
-                    paid: true,
-                    paid_time:
-                        new Date().toISOString()
-                }
-            );
+                );
 
-            // CLOSE BILL
-            document
-                .getElementById("billPopup")
-                .classList
-                .add("hidden");
+            } catch (error) {
 
-            // REFRESH HISTORY
-            await rebuildHistoryFromSessions();
+                console.error(
+                    "❌ PAYMENT ERROR:",
+                    error
+                );
 
-            openHistory(tableId);
-
-            // PRINT
-            printThermalBill(
-                tableId,
-                currentHistory
-            );
+                alert(
+                    "Payment save failed ❌"
+                );
+            }
         };
 }
 
@@ -4961,55 +5129,154 @@ function buildTableHistoryRow(t, d) {
     `;
 }
 /******************************************************
- * TABLE HISTORY PAGINATION (FINAL FIX)
+ * TABLE HISTORY PAGINATION
  ******************************************************/
 
 let historyPage = 1;
 let historyPerPage = 100;
 
-
 function renderHistoryPage() {
 
-    let tableId = document.getElementById("tableHistoryTableSelect").value;
-    let t = tables.find(x => String(x.id) === String(tableId));
+    const tableId =
+        document.getElementById("tableHistoryTableSelect").value;
 
-    let body = document.getElementById("historyTableBody");
+    const t =
+        tables.find(x => String(x.id) === String(tableId));
+
+    const body =
+        document.getElementById("historyTableBody");
+
+    if (!body) return;
+
     body.innerHTML = "";
 
-    if (!t || t.history.length === 0) {
-        body.innerHTML = "<tr><td colspan='9'>No history found.</td></tr>";
+    if (!t || !Array.isArray(t.history) || t.history.length === 0) {
+
+        body.innerHTML =
+            "<tr><td colspan='10'>No history found.</td></tr>";
+
         return;
     }
 
-    let start = (historyPage - 1) * historyPerPage;
-    let end = start + historyPerPage;
+    let history =
+        [...t.history];
 
-    let pageRows = t.history.slice(start, end);
+    // SHIFT FILTER
+    const shiftSelect =
+        document.getElementById("tableHistoryShiftSelect");
+
+    const selectedShift =
+        shiftSelect ? shiftSelect.value : "all";
+
+    if (selectedShift === "1") {
+
+        history =
+            history.filter(
+                h => Number(h.shiftNumber) === 1
+            );
+
+    } else if (selectedShift === "2") {
+
+        history =
+            history.filter(
+                h => Number(h.shiftNumber) === 2
+            );
+    }
+
+    // LATEST FIRST
+    history.sort(
+        (a, b) =>
+            Number(b.checkout || 0) -
+            Number(a.checkout || 0)
+    );
+
+    const start =
+        (historyPage - 1) * historyPerPage;
+
+    const end =
+        start + historyPerPage;
+
+    const pageRows =
+        history.slice(start, end);
 
     pageRows.forEach((h, index) => {
+
+        /*
+         * IMPORTANT:
+         * Firebase sessionId is the REAL ID.
+         * Never pass array index to openBillFromHistory().
+         */
+
+        const sessionId =
+            String(h.sessionId || "");
+
+        const rowNumber =
+            start + index + 1;
+
         body.innerHTML += `
             <tr>
-                <td>${start + index + 1}</td>
-                <td>${formatTime(h.checkin)}</td>
-                <td>${formatTime(h.checkout)}</td>
-                <td>${formatSeconds(h.playSeconds)}</td>
-                <td>${h.rate}</td>
-                <td>${h.amount}</td>
-                <td>${h.canteenAmount}</td>
-                <td>${h.total}</td>
-<td>
-${h.paid
-    ? `<button class="paid-btn" disabled>PAID</button>`
-    : `<button class="unpaid-btn" onclick="openBillFromHistory('${id}','${h.sessionId}')">UNPAID</button>`}
-</td>
 
+                <td>${rowNumber}</td>
+
+                <td>
+                    ${formatTime(h.checkin)}
+                </td>
+
+                <td>
+                    ${formatTime(h.checkout)}
+                </td>
+
+                <td>
+                    ${formatSeconds(h.playSeconds || 0)}
+                </td>
+
+                <td>
+                    ${h.rate || 0}
+                </td>
+
+                <td>
+                    ${h.amount || 0}
+                </td>
+
+                <td>
+                    ${h.canteenAmount || 0}
+                </td>
+
+                <td>
+                    ${h.total || 0}
+                </td>
+
+                <td>
+
+                    ${
+                        h.paid
+                        ?
+                        `
+                        <button
+                            class="paid-btn"
+                            disabled>
+                            PAID
+                        </button>
+                        `
+                        :
+                        `
+                        <button
+                            class="unpaid-btn"
+                            onclick="window.openBillFromHistory(
+                                '${tableId}',
+                                '${sessionId}'
+                            )">
+                            UNPAID
+                        </button>
+                        `
+                    }
+
+                </td>
 
             </tr>
         `;
     });
 }
-
-window.openBillFromHistory = openBillFromHistory;
 
 /******************************************************
  * 🟢 RESTORE TIMERS ON PAGE LOAD
