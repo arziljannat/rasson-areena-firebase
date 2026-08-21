@@ -1,76 +1,106 @@
-/* MAIN PAGE */
+/* =========================================================
+   RASSON ARENA - REPORTS
+   Day History Style
+   ========================================================= */
+
 body {
     margin: 0;
     padding: 0;
+
     background: url('../assets/icon.png') no-repeat center center fixed;
     background-size: cover;
+
     font-family: Arial, sans-serif;
+
+    color: #00ffcc;
 }
+
+
+/* =========================================================
+   MAIN REPORT AREA
+   ========================================================= */
 
 .report-main {
-    margin-top: 95px;
-    padding: 25px;
-    width: calc(100% - 50px);
-    max-width: 1450px;
-    margin-left: auto;
-    margin-right: auto;
+
+    width: calc(100% - 40px);
+
+    margin: 115px 20px 40px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
 }
 
 
-/* ================================
-   REPORT SIDEBAR
-================================ */
+/* =========================================================
+   REPORT MENU
+   NAVBAR KE BILKUL NEECHE
+   ========================================================= */
 
 .report-sidebar {
+
     width: 100%;
+
     box-sizing: border-box;
 
     background: rgba(0, 0, 0, 0.55);
 
-    border: 1px solid #00ff9d;
-    border-radius: 14px;
+    border: 2px solid #00ff9d;
+
+    border-radius: 15px;
 
     box-shadow:
-        0 0 12px rgba(0, 255, 157, 0.55),
+        0 0 15px #00ff9d,
         inset 0 0 15px rgba(0, 255, 157, 0.08);
 
-    padding: 14px 18px;
-
-    margin-bottom: 18px;
-
-    display: flex;
-    align-items: center;
-    gap: 12px;
-
-    backdrop-filter: blur(5px);
+    padding: 12px 18px;
 }
 
 
-/* REPORTS TITLE */
+/* TITLE */
 
 .sidebar-title {
+
+    margin: 0 0 12px;
+
+    text-align: left;
+
     color: #00ffcc;
 
-    font-size: 20px;
-
-    margin: 0 15px 0 0;
-
-    white-space: nowrap;
+    font-size: 22px;
 
     text-shadow:
         0 0 8px #00ffcc,
-        0 0 15px rgba(0, 255, 204, 0.6);
+        0 0 15px #00ffcc;
 }
 
 
-/* REPORT BUTTONS */
+/* BUTTONS VERTICAL */
+
+.report-menu {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    width: 100%;
+}
+
+
+/* REPORT BUTTON */
 
 .report-btn {
-    flex: 1;
 
-    min-height: 42px;
+    width: 100%;
 
-    padding: 9px 14px;
+    box-sizing: border-box;
+
+    padding: 11px 15px;
+
+    text-align: left;
 
     background: rgba(0, 0, 0, 0.65);
 
@@ -78,106 +108,154 @@ body {
 
     border: 1px solid #00ff9d;
 
-    border-radius: 9px;
+    border-radius: 8px;
 
     cursor: pointer;
 
+    font-size: 15px;
+
     font-weight: bold;
 
-    transition: 0.25s ease;
-
-    box-shadow:
-        inset 0 0 8px rgba(0, 255, 157, 0.08);
+    transition: 0.25s;
 }
 
 
 .report-btn:hover {
-    background: rgba(0, 255, 157, 0.12);
 
-    box-shadow:
-        0 0 12px #00ff9d,
-        inset 0 0 10px rgba(0, 255, 157, 0.15);
+    background: rgba(0, 255, 200, 0.16);
+
+    box-shadow: 0 0 12px #00ffcc;
+
+    transform: translateX(3px);
 }
 
 
 .report-btn.active {
-    background: rgba(0, 255, 157, 0.18);
+
+    background: rgba(0, 255, 200, 0.20);
+
+    border-color: #00ffcc;
+
+    box-shadow:
+        0 0 12px #00ffcc,
+        inset 0 0 8px rgba(0, 255, 200, 0.12);
 
     color: #ffffff;
-
-    box-shadow:
-        0 0 12px #00ff9d,
-        inset 0 0 12px rgba(0, 255, 157, 0.15);
 }
 
 
-/* ================================
+/* =========================================================
    REPORT CONTENT
-================================ */
+   SIDEBAR KE NEECHE
+   ========================================================= */
 
 .report-content {
+
     width: 100%;
-    padding: 0;
+
+    box-sizing: border-box;
 }
 
 
-/* MAIN REPORT PANEL */
+/* =========================================================
+   MAIN REPORT PANEL
+   ========================================================= */
 
 .report-panel {
+
     width: 100%;
+
     box-sizing: border-box;
 
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(0, 0, 0, 0.58);
 
-    border: 1px solid #00ff9d;
+    border: 2px solid #00ff9d;
 
-    border-radius: 14px;
-
-    padding: 25px;
+    border-radius: 15px;
 
     box-shadow:
-        0 0 15px rgba(0, 255, 157, 0.55),
-        inset 0 0 20px rgba(0, 255, 157, 0.05);
+        0 0 20px #00ff9d,
+        inset 0 0 15px rgba(0, 255, 157, 0.06);
 
-    backdrop-filter: blur(5px);
+    padding: 22px;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.report-header {
+
+    border-top: 1px solid rgba(0, 255, 157, 0.45);
+
+    border-bottom: 1px solid rgba(0, 255, 157, 0.45);
+
+    padding: 10px 0 12px;
+
+    margin-bottom: 18px;
 }
 
 
 .report-panel h1 {
+
+    margin: 0;
+
+    text-align: center;
+
     color: #00ffcc;
 
-    margin: 0 0 6px 0;
-
-    font-size: 27px;
+    font-size: 25px;
 
     text-shadow:
-        0 0 8px #00ffcc;
+        0 0 8px #00ffcc,
+        0 0 15px #00ffcc;
 }
 
 
-.sub-heading {
+.sub-heading,
+.report-header p {
+
+    margin: 7px 0 0;
+
+    text-align: center;
+
     color: #00ffaa;
 
-    margin: 0 0 20px 0;
+    font-size: 14px;
 }
 
-.sub-heading {
-    color: #00ffaa;
-    margin-bottom: 20px;
-}
+
+/* =========================================================
+   FILTER
+   ========================================================= */
 
 .filter-row {
-    display: flex;
-    align-items: flex-end;
-    gap: 18px;
 
-    margin-bottom: 20px;
+    display: flex;
+
+    align-items: flex-end;
+
+    gap: 15px;
 
     flex-wrap: wrap;
+
+    margin-bottom: 15px;
 }
 
 
-.filter-row label {
+.date-box {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.date-box label {
+
     color: #00ffaa;
 
     font-size: 13px;
@@ -186,16 +264,19 @@ body {
 }
 
 
-.filter-row input {
-    margin-top: 5px;
+.date-box input {
 
-    padding: 9px 12px;
+    min-width: 170px;
+
+    padding: 9px 10px;
+
+    box-sizing: border-box;
 
     border-radius: 8px;
 
     border: 1px solid #00ff9d;
 
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(0, 0, 0, 0.65);
 
     color: #00ffcc;
 
@@ -203,51 +284,277 @@ body {
 }
 
 
-.filter-row input:focus {
-    box-shadow: 0 0 10px #00ff9d;
+.date-box input:focus {
+
+    box-shadow: 0 0 12px #00ffcc;
 }
 
 
-.filter-row button {
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.generate-btn,
+.print-btn {
+
     padding: 10px 18px;
 
-    border-radius: 9px;
-
-    border: 1px solid #00ff9d;
-
-    background: #00ff9d;
-
-    color: #001b12;
-
-    cursor: pointer;
+    border-radius: 8px;
 
     font-weight: bold;
 
-    transition: 0.25s ease;
+    cursor: pointer;
+
+    transition: 0.2s;
 }
 
 
-.filter-row button:hover {
-    box-shadow:
-        0 0 15px #00ffcc;
+.generate-btn {
+
+    background: #00ff9d;
+
+    color: #001a12;
+
+    border: 1px solid #00ffcc;
 }
+
+
+.print-btn {
+
+    background: rgba(0, 0, 0, 0.7);
+
+    color: #00ffcc;
+
+    border: 1px solid #00ff9d;
+}
+
+
+.generate-btn:hover,
+.print-btn:hover {
+
+    box-shadow: 0 0 15px #00ffcc;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   DIVIDER
+   ========================================================= */
+
+.report-divider {
+
+    height: 1px;
+
+    width: 100%;
+
+    background: rgba(0, 255, 157, 0.55);
+
+    margin: 10px 0 18px;
+}
+
+
+/* =========================================================
+   REPORT OUTPUT
+   ========================================================= */
+
 .output-box {
-    margin-top: 20px;
 
-    min-height: 250px;
-
-    padding: 20px;
+    width: 100%;
 
     box-sizing: border-box;
 
-    background: rgba(0, 0, 0, 0.45);
+    min-height: 350px;
+
+    background: rgba(0, 0, 0, 0.42);
 
     border: 1px solid #00ff9d;
 
     border-radius: 12px;
 
+    padding: 18px;
+
     color: #00ffcc;
 
     box-shadow:
-        inset 0 0 15px rgba(0, 255, 204, 0.08);
+        inset 0 0 12px rgba(0, 255, 204, 0.12);
+}
+
+
+.empty-report {
+
+    min-height: 300px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    color: #00ffaa;
+
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   REPORT TABLES
+   JS SE JO TABLE GENERATE HOGA
+   ========================================================= */
+
+.output-box table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    table-layout: auto;
+}
+
+
+.output-box th {
+
+    padding: 12px 9px;
+
+    color: #00ffcc;
+
+    font-size: 13px;
+
+    text-align: center;
+
+    border-bottom: 1px solid #00ff9d;
+
+    white-space: nowrap;
+}
+
+
+.output-box td {
+
+    padding: 11px 9px;
+
+    color: #eafff8;
+
+    text-align: center;
+
+    border-bottom: 1px solid rgba(0, 255, 157, 0.35);
+
+    white-space: nowrap;
+}
+
+
+.output-box tr:hover td {
+
+    background: rgba(0, 255, 200, 0.06);
+}
+
+
+/* =========================================================
+   SHIFT / COMBINED STYLE
+   ========================================================= */
+
+.output-box .shift-title {
+
+    text-align: center;
+
+    color: #00ffcc;
+
+    font-size: 19px;
+
+    font-weight: bold;
+
+    margin: 12px 0;
+
+    text-shadow: 0 0 8px #00ffcc;
+}
+
+
+.output-box .combined-title {
+
+    text-align: center;
+
+    color: #00ffcc;
+
+    font-size: 20px;
+
+    font-weight: bold;
+
+    margin: 25px 0 12px;
+
+    padding: 10px 0;
+
+    border-top: 1px solid rgba(0, 255, 157, 0.5);
+
+    border-bottom: 1px solid rgba(0, 255, 157, 0.5);
+
+    text-shadow: 0 0 8px #00ffcc;
+}
+
+
+.output-box .combined-row {
+
+    background: rgba(255, 220, 0, 0.10);
+
+    color: #ffe600;
+
+    border-top: 1px solid rgba(255, 220, 0, 0.45);
+
+    border-bottom: 1px solid rgba(255, 220, 0, 0.45);
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+    .report-main {
+
+        width: calc(100% - 20px);
+
+        margin: 105px 10px 30px;
+    }
+
+
+    .report-panel {
+
+        padding: 14px;
+    }
+
+
+    .filter-row {
+
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+
+    .date-box input {
+
+        width: 100%;
+
+        min-width: 0;
+    }
+
+
+    .generate-btn,
+    .print-btn {
+
+        width: 100%;
+    }
+
+
+    .output-box {
+
+        overflow-x: auto;
+    }
+
+
+    .output-box table {
+
+        min-width: 850px;
+    }
 }
