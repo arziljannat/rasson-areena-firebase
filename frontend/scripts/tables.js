@@ -2868,7 +2868,6 @@ bill.innerHTML = `
 `;
 
     document.getElementById("billPopup").classList.remove("hidden");
-}
 
 
 /******************************************************
