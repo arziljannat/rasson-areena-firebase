@@ -2122,7 +2122,8 @@ function openHistory(id) {
     body.innerHTML = "";
 
     // ==========================================
-    // 🔥 HISTORY COPY — ORIGINAL ARRAY TOUCH NAHI
+    // 🔥 HISTORY COPY
+    // ORIGINAL ARRAY KO MODIFY NAHI KARNA
     // ==========================================
 
     const historyList = Array.isArray(t.history)
@@ -2217,11 +2218,9 @@ function openHistory(id) {
                     </td>
 
                     <td>
-
                         ${
                             h.fromBooking &&
                             Number(h.bookingAdvance || 0) > 0
-
                             ? `
                                 <div>
                                     ${
@@ -2238,28 +2237,16 @@ function openHistory(id) {
                                         h.bookingAdvance || 0
                                     }
                                 </small>
-
-                                <br>
-
-                                <small
-                                    style="color:#ffd700;">
-                                    Remaining:
-                                    Rs ${
-                                        h.remainingPayment || 0
-                                    }
-                                </small>
                               `
-
-                            : `${h.total || 0}`
+                            : `
+                                ${h.total || 0}
+                              `
                         }
-
                     </td>
 
                     <td>
-
                         ${
                             h.paid
-
                             ? `
                                 <button
                                     class="paid-btn"
@@ -2267,38 +2254,31 @@ function openHistory(id) {
                                     PAID
                                 </button>
                               `
-
                             : `
                                 <button
                                     class="unpaid-btn"
-                                    onclick="
-                                        openBillFromHistory(
-                                            '${id}',
-                                            '${h.sessionId}'
-                                        )
-                                    ">
+                                    onclick="openBillFromHistory(
+                                        '${id}',
+                                        ${t.history.indexOf(h)}
+                                    )">
                                     UNPAID
                                 </button>
                               `
                         }
-
                     </td>
 
                     <td>
-
                         ${
                             ROLE === "admin"
-
                             ? `
                                 <input
                                     type="checkbox"
                                     class="historyDeleteCheck"
-                                    value="${h.sessionId || ""}">
+                                    value="${t.history.indexOf(h)}"
+                                >
                               `
-
                             : "-"
                         }
-
                     </td>
 
                 </tr>
@@ -2307,18 +2287,15 @@ function openHistory(id) {
     }
 
     // ==========================================
-    // OPEN POPUP
+    // SHOW POPUP
     // ==========================================
 
-    const popup =
-        document.getElementById("historyPopup");
-
-    if (popup) {
-        popup.classList.remove("hidden");
-    }
+    document
+        .getElementById("historyPopup")
+        .classList.remove("hidden");
 
     // ==========================================
-    // CLOSE BUTTON
+    // CLOSE HISTORY BUTTON
     // ==========================================
 
     const closeBtn =
@@ -2330,14 +2307,14 @@ function openHistory(id) {
 
             document
                 .getElementById("historyPopup")
-                ?.classList
-                .add("hidden");
+                .classList.add("hidden");
 
         };
+
     }
 
     // ==========================================
-    // DELETE SELECTED
+    // DELETE SELECTED HISTORY
     // ==========================================
 
     const deleteBtn =
@@ -2359,11 +2336,7 @@ function openHistory(id) {
                 );
 
             if (checks.length === 0) {
-
-                alert(
-                    "Select history first ❌"
-                );
-
+                alert("Select history first ❌");
                 return;
             }
 
@@ -2373,37 +2346,15 @@ function openHistory(id) {
 
             if (!ok) return;
 
-            const sessionIds = [
-                ...checks
-            ]
-            .map(c => c.value)
-            .filter(Boolean);
+            const indexes =
+                [...checks]
+                    .map(c => Number(c.value))
+                    .sort((a, b) => b - a);
 
-            // ======================================
-            // 🔥 EXACT SESSION DELETE
-            // ======================================
-
-            for (const sessionId of sessionIds) {
-
-                const hIndex =
-                    t.history.findIndex(
-                        h =>
-                            String(h.sessionId) ===
-                            String(sessionId)
-                    );
-
-                if (hIndex >= 0) {
-
-                    await softDeleteSession(
-                        id,
-                        hIndex
-                    );
-                }
+            // DELETE FROM HIGH INDEX → LOW INDEX
+            for (const i of indexes) {
+                await softDeleteSession(id, i);
             }
-
-            // ======================================
-            // REFRESH
-            // ======================================
 
             await rebuildHistoryFromSessions();
 
@@ -2412,7 +2363,7 @@ function openHistory(id) {
             openHistory(id);
 
             alert(
-                `${sessionIds.length} sessions deleted successfully ✅`
+                `${indexes.length} sessions deleted successfully ✅`
             );
         };
 
@@ -2422,7 +2373,6 @@ function openHistory(id) {
 
     }
 }
-
 function openBillFromHistory(tableId, sessionId) {
 
     const t = tables.find(
