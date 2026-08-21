@@ -2869,6 +2869,8 @@ bill.innerHTML = `
 
     document.getElementById("billPopup").classList.remove("hidden");
 }
+
+
 /******************************************************
  * SHIFT TABLE POPUP (OPEN)
  ******************************************************/
@@ -3080,6 +3082,8 @@ async function shiftPlayerToNewTable() {
 
     alert(`Shifted successfully to ${newT.name}`);
 }
+
+
 /******************************************************
  * SHIFT BUTTON BINDING
  ******************************************************/
