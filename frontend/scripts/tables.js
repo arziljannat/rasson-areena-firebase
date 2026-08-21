@@ -2373,6 +2373,9 @@ function openHistory(id) {
 
     }
 }
+
+
+
 function openBillFromHistory(tableId, sessionId) {
 
     const t = tables.find(
