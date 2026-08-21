@@ -3362,3 +3362,82 @@ body * {
     }
 
 }
+/* ============================================================
+   🔥 DAY HISTORY — COMBINED TITLE FIX
+============================================================ */
+
+#dayHistoryPopup .summary-heading {
+
+    display: block !important;
+
+    width: 100% !important;
+
+    box-sizing: border-box !important;
+
+    margin: 0 0 18px 0 !important;
+
+    padding: 12px 15px !important;
+
+    text-align: center !important;
+
+    color: #ffd700 !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,215,0,0.10),
+            transparent
+        ) !important;
+
+    border-top:
+        1px solid rgba(255,215,0,0.55) !important;
+
+    border-bottom:
+        1px solid rgba(255,215,0,0.55) !important;
+
+    border-radius: 8px !important;
+
+    font-size: 21px !important;
+
+    font-weight: 900 !important;
+
+    letter-spacing: 1px !important;
+
+    text-shadow:
+
+        0 0 8px #ffd700,
+
+        0 0 18px rgba(255,215,0,0.65) !important;
+
+}
+
+
+/* COMBINED BOX */
+
+#dayHistoryPopup #dayCombinedBody .summary-box {
+
+    border:
+        1px solid rgba(255,215,0,0.35) !important;
+
+    box-shadow:
+        0 0 12px rgba(255,215,0,0.12) !important;
+
+}
+
+
+/* COMBINED SECTION TITLES */
+
+#dayHistoryPopup #dayCombinedBody .summary-section-title {
+
+    color: #00ffcc !important;
+
+    font-weight: 900 !important;
+
+    text-align: center !important;
+
+    margin-top: 16px !important;
+
+    margin-bottom: 8px !important;
+
+}
