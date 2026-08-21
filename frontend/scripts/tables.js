@@ -2998,13 +2998,19 @@ function openBillFromHistory(tableId, sessionId) {
                     ?.classList
                     .add("hidden");
 
-                // Refresh history popup
-                openHistory(tableId);
+// Refresh history popup
+openHistory(tableId);
 
-                console.log(
-                    "✅ BILL PAID:",
-                    sessionId
-                );
+// PRINT BILL
+printThermalBill(
+    tableId,
+    h
+);
+
+console.log(
+    "✅ BILL PAID + PRINTED:",
+    sessionId
+);
 
             } catch (error) {
 
