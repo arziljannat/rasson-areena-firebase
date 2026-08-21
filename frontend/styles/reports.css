@@ -563,34 +563,180 @@ body {
    REPORTS PAGE - FINAL UI ALIGNMENT
    ========================================================= */
 
-/* Reports sidebar ko navbar ke neeche full horizontal panel */
+/* REPORT MENU PANEL */
 .report-sidebar {
     width: 100%;
     height: auto;
+
     box-sizing: border-box;
-    padding: 18px 20px;
+
+    padding: 14px 18px;
     margin: 0;
-}
 
-/* Reports title center */
-.sidebar-title {
     text-align: center;
-    margin: 0 0 15px 0;
-    font-size: 24px;
 }
 
-/* Report buttons - bade + centered */
+
+/* REPORTS TITLE */
+.sidebar-title {
+    margin: 0 0 12px 0;
+
+    text-align: center;
+
+    font-size: 21px;
+
+    color: #00ffcc;
+
+    text-shadow:
+        0 0 8px #00ffcc,
+        0 0 15px #00ffcc;
+}
+
+
+/* =========================================================
+   COMPACT REPORT BUTTONS
+   ========================================================= */
+
 .report-btn {
+
     display: block;
-    width: 100%;
-    min-height: 48px;
-    padding: 12px 20px;
-    margin: 8px 0;
+
+    width: 220px;
+
+    min-height: 0;
+
+    padding: 8px 14px;
+
+    margin: 7px auto;
+
     box-sizing: border-box;
 
     text-align: center;
-    font-size: 15px;
-    font-weight: 700;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    line-height: 1.2;
+
+    background: rgba(0, 0, 0, 0.65);
+
+    color: #00ffcc;
+
+    border: 1px solid #00ff9d;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    transition:
+        0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+/* HOVER */
+.report-btn:hover {
+
+    background: rgba(0, 255, 200, 0.16);
+
+    box-shadow:
+        0 0 10px #00ffcc;
+
+    transform: scale(1.02);
+}
+
+
+/* ACTIVE */
+.report-btn.active {
+
+    background: rgba(0, 255, 200, 0.20);
+
+    border-color: #00ffcc;
+
+    box-shadow:
+        0 0 12px #00ffcc,
+        inset 0 0 8px rgba(0, 255, 200, 0.12);
+
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   BRANCH INCOME REPORT
+   ========================================================= */
+
+.report-content {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 0;
+}
+
+
+.report-panel {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 25px 30px;
+
+    text-align: center;
+}
+
+
+/* MAIN REPORT HEADING */
+.report-panel h1 {
+
+    text-align: center;
+
+    margin-top: 0;
+
+    margin-bottom: 8px;
+
+    font-size: 28px;
+}
+
+
+/* SUBTITLE */
+.report-panel .sub-heading {
+
+    text-align: center;
+
+    margin-bottom: 22px;
+}
+
+
+/* DATE / FILTER CONTROLS */
+.filter-row {
+
+    justify-content: center;
+
+    align-items: flex-end;
+
+    flex-wrap: wrap;
+}
+
+
+/* GENERATE / PRINT BUTTONS */
+.filter-row button {
+
+    min-height: 42px;
+
+    padding: 10px 22px;
+
+    font-size: 14px;
+}
+
+
+/* OUTPUT */
+.output-box {
+
+    width: 100%;
+
+    box-sizing: border-box;
 }
 
 /* =========================================================
