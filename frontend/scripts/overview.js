@@ -381,42 +381,6 @@ document.addEventListener(
 
                 </div>
 
-                                <div class="overview-stats room-overview-stats">
-
-                    <div class="stat-box">
-
-                        <h3>TOTAL ROOMS</h3>
-
-                        <p>
-                            ${rooms.length}
-                        </p>
-
-                    </div>
-
-
-                    <div class="stat-box">
-
-                        <h3>ACTIVE ROOMS</h3>
-
-                        <p>
-                            ${activeRooms}
-                        </p>
-
-                    </div>
-
-
-                    <div class="stat-box">
-
-                        <h3>FREE ROOMS</h3>
-
-                        <p>
-                            ${freeRooms}
-                        </p>
-
-                    </div>
-
-                </div>
-
 
                 <section class="overview-section">
 
@@ -430,22 +394,67 @@ document.addEventListener(
 
                     </div>
 
-                </section>
+</section>
 
 
-                <section class="overview-section rooms-section">
+//=========================
+//   ROOM STATS
+//=========================
 
-                    <h2 class="section-heading">
-                        ROOMS
-                    </h2>
+<div class="overview-stats room-overview-stats">
 
-                    <div class="overview-rooms-grid">
+    <div class="stat-box">
 
-                        ${roomsHTML}
+        <h3>TOTAL ROOMS</h3>
 
-                    </div>
+        <p>
+            ${rooms.length}
+        </p>
 
-                </section>
+    </div>
+
+
+    <div class="stat-box">
+
+        <h3>ACTIVE ROOMS</h3>
+
+        <p>
+            ${activeRooms}
+        </p>
+
+    </div>
+
+
+    <div class="stat-box">
+
+        <h3>FREE ROOMS</h3>
+
+        <p>
+            ${freeRooms}
+        </p>
+
+    </div>
+
+</div>
+
+
+//=========================
+//     ROOMS
+//=========================
+
+<section class="overview-section rooms-section">
+
+    <h2 class="section-heading">
+        ROOMS
+    </h2>
+
+    <div class="overview-rooms-grid">
+
+        ${roomsHTML}
+
+    </div>
+
+</section>
 
             </div>
 
