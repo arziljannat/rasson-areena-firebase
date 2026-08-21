@@ -3020,6 +3020,9 @@ function openBillFromHistory(tableId, sessionId) {
         };
 }
 
+// 🔥 MUST BE GLOBAL FOR HTML ONCLICK
+window.openBillFromHistory = openBillFromHistory;
+
     let academy = localStorage.getItem("academyName") || "Rasson Snooker Academy";
     let branch = BRANCH || "Rasson1";
 
