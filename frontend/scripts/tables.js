@@ -2767,9 +2767,10 @@ function hidePopup(id) {
 }
 
 /******************************************************
- * OPEN SHIFT SUMMARY POPUP (Shift1 + Shift2 + Combined)
+ * 🔥 HABIB STYLE SHIFT SNAPSHOT
+ * LIVE CALCULATION + SHIFT 1 + SHIFT 2
  ******************************************************/
-function openShiftSummary() {
+async function openShiftSummary() {
 
     const btn =
         document.getElementById("shiftCloseBtn");
@@ -2781,13 +2782,13 @@ function openShiftSummary() {
         document.getElementById("shiftSummaryTitle");
 
 
-    // ==========================================
-    // TITLE
-    // ==========================================
+    // ==================================================
+    // TITLE + CLOSE BUTTON
+    // ==================================================
 
     if (btn.innerText.includes("Day")) {
 
-        title.innerText = "DAY SNAPSHOT";
+        title.innerText = "SHIFT SNAPSHOT";
 
         document.getElementById(
             "confirmShiftCloseBtn"
@@ -2803,228 +2804,502 @@ function openShiftSummary() {
     }
 
 
-    // ==========================================
-    // GET SHIFTS
-    // ==========================================
+    // ==================================================
+    // 🔥 ALWAYS REBUILD LATEST HISTORY
+    // ==================================================
 
-    const s1 =
+    try {
+
+        await rebuildHistoryFromSessions();
+
+    } catch (err) {
+
+        console.error(
+            "❌ Snapshot history rebuild error:",
+            err
+        );
+
+    }
+
+
+    // ==================================================
+    // CURRENT SHIFT DATA
+    // ==================================================
+
+    let s1 =
         shift1
             ? { ...shift1 }
             : null;
 
-    const s2 =
+    let s2 =
         shift2
             ? { ...shift2 }
             : null;
 
 
-    // ==========================================
-    // COMBINED
-    // ==========================================
+    // ==================================================
+    // 🔥 LIVE SHIFT 1 CALCULATION
+    // ==================================================
 
-    let combined = null;
+    if (!s1 && !btn.innerText.includes("Day")) {
 
-    if (s1 && s2) {
+        let now = Date.now();
 
-        combined = {
+        let startMs = now;
 
-            gameTotal:
-                Number(s1.gameTotal || 0) +
-                Number(s2.gameTotal || 0),
 
-            canteenTotal:
-                Number(s1.canteenTotal || 0) +
-                Number(s2.canteenTotal || 0),
+        // ----------------------------------------------
+        // GET FIRST SESSION
+        // ----------------------------------------------
 
-            gameCollection:
-                Number(s1.gameCollection || 0) +
-                Number(s2.gameCollection || 0),
+        const allHistory =
+            tables.flatMap(
+                t => t.history || []
+            );
 
-            canteenCollection:
-                Number(s1.canteenCollection || 0) +
-                Number(s2.canteenCollection || 0),
 
-            gameBalance:
-                Number(s1.gameBalance || 0) +
-                Number(s2.gameBalance || 0),
+        const validHistory =
+            allHistory
+                .filter(h => h.checkin)
+                .sort(
+                    (a, b) =>
+                        Number(a.checkin) -
+                        Number(b.checkin)
+                );
 
-            canteenBalance:
-                Number(s1.canteenBalance || 0) +
-                Number(s2.canteenBalance || 0),
 
-            discount:
-                Number(s1.discount || 0) +
-                Number(s2.discount || 0),
+        if (validHistory.length > 0) {
 
-            expenses:
-                Number(s1.expenses || 0) +
-                Number(s2.expenses || 0),
+            startMs =
+                Number(
+                    validHistory[0].checkin
+                );
 
-            easypaisa:
-                Number(s1.easypaisa || 0) +
-                Number(s2.easypaisa || 0)
+        }
+
+
+        // ----------------------------------------------
+        // RUNNING TABLE MAY BE FIRST
+        // ----------------------------------------------
+
+        tables.forEach(t => {
+
+            if (
+                t.isRunning &&
+                t.checkinTime
+            ) {
+
+                const runningStart =
+                    Number(
+                        t.checkinTime
+                    );
+
+                if (
+                    runningStart < startMs
+                ) {
+
+                    startMs =
+                        runningStart;
+
+                }
+
+            }
+
+        });
+
+
+        // ----------------------------------------------
+        // LIVE CALCULATION
+        // ----------------------------------------------
+
+        try {
+
+            const liveData =
+                calculateShiftSnapshot(
+                    startMs,
+                    now,
+                    1
+                );
+
+
+            s1 = {
+
+                shift: 1,
+
+                openTime:
+                    new Date(
+                        startMs
+                    ).toLocaleString(
+                        "en-PK",
+                        {
+                            timeZone:
+                                "Asia/Karachi"
+                        }
+                    ),
+
+                closeTime:
+                    "-",
+
+                startMs:
+                    startMs,
+
+                endMs:
+                    now,
+
+                ...liveData
+
+            };
+
+
+        } catch (err) {
+
+            console.error(
+                "❌ LIVE SHIFT CALC ERROR:",
+                err
+            );
+
+        }
+
+    }
+
+
+    // ==================================================
+    // 🔥 MONEY FORMAT
+    // ==================================================
+
+    const money = value => {
+
+        const n =
+            Number(value || 0);
+
+        return n.toLocaleString();
+
+    };
+
+
+    // ==================================================
+    // 🔥 ROW BUILDER
+    // ==================================================
+
+    const makeShiftRow =
+        (
+            shiftName,
+            data
+        ) => {
+
+            // ------------------------------------------
+            // NOT CLOSED
+            // ------------------------------------------
+
+            if (!data) {
+
+                return `
+
+                    <tr
+                        class="
+                            shift-summary-row
+                            shift-not-closed-row
+                        "
+                    >
+
+                        <td>
+                            <strong>
+                                ${shiftName}
+                            </strong>
+                        </td>
+
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+
+                    </tr>
+
+                `;
+
+            }
+
+
+            // ------------------------------------------
+            // NORMAL ROW
+            // ------------------------------------------
+
+            return `
+
+                <tr
+                    class="
+                        shift-summary-row
+                        ${
+                            shiftName
+                                .toLowerCase()
+                                .includes("1")
+                                ? "shift1-row"
+                                : "shift2-row"
+                        }
+                    "
+                >
+
+                    <!-- SHIFT -->
+
+                    <td>
+
+                        <strong>
+                            ${shiftName}
+                        </strong>
+
+                    </td>
+
+
+                    <!-- GAME TOTAL -->
+
+                    <td>
+                        ${money(
+                            data.gameTotal
+                        )}
+                    </td>
+
+
+                    <!-- CANTEEN TOTAL -->
+
+                    <td>
+                        ${money(
+                            data.canteenTotal
+                        )}
+                    </td>
+
+
+                    <!-- GAME COLLECTION -->
+
+                    <td>
+                        ${money(
+                            data.gameCollection
+                        )}
+                    </td>
+
+
+                    <!-- CANTEEN COLLECTION -->
+
+                    <td>
+                        ${money(
+                            data.canteenCollection
+                        )}
+                    </td>
+
+
+                    <!-- GAME BALANCE -->
+
+                    <td>
+                        ${money(
+                            data.gameBalance
+                        )}
+                    </td>
+
+
+                    <!-- CANTEEN BALANCE -->
+
+                    <td>
+                        ${money(
+                            data.canteenBalance
+                        )}
+                    </td>
+
+
+                    <!-- DISCOUNT -->
+
+                    <td>
+                        ${money(
+                            data.discount
+                        )}
+                    </td>
+
+
+                    <!-- EXPENSES -->
+
+                    <td>
+                        ${money(
+                            data.expenses
+                        )}
+                    </td>
+
+
+                    <!-- EASYPAISA -->
+
+                    <td>
+                        ${money(
+                            data.easypaisa
+                        )}
+                    </td>
+
+
+                    <!-- CLOSING CASH -->
+
+                    <td>
+                        ${money(
+                            data.closingCash
+                        )}
+                    </td>
+
+
+                    <!-- OPEN TIME -->
+
+                    <td>
+                        ${
+                            data.openTime ||
+                            "-"
+                        }
+                    </td>
+
+
+                    <!-- CLOSE TIME -->
+
+                    <td>
+                        ${
+                            data.closeTime ||
+                            "-"
+                        }
+                    </td>
+
+                </tr>
+
+            `;
 
         };
 
 
-        combined.closingCash =
+    // ==================================================
+    // 🔥 BUILD HABIB STYLE TABLE
+    // ==================================================
 
-            Number(combined.gameCollection || 0) +
+    summaryBody.innerHTML = `
 
-            Number(combined.canteenCollection || 0) -
+        <tr>
 
-            Number(combined.expenses || 0) -
+            <td colspan="13">
 
-            Number(combined.easypaisa || 0);
-    }
+                <div
+                    class="
+                        habib-shift-snapshot
+                    "
+                >
 
+                    <div
+                        class="
+                            snapshot-table-wrapper
+                        "
+                    >
 
-// ==========================================
-// 🔥 HABIB STYLE SHIFT SNAPSHOT ROW
-// ==========================================
+                        <table
+                            class="
+                                habib-shift-table
+                            "
+                        >
 
-const makeShiftRow = (shiftName, data) => {
+                            <thead>
 
-    if (!data) {
+                                <tr>
 
-        return `
-            <tr class="shift-not-closed-row">
+                                    <th>
+                                        Shift
+                                    </th>
 
-                <td> ${shiftName} </td>
+                                    <th>
+                                        Game<br>Total
+                                    </th>
 
-                <td> - </td>
-                <td> - </td>
-                <td> - </td>
-                <td> - </td>
-                <td> - </td>
-                <td> - </td>
-                <td> - </td>
-                <td> - </td>
-                <td> - </td>
-                <td> - </td>
-                <td> - </td>
-                <td> - </td>
+                                    <th>
+                                        Canteen<br>Total
+                                    </th>
 
-            </tr>
-        `;
-    }
+                                    <th>
+                                        Game<br>Collection
+                                    </th>
 
+                                    <th>
+                                        Canteen<br>Collection
+                                    </th>
 
-    const money = value =>
-        Number(value || 0).toLocaleString();
+                                    <th>
+                                        Game<br>Balance
+                                    </th>
 
+                                    <th>
+                                        Canteen<br>Balance
+                                    </th>
 
-    return `
-        <tr class="shift-summary-row">
+                                    <th>
+                                        Discount
+                                    </th>
 
-            <!-- SHIFT -->
-            <td>
-                <strong>
-                    ${shiftName}
-                </strong>
-            </td>
+                                    <th>
+                                        Expenses
+                                    </th>
 
+                                    <th>
+                                        EasyPaisa
+                                    </th>
 
-            <!-- GAME TOTAL -->
-            <td>
-                ${money(data.gameTotal)}
-            </td>
+                                    <th>
+                                        Closing<br>Cash
+                                    </th>
 
+                                    <th>
+                                        Open Time
+                                    </th>
 
-            <!-- CANTEEN TOTAL -->
-            <td>
-                ${money(data.canteenTotal)}
-            </td>
+                                    <th>
+                                        Close Time
+                                    </th>
 
+                                </tr>
 
-            <!-- GAME COLLECTION -->
-            <td>
-                ${money(data.gameCollection)}
-            </td>
-
-
-            <!-- CANTEEN COLLECTION -->
-            <td>
-                ${money(data.canteenCollection)}
-            </td>
-
-
-            <!-- GAME BALANCE -->
-            <td>
-                ${money(data.gameBalance)}
-            </td>
-
-
-            <!-- CANTEEN BALANCE -->
-            <td>
-                ${money(data.canteenBalance)}
-            </td>
+                            </thead>
 
 
-            <!-- DISCOUNT -->
-            <td>
-                ${money(data.discount)}
-            </td>
+                            <tbody>
 
+                                ${
+                                    makeShiftRow(
+                                        "Shift 1",
+                                        s1
+                                    )
+                                }
 
-            <!-- EXPENSES -->
-            <td>
-                ${money(data.expenses)}
-            </td>
+                                ${
+                                    makeShiftRow(
+                                        "Shift 2",
+                                        s2
+                                    )
+                                }
 
+                            </tbody>
 
-            <!-- EASYPAISA -->
-            <td>
-                ${money(data.easypaisa)}
-            </td>
+                        </table>
 
+                    </div>
 
-            <!-- CLOSING CASH -->
-            <td>
-                ${money(data.closingCash)}
-            </td>
+                </div>
 
-
-            <!-- OPEN TIME -->
-            <td>
-                ${data.openTime || "-"}
-            </td>
-
-
-            <!-- CLOSE TIME -->
-            <td>
-                ${data.closeTime || "-"}
             </td>
 
         </tr>
+
     `;
-};
 
 
-    // ==========================================
-    // BUILD POPUP
-    // ==========================================
+    // ==================================================
+    // SHOW POPUP
+    // ==================================================
 
-summaryBody.innerHTML = `
-
-    ${makeShiftRow(
-        "Shift 1",
-        s1
-    )}
-
-    ${makeShiftRow(
-        "Shift 2",
-        s2
-    )}
-
-`;
-
-
-    // ==========================================
-    // SHOW
-    // ==========================================
-
-    showPopup("shiftSummaryPopup");
+    showPopup(
+        "shiftSummaryPopup"
+    );
 
 }
 
