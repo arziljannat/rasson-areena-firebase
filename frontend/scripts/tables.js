@@ -2882,53 +2882,6 @@ if (!s1) {
 }
 
 
-// ==========================================
-// 🔥 LIVE SHIFT 2
-// Shift 1 closed + Shift 2 running
-// ==========================================
-
-if (s1 && !s2) {
-
-    // 🔥 SHIFT 2 START =
-    // SHIFT 1 ACTUAL CLOSE TIME
-    const shiftStart =
-        Number(s1.endMs) || now;
-
-    const liveShift2 =
-        calculateShiftSnapshot(
-            shiftStart,
-            now,
-            2
-        );
-
-    s2 = {
-
-        shift: 2,
-
-        startMs: shiftStart,
-
-        // 🔥 IMPORTANT:
-        // running Shift 2 ka end time nahi
-        endMs: null,
-
-        openTime:
-            new Date(shiftStart)
-                .toLocaleString(
-                    "en-PK",
-                    {
-                        timeZone:
-                            "Asia/Karachi"
-                    }
-                ),
-
-        // 🔥 RUNNING
-        closeTime: "RUNNING",
-
-        ...liveShift2
-    };
-
-}
-
     // ==========================================
     // 🔥 COMBINED
     // ==========================================
