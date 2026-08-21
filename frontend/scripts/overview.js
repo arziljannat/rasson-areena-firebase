@@ -381,6 +381,42 @@ document.addEventListener(
 
                 </div>
 
+                                <div class="overview-stats room-overview-stats">
+
+                    <div class="stat-box">
+
+                        <h3>TOTAL ROOMS</h3>
+
+                        <p>
+                            ${rooms.length}
+                        </p>
+
+                    </div>
+
+
+                    <div class="stat-box">
+
+                        <h3>ACTIVE ROOMS</h3>
+
+                        <p>
+                            ${activeRooms}
+                        </p>
+
+                    </div>
+
+
+                    <div class="stat-box">
+
+                        <h3>FREE ROOMS</h3>
+
+                        <p>
+                            ${freeRooms}
+                        </p>
+
+                    </div>
+
+                </div>
+
 
                 <section class="overview-section">
 
