@@ -1110,7 +1110,7 @@ function playTable15MinuteAlarm(t) {
     if (totalMinutes <= 0) return;
 
     // 🔔 Only every 15 minutes
-    if (totalMinutes % 2 !== 0) return;
+    if (totalMinutes % 15 !== 0) return;
 
     // 🔒 Prevent the same 15-minute alarm from repeating
     const alarmKey =
