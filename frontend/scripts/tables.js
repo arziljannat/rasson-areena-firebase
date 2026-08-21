@@ -2829,127 +2829,105 @@ async function openShiftSummary() {
         : null;
 
 
-    // ==========================================
-    // 🔥 LIVE SHIFT 1
-    // ==========================================
+// ==========================================
+// 🔥 LIVE SHIFT 1
+// Shift 1 is running when no closed Shift 1
+// exists for current operational day.
+// ==========================================
 
-    if (!s1) {
+if (!s1) {
 
-        let startMs = now;
+    // 🔥 SHIFT 1 START = CURRENT OPERATIONAL DAY START
+    let startMs =
+        Number(window.currentDayId) || 0;
 
-        const allHistory =
-            tables.flatMap(
-                t => t.history || []
-            );
+    // Safety fallback
+    if (!startMs || startMs < 1000000000000) {
+        startMs = now;
+    }
 
-        const validHistory =
-            allHistory
-                .filter(h => h.checkin)
-                .sort(
-                    (a, b) =>
-                        Number(a.checkin) -
-                        Number(b.checkin)
-                );
-
-        if (validHistory.length > 0) {
-
-            startMs =
-                Number(
-                    validHistory[0].checkin
-                );
-
-        }
-
-        const liveData =
-            calculateShiftSnapshot(
-                startMs,
-                now
-            );
-
-        s1 = {
-
-            shift: 1,
-
+    const liveData =
+        calculateShiftSnapshot(
             startMs,
+            now,
+            1
+        );
 
-            endMs: now,
+    s1 = {
 
-            openTime:
-                new Date(startMs)
-                    .toLocaleString(
-                        "en-PK",
-                        {
-                            timeZone:
-                                "Asia/Karachi"
-                        }
-                    ),
+        shift: 1,
 
-            closeTime:
-                new Date(now)
-                    .toLocaleString(
-                        "en-PK",
-                        {
-                            timeZone:
-                                "Asia/Karachi"
-                        }
-                    ),
+        startMs: startMs,
 
-            ...liveData
-        };
+        // 🔥 IMPORTANT:
+        // running shift ka end time nahi hota
+        endMs: null,
 
-    }
+        openTime:
+            new Date(startMs)
+                .toLocaleString(
+                    "en-PK",
+                    {
+                        timeZone:
+                            "Asia/Karachi"
+                    }
+                ),
+
+        // 🔥 RUNNING
+        closeTime: "RUNNING",
+
+        ...liveData
+    };
+
+}
 
 
-    // ==========================================
-    // 🔥 LIVE CURRENT SHIFT
-    // If Shift 1 is already closed and Shift 2
-    // is running, calculate Shift 2 live.
-    // ==========================================
+// ==========================================
+// 🔥 LIVE SHIFT 2
+// Shift 1 closed + Shift 2 running
+// ==========================================
 
-    if (s1 && !s2) {
+if (s1 && !s2) {
 
-        const shiftStart =
-            s1.endMs || now;
+    // 🔥 SHIFT 2 START =
+    // SHIFT 1 ACTUAL CLOSE TIME
+    const shiftStart =
+        Number(s1.endMs) || now;
 
-        const liveShift2 =
-            calculateShiftSnapshot(
-                shiftStart,
-                now
-            );
+    const liveShift2 =
+        calculateShiftSnapshot(
+            shiftStart,
+            now,
+            2
+        );
 
-        s2 = {
+    s2 = {
 
-            shift: 2,
+        shift: 2,
 
-            startMs: shiftStart,
+        startMs: shiftStart,
 
-            endMs: now,
+        // 🔥 IMPORTANT:
+        // running Shift 2 ka end time nahi
+        endMs: null,
 
-            openTime:
-                new Date(shiftStart)
-                    .toLocaleString(
-                        "en-PK",
-                        {
-                            timeZone:
-                                "Asia/Karachi"
-                        }
-                    ),
+        openTime:
+            new Date(shiftStart)
+                .toLocaleString(
+                    "en-PK",
+                    {
+                        timeZone:
+                            "Asia/Karachi"
+                    }
+                ),
 
-            closeTime:
-                new Date(now)
-                    .toLocaleString(
-                        "en-PK",
-                        {
-                            timeZone:
-                                "Asia/Karachi"
-                        }
-                    ),
+        // 🔥 RUNNING
+        closeTime: "RUNNING",
 
-            ...liveShift2
-        };
+        ...liveShift2
+    };
 
-    }
-
+}
 
     // ==========================================
     // 🔥 COMBINED
@@ -3185,8 +3163,15 @@ if (!snap.empty) {
 let now = Date.now();
 
 // 🔥 FORCE SAFE TIME
-let startMs = now - 1000;
 let endMs = now;
+
+// 🔥 SHIFT 1 START = CURRENT OPERATIONAL DAY START
+let startMs = Number(window.currentDayId) || 0;
+
+// Safety fallback
+if (!startMs || startMs < 1000000000000) {
+    startMs = now;
+}
 
 // ❗ HARD PROTECTION
 if (!endMs || endMs < 100000) {
@@ -3201,16 +3186,6 @@ if (!startMs || startMs <= 0) {
 // 🔥 STEP 1: FIRST REBUILD HISTORY
 await rebuildHistoryFromSessions();
 
-// 🔥 STEP 2: THEN GET HISTORY
-let allHistory = tables.flatMap(t => t.history);
-
-if (allHistory.length > 0) {
-    let firstSession = allHistory.sort((a,b) => a.checkin - b.checkin)[0];
-
-    if (firstSession && firstSession.checkin) {
-        startMs = firstSession.checkin;
-    }
-}
 
 // 🔥 STEP 3: CALCULATE
 let shiftData = calculateShiftSnapshot(startMs, endMs);
