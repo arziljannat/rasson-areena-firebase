@@ -2165,6 +2165,11 @@ function openHistory(id) {
         return true;
     });
 
+
+
+
+
+  
     // ==================================================
     // 🔥 SORT — LATEST FIRST
     // ==================================================
@@ -2416,11 +2421,10 @@ function openHistory(id) {
                             ? `<button class="paid-btn" disabled>PAID</button>`
                             : `
                                 <button
-                                    class="unpaid-btn"
-                                    onclick="openBillFromHistory(
-                                        '${id}',
-                                        ${t.history.indexOf(h)}
-                                    )">
+  onclick="openBillFromHistory(
+      '${id}',
+      '${h.sessionId}'
+  )">
                                     UNPAID
                                 </button>
                               `
@@ -4996,8 +5000,7 @@ function renderHistoryPage() {
 <td>
 ${h.paid
     ? `<button class="paid-btn" disabled>PAID</button>`
-    : `<button class="unpaid-btn" onclick="openBillFromHistory('${tableId}', ${start + index})">UNPAID</button>`
-}
+    : `<button class="unpaid-btn" onclick="openBillFromHistory('${id}','${h.sessionId}')">UNPAID</button>`}
 </td>
 
 
@@ -5005,6 +5008,8 @@ ${h.paid
         `;
     });
 }
+
+window.openBillFromHistory = openBillFromHistory;
 
 /******************************************************
  * 🟢 RESTORE TIMERS ON PAGE LOAD
