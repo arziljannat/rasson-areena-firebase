@@ -19,7 +19,7 @@ document.addEventListener(
         // RASSON AREENA - SINGLE BRANCH
         // =====================================
 
-        const branch = "rasson1";
+        const branch = "areena";
 
         // =====================================
         // LOAD TABLES
