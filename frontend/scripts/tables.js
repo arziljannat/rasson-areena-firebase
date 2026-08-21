@@ -4210,64 +4210,68 @@ document.getElementById("dayShift2Body").innerHTML = `
 </tr>
 `;
 
-    document.getElementById("dayCombinedBody").innerHTML = `
-    <tr>
-        <td>${c.gameTotal || 0}</td>
-        <td>${c.canteenTotal || 0}</td>
-        <td>${c.gameCollection || 0}</td>
-        <td>${c.canteenCollection || 0}</td>
-        <td>${c.gameBalance || 0}</td>
-        <td>${c.canteenBalance || 0}</td>
-        <td>${c.expenses || 0}</td>
-        <td>${c.easypaisa || 0}</td>
-        <td>${c.discount || 0}</td>
-        <td>${c.closingCash || 0}</td>
+document.getElementById("dayCombinedBody").innerHTML = `
+<tr>
+    <td colspan="7">
 
-        <!-- ✅ MAIN FIX -->
-        <td>
-    ${d.date}<br>
-    (${s1.startMs ? new Date(s1.startMs).toLocaleTimeString('en-PK', {
-    timeZone: 'Asia/Karachi',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
-}) : "-"}
-     →
-     ${s2.endMs ? new Date(s2.endMs).toLocaleTimeString('en-PK', {
-    timeZone: 'Asia/Karachi',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
-}) : "-"})
-</td>
-    </tr>
+        <div class="summary-box">
+
+            <div class="summary-row">
+                <span>🎮 Game</span>
+                <span>${c.gameTotal || 0}</span>
+            </div>
+
+            <div class="summary-row">
+                <span>🍔 Canteen</span>
+                <span>${c.canteenTotal || 0}</span>
+            </div>
+
+            <div class="summary-row">
+                <span>💰 Game Collection</span>
+                <span>${c.gameCollection || 0}</span>
+            </div>
+
+            <div class="summary-row">
+                <span>🧾 Canteen Collection</span>
+                <span>${c.canteenCollection || 0}</span>
+            </div>
+
+            <div class="summary-row">
+                <span>⚖️ Balance</span>
+                <span>
+                    ${
+                        Number(c.gameBalance || 0) +
+                        Number(c.canteenBalance || 0)
+                    }
+                </span>
+            </div>
+
+            <div class="summary-row">
+                <span>💸 Expenses</span>
+                <span>${c.expenses || 0}</span>
+            </div>
+
+            <div class="summary-row">
+                <span>📲 EasyPaisa</span>
+                <span>${c.easypaisa || 0}</span>
+            </div>
+
+            <div class="summary-row">
+                <span>🎁 Discount</span>
+                <span>${c.discount || 0}</span>
+            </div>
+
+            <div class="summary-row total">
+                <span>💵 Cash</span>
+                <span>${c.closingCash || 0}</span>
+            </div>
+
+        </div>
+
+    </td>
+</tr>
 `;
 }
-
-/******************************************************
- * 🟢 BUILD DAY SUMMARY (SHIFT 1 + SHIFT 2 + COMBINED)
- ******************************************************/
-
-
-/******************************************************
- * 🟢 BUILD A SINGLE SUMMARY ROW
- ******************************************************/
-function buildDayRow(s) {
-    return `
-        <tr>
-            <td>${s.gameTotal}</td>
-            <td>${s.canteenTotal}</td>
-            <td>${s.gameCollection}</td>
-            <td>${s.canteenCollection}</td>
-            <td>${s.gameBalance}</td>
-            <td>${s.canteenBalance}</td>
-            <td>${s.expenses}</td>
-            <td>${s.closingCash}</td>
-        </tr>
-    `;
-
-}
-
 
 /******************************************************
  * 🟢 OPEN TABLE HISTORY POPUP
