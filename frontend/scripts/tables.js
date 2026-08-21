@@ -4978,45 +4978,41 @@ function playWarningBeep() {
 
     try {
 
-        if (!audioUnlocked) {
-            console.log("⚠️ Audio not unlocked yet");
-            return;
-        }
+        // 🔊 Har alarm ke liye NEW audio object
+        const alarmAudio =
+            new Audio("/assets/audio/warning.mp3");
 
-        if (!warningAudio) {
-            warningAudio =
-                new Audio("/assets/audio/warning.mp3");
+        alarmAudio.preload = "auto";
+        alarmAudio.volume = 1;
 
-            warningAudio.preload = "auto";
-            warningAudio.volume = 1;
-        }
-
-        // Agar previous sound chal rahi hai
-        // to safely reset karo
-        warningAudio.pause();
-        warningAudio.currentTime = 0;
-
-        const playPromise = warningAudio.play();
+        const playPromise = alarmAudio.play();
 
         if (playPromise !== undefined) {
 
             playPromise
                 .then(() => {
 
-                    console.log(
-                        "🔊 Warning beep played"
-                    );
+                    console.log("🔊 Warning beep played");
 
                 })
                 .catch(err => {
 
                     console.log(
-                        "⚠️ Warning sound failed:",
+                        "⚠️ Warning sound blocked:",
                         err
                     );
 
                 });
         }
+
+        // Sound khatam hone ke baad memory release
+        alarmAudio.addEventListener(
+            "ended",
+            () => {
+                alarmAudio.remove();
+            },
+            { once: true }
+        );
 
     } catch (err) {
 
@@ -5118,25 +5114,20 @@ let audioUnlocking = false;
 
 function unlockAudio() {
 
-    if (audioUnlocked) {
-        return;
-    }
-
-    if (audioUnlocking) {
-        return;
-    }
+    if (audioUnlocked) return;
+    if (audioUnlocking) return;
 
     audioUnlocking = true;
 
     try {
 
+        // Browser ke audio engine ko initialize karo
         if (!warningAudio) {
 
             warningAudio =
                 new Audio("/assets/audio/warning.mp3");
 
             warningAudio.preload = "auto";
-            warningAudio.volume = 1;
         }
 
         warningAudio.volume = 0;
@@ -5151,11 +5142,6 @@ function unlockAudio() {
 
                     audioUnlocked = true;
                     audioUnlocking = false;
-
-                    // Reset ONLY after browser accepted play
-                    warningAudio.pause();
-                    warningAudio.currentTime = 0;
-                    warningAudio.volume = 1;
 
                     console.log(
                         "✅ Audio unlocked"
