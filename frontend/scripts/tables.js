@@ -2771,126 +2771,381 @@ function hidePopup(id) {
  ******************************************************/
 function openShiftSummary() {
 
-    let btn = document.getElementById("shiftCloseBtn");
-    let summaryBody = document.getElementById("shiftSummaryBody");
-    let title = document.getElementById("shiftSummaryTitle");
+    const btn =
+        document.getElementById("shiftCloseBtn");
+
+    const summaryBody =
+        document.getElementById("shiftSummaryBody");
+
+    const title =
+        document.getElementById("shiftSummaryTitle");
 
 
+    // ==========================================
+    // TITLE
+    // ==========================================
 
-    let now = new Date().toLocaleString('en-PK', {
-    timeZone: 'Asia/Karachi'
-});
-
-    
-    
-
-
-    // Title Logic
     if (btn.innerText.includes("Day")) {
-        title.innerText = "Day Summary";
-        document.getElementById("confirmShiftCloseBtn").innerText = "Close Day";
+
+        title.innerText = "DAY SNAPSHOT";
+
+        document.getElementById(
+            "confirmShiftCloseBtn"
+        ).innerText = "Close Day";
+
     } else {
-        title.innerText = "Shift Summary";
-        document.getElementById("confirmShiftCloseBtn").innerText = "Close Shift";
+
+        title.innerText = "SHIFT SNAPSHOT";
+
+        document.getElementById(
+            "confirmShiftCloseBtn"
+        ).innerText = "Close Shift";
     }
 
-// Load frozen snapshots of shift1 & shift2
-let s1 = shift1 || null;
-let s2 = shift2 || null;
 
-let combined = null;
+    // ==========================================
+    // GET SHIFTS
+    // ==========================================
 
-if (s1 && s2) {
-    combined = {
-        gameTotal: s1.gameTotal + s2.gameTotal,
-        canteenTotal: s1.canteenTotal + s2.canteenTotal,
+    const s1 =
+        shift1
+            ? { ...shift1 }
+            : null;
 
-        gameCollection: s1.gameCollection + s2.gameCollection,
-        canteenCollection: s1.canteenCollection + s2.canteenCollection,
+    const s2 =
+        shift2
+            ? { ...shift2 }
+            : null;
 
-        expenses: (s1.expenses || 0) + (s2.expenses || 0),
 
-        easypaisa: (s1.easypaisa || 0) + (s2.easypaisa || 0),
+    // ==========================================
+    // COMBINED
+    // ==========================================
 
-        // 🔥 ADD THIS
-        discount:
-        (s1.discount || 0)
-        +
-        (s2.discount || 0),
+    let combined = null;
+
+    if (s1 && s2) {
+
+        combined = {
+
+            gameTotal:
+                Number(s1.gameTotal || 0) +
+                Number(s2.gameTotal || 0),
+
+            canteenTotal:
+                Number(s1.canteenTotal || 0) +
+                Number(s2.canteenTotal || 0),
+
+            gameCollection:
+                Number(s1.gameCollection || 0) +
+                Number(s2.gameCollection || 0),
+
+            canteenCollection:
+                Number(s1.canteenCollection || 0) +
+                Number(s2.canteenCollection || 0),
+
+            gameBalance:
+                Number(s1.gameBalance || 0) +
+                Number(s2.gameBalance || 0),
+
+            canteenBalance:
+                Number(s1.canteenBalance || 0) +
+                Number(s2.canteenBalance || 0),
+
+            discount:
+                Number(s1.discount || 0) +
+                Number(s2.discount || 0),
+
+            expenses:
+                Number(s1.expenses || 0) +
+                Number(s2.expenses || 0),
+
+            easypaisa:
+                Number(s1.easypaisa || 0) +
+                Number(s2.easypaisa || 0)
+
+        };
+
+
+        combined.closingCash =
+
+            Number(combined.gameCollection || 0) +
+
+            Number(combined.canteenCollection || 0) -
+
+            Number(combined.expenses || 0) -
+
+            Number(combined.easypaisa || 0);
+    }
+
+
+    // ==========================================
+    // SNAPSHOT CARD
+    // ==========================================
+
+    const makeShiftCard = (
+        shiftName,
+        data,
+        extraClass = ""
+    ) => {
+
+        if (!data) {
+
+            return `
+                <div class="shift-snapshot-card empty">
+                    <div class="snapshot-card-title">
+                        ${shiftName}
+                    </div>
+
+                    <div class="snapshot-empty">
+                        Not Closed
+                    </div>
+                </div>
+            `;
+        }
+
+
+        const totalBalance =
+
+            Number(data.gameBalance || 0) +
+
+            Number(data.canteenBalance || 0);
+
+
+        return `
+
+            <div class="
+                shift-snapshot-card
+                ${extraClass}
+            ">
+
+                <div class="snapshot-card-title">
+                    ${shiftName}
+                </div>
+
+
+                <div class="snapshot-time">
+
+                    ${data.openTime || "-"}
+
+                    <span>→</span>
+
+                    ${data.closeTime || "-"}
+
+                </div>
+
+
+                <div class="snapshot-grid">
+
+
+                    <div class="snapshot-item">
+
+                        <span>🎱 Game Total</span>
+
+                        <strong>
+                            Rs. ${Number(
+                                data.gameTotal || 0
+                            ).toLocaleString()}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="snapshot-item">
+
+                        <span>🍔 Canteen Total</span>
+
+                        <strong>
+                            Rs. ${Number(
+                                data.canteenTotal || 0
+                            ).toLocaleString()}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="snapshot-item">
+
+                        <span>💰 Game Collection</span>
+
+                        <strong>
+                            Rs. ${Number(
+                                data.gameCollection || 0
+                            ).toLocaleString()}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="snapshot-item">
+
+                        <span>🧾 Canteen Collection</span>
+
+                        <strong>
+                            Rs. ${Number(
+                                data.canteenCollection || 0
+                            ).toLocaleString()}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="snapshot-item">
+
+                        <span>⚖️ Game Balance</span>
+
+                        <strong>
+                            Rs. ${Number(
+                                data.gameBalance || 0
+                            ).toLocaleString()}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="snapshot-item">
+
+                        <span>⚖️ Canteen Balance</span>
+
+                        <strong>
+                            Rs. ${Number(
+                                data.canteenBalance || 0
+                            ).toLocaleString()}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="snapshot-item">
+
+                        <span>🎁 Discount</span>
+
+                        <strong>
+                            Rs. ${Number(
+                                data.discount || 0
+                            ).toLocaleString()}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="snapshot-item">
+
+                        <span>💸 Expenses</span>
+
+                        <strong>
+                            Rs. ${Number(
+                                data.expenses || 0
+                            ).toLocaleString()}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="snapshot-item">
+
+                        <span>📲 EasyPaisa</span>
+
+                        <strong>
+                            Rs. ${Number(
+                                data.easypaisa || 0
+                            ).toLocaleString()}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="
+                        snapshot-item
+                        snapshot-balance
+                    ">
+
+                        <span>⚖️ Total Balance</span>
+
+                        <strong>
+                            Rs. ${totalBalance.toLocaleString()}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="
+                        snapshot-item
+                        snapshot-cash
+                    ">
+
+                        <span>💵 Closing Cash</span>
+
+                        <strong>
+                            Rs. ${Number(
+                                data.closingCash || 0
+                            ).toLocaleString()}
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        `;
     };
 
-combined.gameBalance =
-(s1.gameBalance || 0)
-+
-(s2.gameBalance || 0);
 
-combined.canteenBalance =
-(s1.canteenBalance || 0)
-+
-(s2.canteenBalance || 0);
+    // ==========================================
+    // BUILD POPUP
+    // ==========================================
 
-    combined.closingCash =
-    (combined.gameCollection + combined.canteenCollection)
-    - combined.expenses
-    - (combined.easypaisa || 0);
-}
+    summaryBody.innerHTML = `
+
+        <tr>
+
+            <td colspan="13">
+
+                <div class="shift-snapshot-container">
+
+                    ${makeShiftCard(
+                        "SHIFT 1",
+                        s1,
+                        "shift1-card"
+                    )}
 
 
-// APPLY to HTML table
-summaryBody.innerHTML = `
-<tr>
-    <td>Shift 1</td>
-    <td>${s1?.gameTotal || 0}</td>
-    <td>${s1?.canteenTotal || 0}</td>
-    <td>${s1?.gameCollection || 0}</td>
-    <td>${s1?.canteenCollection || 0}</td>
-    <td>${s1?.gameBalance || 0}</td>
-    <td>${s1?.canteenBalance || 0}</td>
-    <td>${s1?.discount || 0}</td>
-    <td>${s1?.expenses || 0}</td>
-    <td>${s1?.easypaisa || 0}</td>
-    <td>${s1?.closingCash || 0}</td>
-    <td>${s1?.openTime || "-"}</td>
-    <td>${s1?.closeTime || "-"}</td>
-</tr>
+                    ${makeShiftCard(
+                        "SHIFT 2",
+                        s2,
+                        "shift2-card"
+                    )}
 
-<tr>
-    <td>Shift 2</td>
-    <td>${s2?.gameTotal || 0}</td>
-    <td>${s2?.canteenTotal || 0}</td>
-    <td>${s2?.gameCollection || 0}</td>
-    <td>${s2?.canteenCollection || 0}</td>
-    <td>${s2?.gameBalance || 0}</td>
-    <td>${s2?.canteenBalance || 0}</td>
-    <td>${s2?.discount || 0}</td>
-    <td>${s2?.expenses || 0}</td>
-    <td>${s2?.easypaisa || 0}</td>
-    <td>${s2?.closingCash || 0}</td>
-    <td>${s2?.openTime || "-"}</td>
-    <td>${s2?.closeTime || "-"}</td>
-</tr>
 
-${combined ? (
-"<tr class='combined-row'>" +
-"<td>Combined</td>" +
-"<td>" + combined.gameTotal + "</td>" +
-"<td>" + combined.canteenTotal + "</td>" +
-"<td>" + combined.gameCollection + "</td>" +
-"<td>" + combined.canteenCollection + "</td>" +
-"<td>" + combined.gameBalance + "</td>" +
-"<td>" + combined.canteenBalance + "</td>" +
-"<td>" + combined.discount + "</td>" +
-"<td>" + combined.expenses + "</td>" +
-"<td>" + combined.easypaisa + "</td>" +
-"<td>" + combined.closingCash + "</td>" +
-"<td>-</td>" +
-"<td>-</td>" +
-"</tr>"
-) : ""}
-`;
+                    ${
+                        combined
+                        ?
+                        makeShiftCard(
+                            "COMBINED",
+                            combined,
+                            "combined-card"
+                        )
+                        :
+                        ""
+                    }
 
+                </div>
+
+            </td>
+
+        </tr>
+
+    `;
+
+
+    // ==========================================
+    // SHOW
+    // ==========================================
 
     showPopup("shiftSummaryPopup");
+
 }
 
 /******************************************************
