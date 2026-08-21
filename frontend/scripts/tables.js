@@ -2097,6 +2097,221 @@ function openHistory(id) {
 
     let t = tables.find(x => String(x.id) === String(id));
 
+  // ==========================================
+// 🔥 HISTORY SUMMARY COUNTERS
+// ==========================================
+
+const historyList = Array.isArray(t.history)
+    ? t.history
+    : [];
+
+
+// ==========================================
+// SHIFT 1 / SHIFT 2
+// ==========================================
+
+const shift1History =
+    historyList.filter(
+        h => Number(h.shiftNumber || 1) === 1
+    );
+
+const shift2History =
+    historyList.filter(
+        h => Number(h.shiftNumber || 1) === 2
+    );
+
+
+// ==========================================
+// 🎮 TOTAL GAME
+// ==========================================
+
+const shift1Game =
+    shift1History.length;
+
+const shift2Game =
+    shift2History.length;
+
+
+// ==========================================
+// 👤 GUEST PLAY
+// Booking nahi = Guest
+// ==========================================
+
+const shift1Guest =
+    shift1History.filter(
+        h => !h.fromBooking
+    ).length;
+
+const shift2Guest =
+    shift2History.filter(
+        h => !h.fromBooking
+    ).length;
+
+
+// ==========================================
+// 📅 BOOKING PLAY
+// ==========================================
+
+const shift1Booking =
+    shift1History.filter(
+        h => h.fromBooking
+    ).length;
+
+const shift2Booking =
+    shift2History.filter(
+        h => h.fromBooking
+    ).length;
+
+
+// ==========================================
+// 💰 PAID
+// ==========================================
+
+const shift1Paid =
+    shift1History.filter(
+        h => h.paid
+    ).length;
+
+const shift2Paid =
+    shift2History.filter(
+        h => h.paid
+    ).length;
+
+
+// ==========================================
+// ⚠️ UNPAID
+// ==========================================
+
+const shift1Unpaid =
+    shift1History.filter(
+        h => !h.paid
+    ).length;
+
+const shift2Unpaid =
+    shift2History.filter(
+        h => !h.paid
+    ).length;
+
+
+// ==========================================
+// 💵 PAID AMOUNT
+// ==========================================
+
+const shift1PaidAmount =
+    shift1History
+        .filter(h => h.paid)
+        .reduce(
+            (sum, h) =>
+                sum + Number(h.total || 0),
+            0
+        );
+
+const shift2PaidAmount =
+    shift2History
+        .filter(h => h.paid)
+        .reduce(
+            (sum, h) =>
+                sum + Number(h.total || 0),
+            0
+        );
+
+
+// ==========================================
+// 💸 UNPAID AMOUNT
+// ==========================================
+
+const shift1UnpaidAmount =
+    shift1History
+        .filter(h => !h.paid)
+        .reduce(
+            (sum, h) =>
+                sum + Number(h.total || 0),
+            0
+        );
+
+const shift2UnpaidAmount =
+    shift2History
+        .filter(h => !h.paid)
+        .reduce(
+            (sum, h) =>
+                sum + Number(h.total || 0),
+            0
+        );
+
+
+// ==========================================
+// 🔥 UPDATE SUMMARY BOXES
+// ==========================================
+
+// TOTAL GAME
+document.getElementById(
+    "historyShift1Game"
+).textContent = shift1Game;
+
+document.getElementById(
+    "historyShift2Game"
+).textContent = shift2Game;
+
+
+// GUEST
+document.getElementById(
+    "historyShift1Guest"
+).textContent = shift1Guest;
+
+document.getElementById(
+    "historyShift2Guest"
+).textContent = shift2Guest;
+
+
+// BOOKING
+document.getElementById(
+    "historyShift1Booking"
+).textContent = shift1Booking;
+
+document.getElementById(
+    "historyShift2Booking"
+).textContent = shift2Booking;
+
+
+// PAID
+document.getElementById(
+    "historyShift1Paid"
+).textContent = shift1Paid;
+
+document.getElementById(
+    "historyShift2Paid"
+).textContent = shift2Paid;
+
+document.getElementById(
+    "historyShift1PaidAmount"
+).textContent =
+    `Rs. ${shift1PaidAmount.toLocaleString()}`;
+
+document.getElementById(
+    "historyShift2PaidAmount"
+).textContent =
+    `Rs. ${shift2PaidAmount.toLocaleString()}`;
+
+
+// UNPAID
+document.getElementById(
+    "historyShift1Unpaid"
+).textContent = shift1Unpaid;
+
+document.getElementById(
+    "historyShift2Unpaid"
+).textContent = shift2Unpaid;
+
+document.getElementById(
+    "historyShift1UnpaidAmount"
+).textContent =
+    `Rs. ${shift1UnpaidAmount.toLocaleString()}`;
+
+document.getElementById(
+    "historyShift2UnpaidAmount"
+).textContent =
+    `Rs. ${shift2UnpaidAmount.toLocaleString()}`;
+
     let body = document.getElementById("historyTableBody");
   document.getElementById("historyTableTitle").innerText =
 `History - ${t.name}`;
