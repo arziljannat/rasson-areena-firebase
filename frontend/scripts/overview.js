@@ -6,286 +6,309 @@ import {
 }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const branches = [
-
-    "rasson1",
-    "rasson2",
-    "rasson3",
-    "rasson4",
-    "rasson5",
-    "rasson6",
-    "rasson7",
-    "rasson8"
-];
-
 document.addEventListener(
     "DOMContentLoaded",
-    async ()=>{
+    async () => {
 
-    const container =
-        document.getElementById(
-            "overviewContainer"
+        const container =
+            document.getElementById("overviewContainer");
+
+        if (!container) return;
+
+        // =========================
+        // SINGLE BRANCH
+        // =========================
+
+        const branch = "rasson1";
+
+        // =========================
+        // LOAD TABLES
+        // =========================
+
+        const tablesSnap =
+            await getDocs(
+                collection(window.db, "tables")
+            );
+
+        // =========================
+        // LOAD SESSIONS
+        // =========================
+
+        const sessionsQuery = query(
+            collection(window.db, "sessions"),
+            where("is_deleted", "==", false)
         );
 
-    if(!container) return;
+        const sessionsSnap =
+            await getDocs(sessionsQuery);
 
-    // =====================
-    // LOAD TABLES
-    // =====================
+        // =========================
+        // STORE DATA
+        // =========================
 
-    const tablesSnap =
-        await getDocs(
-            collection(window.db,"tables")
-        );
+        let tables = [];
+        let sessions = [];
 
-const sessionsQuery = query(
-    collection(window.db, "sessions"),
-    where("is_deleted", "==", false)
-);
+        tablesSnap.forEach(doc => {
 
-const sessionsSnap =
-    await getDocs(sessionsQuery);
-    const systemSnap =
-        await getDocs(
-            collection(window.db,"system")
-        );
+            const t = doc.data();
 
-        
-    let tables = [];
-    let sessions = [];
-    let operationalDays = [];
+            tables.push(t);
 
-    tablesSnap.forEach(doc=>{
+        });
 
-        let t = doc.data();
+        sessionsSnap.forEach(doc => {
 
-        tables.push(t);
-    });
+            const s = doc.data();
 
-    sessionsSnap.forEach(doc=>{
+            if (s.is_deleted === true)
+                return;
 
-        let s = doc.data();
+            sessions.push(s);
 
-        if(s.is_deleted === true)
-            return;
+        });
 
-        sessions.push(s);
-    });
+        // =========================
+        // GET RASSON1 TABLES
+        // =========================
 
-let currentOperationalMap = {};
+        let rawBranchTables =
+            tables.filter(t =>
 
-systemSnap.forEach(doc=>{
+                (t.branch || "")
+                    .toLowerCase() === branch
 
-    let d = doc.data();
+            );
 
-    if(d.type !== "current_day")
-        return;
+        // =========================
+        // REMOVE DUPLICATES
+        // =========================
 
-    let branch =
-        (d.branch || "")
-        .toLowerCase();
+        let uniqueTablesMap = {};
 
-    if(!branch) return;
+        rawBranchTables.forEach(t => {
 
-    currentOperationalMap[branch] =
-        String(d.day_id || "");
-});
+            const tableName =
+                (
+                    t.table_id ||
+                    t.name ||
+                    ""
+                )
+                .trim()
+                .toLowerCase();
 
-   
+            if (!tableName)
+                return;
 
-    // =====================
-    // RENDER BRANCHES
-    // =====================
+            uniqueTablesMap[tableName] = t;
 
-    branches.forEach(branch=>{
+        });
 
-let rawBranchTables =
-    tables.filter(t=>
+        let branchTables =
+            Object.values(uniqueTablesMap);
 
-        (t.branch || "")
-        .toLowerCase() === branch
-    );
+        // =========================
+        // SORT TABLES / ROOMS
+        // =========================
 
-// REMOVE DUPLICATES
-let uniqueTablesMap = {};
+        branchTables.sort((a, b) => {
 
-rawBranchTables.forEach(t=>{
+            const aName =
+                a.table_id ||
+                a.name ||
+                "";
 
-    let tableName =
-        (
-            t.table_id ||
-            t.name ||
-            ""
-        ).trim().toLowerCase();
+            const bName =
+                b.table_id ||
+                b.name ||
+                "";
 
-    if(!tableName) return;
+            const aRoom =
+                aName
+                    .toLowerCase()
+                    .includes("room");
 
-    uniqueTablesMap[tableName] = t;
-});
+            const bRoom =
+                bName
+                    .toLowerCase()
+                    .includes("room");
 
-let branchTables =
-    Object.values(uniqueTablesMap);
+            if (aRoom && !bRoom)
+                return 1;
+
+            if (!aRoom && bRoom)
+                return -1;
+
+            const aNum =
+                parseInt(
+                    aName.match(/\d+/)?.[0] || 0
+                );
+
+            const bNum =
+                parseInt(
+                    bName.match(/\d+/)?.[0] || 0
+                );
+
+            return aNum - bNum;
+
+        });
+
+        // =========================
+        // COUNT ACTIVE TABLES
+        // =========================
 
         let activeTables = 0;
 
         let html = "";
 
-        branchTables.sort((a,b)=>{
+        branchTables.forEach(table => {
 
-            let aName =
-                a.table_id || "";
-
-            let bName =
-                b.table_id || "";
-
-            let aRoom =
-                aName.toLowerCase()
-                .includes("room");
-
-            let bRoom =
-                bName.toLowerCase()
-                .includes("room");
-
-            if(aRoom && !bRoom)
-                return 1;
-
-            if(!aRoom && bRoom)
-                return -1;
-
-            let aNum =
-                parseInt(
-                    aName.match(/\d+/)?.[0]
-                    || 0
-                );
-
-            let bNum =
-                parseInt(
-                    bName.match(/\d+/)?.[0]
-                    || 0
-                );
-
-            return aNum - bNum;
-        });
-
-        branchTables.forEach(table=>{
-
-            let tableName =
+            const tableName =
                 table.table_id ||
                 table.name ||
                 "Table";
 
-let running =
-    sessions.some(s=>{
+            const running =
+                sessions.some(s => {
 
-        return (
+                    return (
 
-            (s.branch || "")
-            .toLowerCase()
-            === branch
+                        (s.branch || "")
+                            .toLowerCase()
+                            === branch
 
-            &&
+                        &&
 
-            (
-                s.table_id === tableName
-                ||
-                s.table === tableName
-            )
+                        (
+                            s.table_id === tableName
+                            ||
+                            s.table === tableName
+                        )
 
-            &&
+                        &&
 
-            (
-                s.check_in_time
-                ||
-                s.start_time
-            )
+                        (
+                            s.check_in_time
+                            ||
+                            s.start_time
+                        )
 
-            &&
+                        &&
 
-            !s.end_time
-            &&
-            !s.checkout_time
-            &&
-            !s.close_time
+                        !s.end_time
+                        &&
+                        !s.checkout_time
+                        &&
+                        !s.close_time
 
-        );
-    });
-            if(running)
+                    );
+
+                });
+
+            if (running)
                 activeTables++;
 
             html += `
 
-            <div class="table-box
-                ${running
-                    ? "table-active"
-                    : "table-free"}">
+                <div class="table-box
+                    ${running
+                        ? "table-active"
+                        : "table-free"}">
 
-                <h2>${tableName}</h2>
+                    <h2>${tableName}</h2>
 
-                <p>
-                ${running
-                    ? "ACTIVE"
-                    : "FREE"}
-                </p>
+                    <p>
+                        ${running
+                            ? "ACTIVE"
+                            : "FREE"}
+                    </p>
 
-            </div>
+                </div>
+
             `;
+
         });
 
-        let freeTables =
-            branchTables.length
-            - activeTables;
+        // =========================
+        // FREE TABLES
+        // =========================
 
-        container.innerHTML += `
+        const freeTables =
+            branchTables.length -
+            activeTables;
 
-        <div class="branch-card">
+        // =========================
+        // SINGLE BRANCH OVERVIEW
+        // =========================
 
-            <div class="branch-title">
+        container.innerHTML = `
 
-                ${branch.toUpperCase()}
+            <div class="overview-page">
 
-            </div>
+                <div class="overview-header">
 
-            <div class="branch-stats">
+                    <h1>Rasson Snooker Areena</h1>
 
-                <div class="stat-box">
-
-                    <h3>Total Tables</h3>
-
-                    <p>
-                    ${branchTables.length}
-                    </p>
+                    <p>Branch Overview</p>
 
                 </div>
 
-                <div class="stat-box">
 
-                    <h3>Active Tables</h3>
+                <div class="branch-card">
 
-                    <p>
-                    ${activeTables}
-                    </p>
+                    <div class="branch-title">
+                        RASSON SNOOKER AREENA
+                    </div>
 
-                </div>
 
-                <div class="stat-box">
+                    <div class="branch-stats">
 
-                    <h3>Free Tables</h3>
+                        <div class="stat-box">
 
-                    <p>
-                    ${freeTables}
-                    </p>
+                            <h3>Total Tables</h3>
+
+                            <p>
+                                ${branchTables.length}
+                            </p>
+
+                        </div>
+
+
+                        <div class="stat-box">
+
+                            <h3>Active Tables</h3>
+
+                            <p>
+                                ${activeTables}
+                            </p>
+
+                        </div>
+
+
+                        <div class="stat-box">
+
+                            <h3>Free Tables</h3>
+
+                            <p>
+                                ${freeTables}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tables-grid">
+
+                        ${html}
+
+                    </div>
 
                 </div>
 
             </div>
 
-            <div class="tables-grid">
-
-                ${html}
-
-            </div>
-
-        </div>
         `;
-    });
-});
+
+    }
+);
