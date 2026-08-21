@@ -2767,8 +2767,7 @@ function hidePopup(id) {
 }
 
 /******************************************************
- * 🔥 HABIB STYLE SHIFT SNAPSHOT
- * LIVE CALCULATION + SHIFT 1 + SHIFT 2
+ * 🔥 HABIB STYLE LIVE SHIFT SNAPSHOT
  ******************************************************/
 async function openShiftSummary() {
 
@@ -2781,14 +2780,13 @@ async function openShiftSummary() {
     const title =
         document.getElementById("shiftSummaryTitle");
 
-
-    // ==================================================
-    // TITLE + CLOSE BUTTON
-    // ==================================================
+    // ==========================================
+    // TITLE
+    // ==========================================
 
     if (btn.innerText.includes("Day")) {
 
-        title.innerText = "SHIFT SNAPSHOT";
+        title.innerText = "DAY SNAPSHOT";
 
         document.getElementById(
             "confirmShiftCloseBtn"
@@ -2804,59 +2802,45 @@ async function openShiftSummary() {
     }
 
 
-    // ==================================================
-    // 🔥 ALWAYS REBUILD LATEST HISTORY
-    // ==================================================
+    // ==========================================
+    // 🔥 ALWAYS REBUILD CURRENT HISTORY FIRST
+    // ==========================================
 
-    try {
-
-        await rebuildHistoryFromSessions();
-
-    } catch (err) {
-
-        console.error(
-            "❌ Snapshot history rebuild error:",
-            err
-        );
-
-    }
+    await rebuildHistoryFromSessions();
 
 
-    // ==================================================
-    // CURRENT SHIFT DATA
-    // ==================================================
+    // ==========================================
+    // 🔥 CURRENT TIME
+    // ==========================================
 
-    let s1 =
-        shift1
-            ? { ...shift1 }
-            : null;
-
-    let s2 =
-        shift2
-            ? { ...shift2 }
-            : null;
+    const now = Date.now();
 
 
-    // ==================================================
-    // 🔥 LIVE SHIFT 1 CALCULATION
-    // ==================================================
+    // ==========================================
+    // 🔥 GET SHIFT DATA
+    // ==========================================
 
-    if (!s1 && !btn.innerText.includes("Day")) {
+    let s1 = shift1
+        ? { ...shift1 }
+        : null;
 
-        let now = Date.now();
+    let s2 = shift2
+        ? { ...shift2 }
+        : null;
+
+
+    // ==========================================
+    // 🔥 LIVE SHIFT 1
+    // ==========================================
+
+    if (!s1) {
 
         let startMs = now;
-
-
-        // ----------------------------------------------
-        // GET FIRST SESSION
-        // ----------------------------------------------
 
         const allHistory =
             tables.flatMap(
                 t => t.history || []
             );
-
 
         const validHistory =
             allHistory
@@ -2867,7 +2851,6 @@ async function openShiftSummary() {
                         Number(b.checkin)
                 );
 
-
         if (validHistory.length > 0) {
 
             startMs =
@@ -2877,59 +2860,23 @@ async function openShiftSummary() {
 
         }
 
+        const liveData =
+            calculateShiftSnapshot(
+                startMs,
+                now
+            );
 
-        // ----------------------------------------------
-        // RUNNING TABLE MAY BE FIRST
-        // ----------------------------------------------
+        s1 = {
 
-        tables.forEach(t => {
+            shift: 1,
 
-            if (
-                t.isRunning &&
-                t.checkinTime
-            ) {
+            startMs,
 
-                const runningStart =
-                    Number(
-                        t.checkinTime
-                    );
+            endMs: now,
 
-                if (
-                    runningStart < startMs
-                ) {
-
-                    startMs =
-                        runningStart;
-
-                }
-
-            }
-
-        });
-
-
-        // ----------------------------------------------
-        // LIVE CALCULATION
-        // ----------------------------------------------
-
-        try {
-
-            const liveData =
-                calculateShiftSnapshot(
-                    startMs,
-                    now,
-                    1
-                );
-
-
-            s1 = {
-
-                shift: 1,
-
-                openTime:
-                    new Date(
-                        startMs
-                    ).toLocaleString(
+            openTime:
+                new Date(startMs)
+                    .toLocaleString(
                         "en-PK",
                         {
                             timeZone:
@@ -2937,369 +2884,282 @@ async function openShiftSummary() {
                         }
                     ),
 
-                closeTime:
-                    "-",
+            closeTime:
+                new Date(now)
+                    .toLocaleString(
+                        "en-PK",
+                        {
+                            timeZone:
+                                "Asia/Karachi"
+                        }
+                    ),
 
-                startMs:
-                    startMs,
-
-                endMs:
-                    now,
-
-                ...liveData
-
-            };
-
-
-        } catch (err) {
-
-            console.error(
-                "❌ LIVE SHIFT CALC ERROR:",
-                err
-            );
-
-        }
+            ...liveData
+        };
 
     }
 
 
-    // ==================================================
-    // 🔥 MONEY FORMAT
-    // ==================================================
+    // ==========================================
+    // 🔥 LIVE CURRENT SHIFT
+    // If Shift 1 is already closed and Shift 2
+    // is running, calculate Shift 2 live.
+    // ==========================================
 
-    const money = value => {
+    if (s1 && !s2) {
 
-        const n =
-            Number(value || 0);
+        const shiftStart =
+            s1.endMs || now;
 
-        return n.toLocaleString();
+        const liveShift2 =
+            calculateShiftSnapshot(
+                shiftStart,
+                now
+            );
 
-    };
+        s2 = {
 
+            shift: 2,
 
-    // ==================================================
-    // 🔥 ROW BUILDER
-    // ==================================================
+            startMs: shiftStart,
 
-    const makeShiftRow =
-        (
-            shiftName,
-            data
-        ) => {
+            endMs: now,
 
-            // ------------------------------------------
-            // NOT CLOSED
-            // ------------------------------------------
-
-            if (!data) {
-
-                return `
-
-                    <tr
-                        class="
-                            shift-summary-row
-                            shift-not-closed-row
-                        "
-                    >
-
-                        <td>
-                            <strong>
-                                ${shiftName}
-                            </strong>
-                        </td>
-
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-
-                    </tr>
-
-                `;
-
-            }
-
-
-            // ------------------------------------------
-            // NORMAL ROW
-            // ------------------------------------------
-
-            return `
-
-                <tr
-                    class="
-                        shift-summary-row
-                        ${
-                            shiftName
-                                .toLowerCase()
-                                .includes("1")
-                                ? "shift1-row"
-                                : "shift2-row"
+            openTime:
+                new Date(shiftStart)
+                    .toLocaleString(
+                        "en-PK",
+                        {
+                            timeZone:
+                                "Asia/Karachi"
                         }
-                    "
-                >
+                    ),
 
-                    <!-- SHIFT -->
-
-                    <td>
-
-                        <strong>
-                            ${shiftName}
-                        </strong>
-
-                    </td>
-
-
-                    <!-- GAME TOTAL -->
-
-                    <td>
-                        ${money(
-                            data.gameTotal
-                        )}
-                    </td>
-
-
-                    <!-- CANTEEN TOTAL -->
-
-                    <td>
-                        ${money(
-                            data.canteenTotal
-                        )}
-                    </td>
-
-
-                    <!-- GAME COLLECTION -->
-
-                    <td>
-                        ${money(
-                            data.gameCollection
-                        )}
-                    </td>
-
-
-                    <!-- CANTEEN COLLECTION -->
-
-                    <td>
-                        ${money(
-                            data.canteenCollection
-                        )}
-                    </td>
-
-
-                    <!-- GAME BALANCE -->
-
-                    <td>
-                        ${money(
-                            data.gameBalance
-                        )}
-                    </td>
-
-
-                    <!-- CANTEEN BALANCE -->
-
-                    <td>
-                        ${money(
-                            data.canteenBalance
-                        )}
-                    </td>
-
-
-                    <!-- DISCOUNT -->
-
-                    <td>
-                        ${money(
-                            data.discount
-                        )}
-                    </td>
-
-
-                    <!-- EXPENSES -->
-
-                    <td>
-                        ${money(
-                            data.expenses
-                        )}
-                    </td>
-
-
-                    <!-- EASYPAISA -->
-
-                    <td>
-                        ${money(
-                            data.easypaisa
-                        )}
-                    </td>
-
-
-                    <!-- CLOSING CASH -->
-
-                    <td>
-                        ${money(
-                            data.closingCash
-                        )}
-                    </td>
-
-
-                    <!-- OPEN TIME -->
-
-                    <td>
-                        ${
-                            data.openTime ||
-                            "-"
+            closeTime:
+                new Date(now)
+                    .toLocaleString(
+                        "en-PK",
+                        {
+                            timeZone:
+                                "Asia/Karachi"
                         }
-                    </td>
+                    ),
+
+            ...liveShift2
+        };
+
+    }
 
 
-                    <!-- CLOSE TIME -->
+    // ==========================================
+    // 🔥 COMBINED
+    // ==========================================
 
-                    <td>
-                        ${
-                            data.closeTime ||
-                            "-"
-                        }
-                    </td>
+    let combined = null;
 
-                </tr>
+    if (s1 && s2) {
 
-            `;
+        combined = {
 
+            gameTotal:
+                Number(s1.gameTotal || 0) +
+                Number(s2.gameTotal || 0),
+
+            canteenTotal:
+                Number(s1.canteenTotal || 0) +
+                Number(s2.canteenTotal || 0),
+
+            gameCollection:
+                Number(s1.gameCollection || 0) +
+                Number(s2.gameCollection || 0),
+
+            canteenCollection:
+                Number(s1.canteenCollection || 0) +
+                Number(s2.canteenCollection || 0),
+
+            gameBalance:
+                Number(s1.gameBalance || 0) +
+                Number(s2.gameBalance || 0),
+
+            canteenBalance:
+                Number(s1.canteenBalance || 0) +
+                Number(s2.canteenBalance || 0),
+
+            discount:
+                Number(s1.discount || 0) +
+                Number(s2.discount || 0),
+
+            expenses:
+                Number(s1.expenses || 0) +
+                Number(s2.expenses || 0),
+
+            easypaisa:
+                Number(s1.easypaisa || 0) +
+                Number(s2.easypaisa || 0)
         };
 
 
-    // ==================================================
-    // 🔥 BUILD HABIB STYLE TABLE
-    // ==================================================
+        combined.closingCash =
+
+            Number(
+                combined.gameCollection || 0
+            ) +
+
+            Number(
+                combined.canteenCollection || 0
+            ) -
+
+            Number(
+                combined.expenses || 0
+            ) -
+
+            Number(
+                combined.easypaisa || 0
+            );
+
+    }
+
+
+    // ==========================================
+    // 🔥 HABIB STYLE ROW
+    // ==========================================
+
+    const value = v =>
+        Number(v || 0)
+            .toLocaleString();
+
+
+    const makeRow = (
+        shiftName,
+        data,
+        combinedRow = false
+    ) => {
+
+        if (!data) {
+
+            return `
+                <tr>
+                    <td>
+                        ${shiftName}
+                    </td>
+
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+            `;
+        }
+
+
+        return `
+            <tr class="
+                ${combinedRow
+                    ? "combined-row"
+                    : ""}
+            ">
+
+                <td>
+                    ${shiftName}
+                </td>
+
+                <td>
+                    ${value(data.gameTotal)}
+                </td>
+
+                <td>
+                    ${value(data.canteenTotal)}
+                </td>
+
+                <td>
+                    ${value(data.gameCollection)}
+                </td>
+
+                <td>
+                    ${value(data.canteenCollection)}
+                </td>
+
+                <td>
+                    ${value(data.gameBalance)}
+                </td>
+
+                <td>
+                    ${value(data.canteenBalance)}
+                </td>
+
+                <td>
+                    ${value(data.discount)}
+                </td>
+
+                <td>
+                    ${value(data.expenses)}
+                </td>
+
+                <td>
+                    ${value(data.easypaisa)}
+                </td>
+
+                <td>
+                    ${value(data.closingCash)}
+                </td>
+
+                <td>
+                    ${data.openTime || "-"}
+                </td>
+
+                <td>
+                    ${data.closeTime || "-"}
+                </td>
+
+            </tr>
+        `;
+    };
+
+
+    // ==========================================
+    // 🔥 HABIB STYLE TABLE
+    // ==========================================
 
     summaryBody.innerHTML = `
 
-        <tr>
+        ${makeRow(
+            "Shift 1",
+            s1
+        )}
 
-            <td colspan="13">
+        ${makeRow(
+            "Shift 2",
+            s2
+        )}
 
-                <div
-                    class="
-                        habib-shift-snapshot
-                    "
-                >
-
-                    <div
-                        class="
-                            snapshot-table-wrapper
-                        "
-                    >
-
-                        <table
-                            class="
-                                habib-shift-table
-                            "
-                        >
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>
-                                        Shift
-                                    </th>
-
-                                    <th>
-                                        Game<br>Total
-                                    </th>
-
-                                    <th>
-                                        Canteen<br>Total
-                                    </th>
-
-                                    <th>
-                                        Game<br>Collection
-                                    </th>
-
-                                    <th>
-                                        Canteen<br>Collection
-                                    </th>
-
-                                    <th>
-                                        Game<br>Balance
-                                    </th>
-
-                                    <th>
-                                        Canteen<br>Balance
-                                    </th>
-
-                                    <th>
-                                        Discount
-                                    </th>
-
-                                    <th>
-                                        Expenses
-                                    </th>
-
-                                    <th>
-                                        EasyPaisa
-                                    </th>
-
-                                    <th>
-                                        Closing<br>Cash
-                                    </th>
-
-                                    <th>
-                                        Open Time
-                                    </th>
-
-                                    <th>
-                                        Close Time
-                                    </th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody>
-
-                                ${
-                                    makeShiftRow(
-                                        "Shift 1",
-                                        s1
-                                    )
-                                }
-
-                                ${
-                                    makeShiftRow(
-                                        "Shift 2",
-                                        s2
-                                    )
-                                }
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </td>
-
-        </tr>
+        ${
+            combined
+            ?
+            makeRow(
+                "Combined",
+                combined,
+                true
+            )
+            :
+            ""
+        }
 
     `;
 
 
-    // ==================================================
-    // SHOW POPUP
-    // ==================================================
+    // ==========================================
+    // 🔥 SHOW POPUP
+    // ==========================================
 
-    showPopup(
-        "shiftSummaryPopup"
-    );
+    showPopup("shiftSummaryPopup");
 
 }
 
