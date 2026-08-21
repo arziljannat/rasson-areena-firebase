@@ -341,75 +341,6 @@ setTimeout(async () => {
 }
 
 
-// ============================================================
-// 🔥 FINAL TABLE / ROOM SECTION LAYOUT
-// ============================================================
-
-const allCards = [...box.querySelectorAll(".table-box")];
-
-box.innerHTML = "";
-
-// TABLES SECTION
-const tablesSection = document.createElement("div");
-tablesSection.className = "resource-section";
-
-const tablesHeading = document.createElement("div");
-tablesHeading.className = "resource-section-title";
-tablesHeading.innerHTML = "TABLES";
-
-const tablesGrid = document.createElement("div");
-tablesGrid.className = "tables-grid section-grid";
-
-tablesSection.appendChild(tablesHeading);
-tablesSection.appendChild(tablesGrid);
-
-
-// ROOMS SECTION
-const roomsSection = document.createElement("div");
-roomsSection.className = "resource-section rooms-section";
-
-const roomsHeading = document.createElement("div");
-roomsHeading.className = "resource-section-title";
-roomsHeading.innerHTML = "ROOMS";
-
-const roomsGrid = document.createElement("div");
-roomsGrid.className = "tables-grid section-grid";
-
-roomsSection.appendChild(roomsHeading);
-roomsSection.appendChild(roomsGrid);
-
-
-// 🔥 CARDS KO PROPER SECTION MEIN DAALO
-allCards.forEach(card => {
-
-    const id = card.getAttribute("data-table-id");
-
-    const t = tables.find(
-        x => String(x.id) === String(id)
-    );
-
-    if (!t) return;
-
-    if (t.tableType === "room") {
-        roomsGrid.appendChild(card);
-    } else {
-        tablesGrid.appendChild(card);
-    }
-
-});
-
-
-// 🔥 FINAL DISPLAY
-if (tablesGrid.children.length > 0) {
-    box.appendChild(tablesSection);
-}
-
-if (roomsGrid.children.length > 0) {
-    box.appendChild(roomsSection);
-}
-
-
-
 // inventory load function
 async function loadInventory() {
 
@@ -828,6 +759,87 @@ setTimeout(() => {
 
 }, 50);
     });
+
+// ============================================================
+// 🔥 FINAL TABLE + ROOM SECTION LAYOUT
+// ============================================================
+
+// Existing cards ko temporarily collect karo
+const allCards = [...box.querySelectorAll(".table-box")];
+
+box.innerHTML = "";
+
+// ============================================================
+// 🎱 TABLES SECTION
+// ============================================================
+
+const tablesSection = document.createElement("div");
+tablesSection.className = "resource-section";
+
+const tablesHeading = document.createElement("div");
+tablesHeading.className = "resource-section-title";
+tablesHeading.innerHTML = "🎱 TABLES";
+
+const tablesGrid = document.createElement("div");
+tablesGrid.className = "tables-grid section-grid";
+
+tablesSection.appendChild(tablesHeading);
+tablesSection.appendChild(tablesGrid);
+
+
+// ============================================================
+// 🚪 ROOMS SECTION
+// ============================================================
+
+const roomsSection = document.createElement("div");
+roomsSection.className = "resource-section rooms-section";
+
+const roomsHeading = document.createElement("div");
+roomsHeading.className = "resource-section-title";
+roomsHeading.innerHTML = "🚪 ROOMS";
+
+const roomsGrid = document.createElement("div");
+roomsGrid.className = "tables-grid section-grid rooms-grid";
+
+roomsSection.appendChild(roomsHeading);
+roomsSection.appendChild(roomsGrid);
+
+
+// ============================================================
+// 🔥 CARDS KO TABLE / ROOM KE MUTABIQ SEPARATE KARO
+// ============================================================
+
+allCards.forEach(card => {
+
+    const id = card.getAttribute("data-table-id");
+
+    const t = tables.find(
+        x => String(x.id) === String(id)
+    );
+
+    if (!t) return;
+
+    if (t.tableType === "room") {
+        roomsGrid.appendChild(card);
+    } else {
+        tablesGrid.appendChild(card);
+    }
+
+});
+
+
+// ============================================================
+// 🔥 FINAL DISPLAY
+// ============================================================
+
+if (tablesGrid.children.length > 0) {
+    box.appendChild(tablesSection);
+}
+
+if (roomsGrid.children.length > 0) {
+    box.appendChild(roomsSection);
+}
+  
 }
 
 /******************************************************
