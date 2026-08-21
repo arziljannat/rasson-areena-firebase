@@ -2098,192 +2098,218 @@ body * {
 
 }
 /* =====================================================
-   🔥🔥 HABIB SOFTWARE STYLE SHIFT SNAPSHOT TABLE
+   🔥 HABIB STYLE SHIFT SNAPSHOT
 ===================================================== */
 
-#shiftSummaryPopup .habib-shift-snapshot {
+#shiftSummaryPopup .popup-box {
 
-    width: 100%;
+    width: min(1150px, 96vw) !important;
+
+    max-width: 1150px !important;
+
+    max-height: 90vh !important;
+
+    overflow: auto !important;
+
+    padding: 22px !important;
 
     box-sizing: border-box;
 
-    margin-top: 5px;
-
 }
 
 
-/* TABLE WRAPPER */
+/* ==========================================
+   TITLE
+========================================== */
 
-#shiftSummaryPopup .snapshot-table-wrapper {
-
-    width: 100%;
-
-    overflow-x: auto;
-
-    overflow-y: auto;
-
-    max-height: 55vh;
-
-    border-radius: 10px;
-
-}
-
-
-/* MAIN TABLE */
-
-#shiftSummaryPopup .habib-shift-table {
-
-    width: 100%;
-
-    min-width: 1050px;
-
-    border-collapse: collapse;
-
-    table-layout: fixed;
-
-    background:
-        rgba(0, 0, 0, 0.35);
-
-}
-
-
-/* HEADER */
-
-#shiftSummaryPopup .habib-shift-table th {
-
-    padding: 12px 7px;
+#shiftSummaryPopup #shiftSummaryTitle {
 
     text-align: center;
 
-    vertical-align: middle;
+    color: #00ffcc;
+
+    font-size: 28px;
+
+    font-weight: 800;
+
+    margin-bottom: 22px;
+
+    text-shadow:
+        0 0 8px #00ffcc,
+        0 0 18px #00ffcc;
+
+}
+
+
+/* ==========================================
+   TABLE WRAPPER
+========================================== */
+
+#shiftSummaryPopup
+.table-mobile-wrapper {
+
+    width: 100%;
+
+    overflow-x: auto !important;
+
+    overflow-y: auto !important;
+
+}
+
+
+/* ==========================================
+   HABIB STYLE TABLE
+========================================== */
+
+#shiftSummaryPopup
+.neon-table {
+
+    width: 100% !important;
+
+    min-width: 1100px;
+
+    border-collapse: collapse;
+
+    border: none !important;
+
+}
+
+
+/* ==========================================
+   HEADER
+========================================== */
+
+#shiftSummaryPopup
+.neon-table th {
+
+    padding: 12px 8px;
+
+    text-align: center;
 
     color: #00ffcc;
 
     font-size: 13px;
 
-    font-weight: 900;
-
-    line-height: 1.15;
-
-    border-bottom:
-        1px solid #00ff99;
-
-    text-shadow:
-        0 0 8px #00ffcc;
+    font-weight: 800;
 
     white-space: nowrap;
-
-}
-
-
-/* BODY CELLS */
-
-#shiftSummaryPopup .habib-shift-table td {
-
-    padding: 11px 7px;
-
-    text-align: center;
-
-    vertical-align: middle;
-
-    color: #eaffff;
-
-    font-size: 13px;
-
-    font-weight: 600;
 
     border-bottom:
         1px solid
-        rgba(0,255,153,0.35);
+        rgba(0,255,180,.65);
+
+}
+
+
+/* ==========================================
+   BODY
+========================================== */
+
+#shiftSummaryPopup
+.neon-table td {
+
+    padding: 13px 9px;
+
+    text-align: center;
+
+    color: #eee;
+
+    font-size: 13px;
 
     white-space: nowrap;
 
+    border-bottom:
+        1px solid
+        rgba(0,255,180,.35);
+
 }
 
 
-/* SHIFT NAME */
+/* ==========================================
+   SHIFT NAME
+========================================== */
 
 #shiftSummaryPopup
-.habib-shift-table td:first-child {
+.neon-table td:first-child {
 
-    color: #ffffff;
+    color: #fff;
 
-    font-weight: 900;
+    font-weight: 800;
 
     text-align: left;
 
-    padding-left: 14px;
-
 }
 
 
-/* SHIFT 1 */
+/* ==========================================
+   COMBINED
+========================================== */
 
 #shiftSummaryPopup
-.habib-shift-table .shift1-row td {
-
-    color: #ffffff;
-
-}
-
-
-/* SHIFT 2 */
-
-#shiftSummaryPopup
-.habib-shift-table .shift2-row td {
-
-    color: #ffffff;
-
-}
-
-
-/* HOVER */
-
-#shiftSummaryPopup
-.habib-shift-table tbody tr:hover {
+.neon-table tr.combined-row {
 
     background:
-        rgba(0,255,153,0.08);
+        rgba(255,215,0,.10);
 
 }
 
-
-/* NOT CLOSED */
 
 #shiftSummaryPopup
-.habib-shift-table
-.shift-not-closed-row td {
+.neon-table tr.combined-row td {
 
-    color: #dddddd;
+    color: #ffd700;
+
+    font-weight: 900;
+
+    border-top:
+        1px solid
+        rgba(255,215,0,.55);
+
+    border-bottom:
+        1px solid
+        rgba(255,215,0,.55);
 
 }
 
 
-/* NUMBER CELLS */
+/* ==========================================
+   BUTTON AREA
+========================================== */
 
 #shiftSummaryPopup
-.habib-shift-table td:not(:first-child) {
+.popup-buttons {
 
-    font-family:
-        "Arial",
-        sans-serif;
+    display: flex;
+
+    justify-content: center;
+
+    gap: 25px;
+
+    margin-top: 25px;
 
 }
 
 
-/* MOBILE */
+/* ==========================================
+   MOBILE
+========================================== */
 
-@media (max-width: 900px) {
+@media(max-width:700px) {
 
-    #shiftSummaryPopup
-    .snapshot-table-wrapper {
+    #shiftSummaryPopup .popup-box {
 
-        overflow-x: auto;
+        width:
+            calc(100vw - 15px) !important;
+
+        max-width:
+            calc(100vw - 15px) !important;
+
+        padding: 12px !important;
 
     }
 
     #shiftSummaryPopup
-    .habib-shift-table {
+    .neon-table {
 
         min-width: 1100px;
 
