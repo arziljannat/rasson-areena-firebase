@@ -72,14 +72,62 @@ body * {
 
 
 /* ============================================================
-   TABLE GRID
+   TABLE / ROOM SECTIONS
 ============================================================ */
+
+.resource-section {
+    width: 100%;
+    margin: 35px auto 45px;
+    text-align: center;
+}
+
+.resource-section-title {
+    width: fit-content;
+    margin: 0 auto 28px;
+
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: 5px;
+
+    color: #00ffcc;
+
+    text-shadow:
+        0 0 8px #00ff88,
+        0 0 18px #00ff88,
+        0 0 35px #00ff88;
+
+    border-bottom: 2px solid #00ff88;
+
+    padding: 8px 35px 10px;
+
+    border-radius: 10px;
+}
+
+.rooms-section {
+    margin-top: 65px;
+}
+
+
+/* ============================================================
+   TABLE GRID
+   5 CARDS IN FIRST ROW
+============================================================ */
+
 .tables-grid {
-    width: 90%;
-    margin: 30px auto;
+    width: 100%;
+    max-width: 1800px;
+
+    margin: 0 auto;
+
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+
+    grid-template-columns:
+        repeat(5, minmax(240px, 1fr));
+
     gap: 25px;
+
+    justify-items: center;
+    align-items: start;
 }
 
 
@@ -88,11 +136,20 @@ body * {
 ============================================================ */
 .table-box {
     background: rgba(0, 0, 0, 0.25);
+
     border: 2px solid #00ff88;
     border-radius: 12px;
+
     padding: 15px;
-    width: 330px;
-    box-shadow: 0 0 15px #00ff88, inset 0 0 15px #00ff88;
+
+    width: 100%;
+    max-width: 300px;
+
+    box-sizing: border-box;
+
+    box-shadow:
+        0 0 15px #00ff88,
+        inset 0 0 15px #00ff88;
 }
 
 .table-title {
@@ -283,28 +340,55 @@ body * {
 }
 
 /* ============================================================
-   RESPONSIVE
+   RESPONSIVE TABLE / ROOM GRID
 ============================================================ */
-@media (max-width: 1200px) {
+
+@media (max-width: 1450px) {
+
     .tables-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns:
+            repeat(4, minmax(230px, 1fr));
     }
+
 }
 
-@media (max-width: 900px) {
+
+@media (max-width: 1150px) {
+
     .tables-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns:
+            repeat(3, minmax(230px, 1fr));
     }
+
 }
+
+
+@media (max-width: 850px) {
+
+    .tables-grid {
+        grid-template-columns:
+            repeat(2, minmax(220px, 1fr));
+    }
+
+}
+
 
 @media (max-width: 600px) {
+
     .tables-grid {
-        grid-template-columns: repeat(1, 1fr);
+        grid-template-columns: 1fr;
     }
 
     .table-box {
         width: 95%;
+        max-width: 360px;
     }
+
+    .resource-section-title {
+        font-size: 24px;
+        padding: 7px 25px 9px;
+    }
+
 }
 
 
