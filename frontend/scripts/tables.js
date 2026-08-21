@@ -1120,11 +1120,13 @@ function playTable15MinuteAlarm(t) {
         return;
     }
 
+    // 🔔 SCREEN ALERT — jis table ka alarm hai usi par show hoga
+    showTable15MinuteAlert(t);
+    
     // 🔊 Voice
     playTableVoice(
         `Attention! ${t.name}. ${totalMinutes} minutes.`
     );
-
     // 🔒 Save locally so refresh does not repeat the same alarm
     localStorage.setItem(alarmKey, "played");
 
@@ -5035,6 +5037,50 @@ document.addEventListener("keydown", () => {
     window.userInteracted = true;
     unlockAudio();
 });
+
+function showTable15MinuteAlert(t) {
+
+    if (!t) return;
+
+    const tableBox =
+        document.querySelector(
+            `button[onclick="checkIn('${t.id}')"]`
+        )?.closest(".table-box");
+
+    if (!tableBox) return;
+
+    // Purana alert hatao
+    const oldAlert =
+        tableBox.querySelector(".table-15-alert");
+
+    if (oldAlert) {
+        oldAlert.remove();
+    }
+
+    // 🔔 NEW ALERT
+    const alertBox =
+        document.createElement("div");
+
+    alertBox.className = "table-15-alert";
+
+    alertBox.innerHTML = `
+        🔔 ATTENTION<br>
+        <strong>${t.name}</strong><br>
+        <span>${Math.floor(t.playSeconds / 60)} MINUTES</span>
+    `;
+
+    tableBox.appendChild(alertBox);
+
+    // 5 seconds baad sirf ye message remove
+    setTimeout(() => {
+
+        alertBox.remove();
+
+    }, 5000);
+}
+
+
+
 function showTableWarning(id) {
 
     const el =
