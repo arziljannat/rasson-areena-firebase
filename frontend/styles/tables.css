@@ -1504,21 +1504,266 @@ body * {
 
 }
 
-/* =====================================================
-   🔥 HABIB STYLE SHIFT SNAPSHOT
-===================================================== */
+/* =========================================================
+   🔥 HABIB STYLE SHIFT / DAY SNAPSHOT POPUP
+   🔥 VERTICAL + HORIZONTAL SCROLL
+========================================================= */
 
 #shiftSummaryPopup .popup-box {
 
-    width: min(1100px, 95vw) !important;
+    width: min(1200px, 95vw) !important;
 
-    max-width: 1100px !important;
+    max-width: 1200px !important;
+
+    height: 90vh !important;
 
     max-height: 90vh !important;
 
-    overflow-y: auto !important;
+    box-sizing: border-box !important;
 
     padding: 25px !important;
+
+    overflow: hidden !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+}
+
+
+/* =========================================================
+   🔥 POPUP TITLE
+========================================================= */
+
+#shiftSummaryPopup #shiftSummaryTitle {
+
+    flex: 0 0 auto !important;
+
+    text-align: center;
+
+    color: #00ffcc;
+
+    font-size: 30px;
+
+    font-weight: 900;
+
+    margin: 0 0 20px 0;
+
+    text-shadow:
+        0 0 10px #00ffcc,
+        0 0 25px #00ffcc;
+
+}
+
+
+/* =========================================================
+   🔥 MAIN SNAPSHOT SCROLL AREA
+   UP/DOWN + LEFT/RIGHT
+========================================================= */
+
+#shiftSummaryPopup .table-mobile-wrapper {
+
+    flex: 1 1 auto !important;
+
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    min-height: 0 !important;
+
+    overflow-x: auto !important;
+
+    overflow-y: auto !important;
+
+    -webkit-overflow-scrolling: touch !important;
+
+}
+
+
+/* =========================================================
+   🔥 REMOVE OLD TABLE RESTRICTIONS
+========================================================= */
+
+#shiftSummaryPopup .neon-table {
+
+    width: max-content !important;
+
+    min-width: 100% !important;
+
+    border: none !important;
+
+}
+
+
+/* =========================================================
+   🔥 SNAPSHOT CONTAINER
+========================================================= */
+
+#shiftSummaryPopup .shift-snapshot-container {
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    gap: 20px !important;
+
+    width: max-content !important;
+
+    min-width: 100% !important;
+
+}
+
+
+/* =========================================================
+   🔥 SNAPSHOT CARD
+========================================================= */
+
+#shiftSummaryPopup .shift-snapshot-card {
+
+    width: 100% !important;
+
+    min-width: 900px !important;
+
+    box-sizing: border-box !important;
+
+    padding: 18px !important;
+
+    border: 2px solid #00ff99 !important;
+
+    border-radius: 18px !important;
+
+    background:
+        rgba(0,0,0,0.78) !important;
+
+    box-shadow:
+        0 0 15px rgba(0,255,150,0.55) !important;
+
+}
+
+
+/* =========================================================
+   🔥 SNAPSHOT GRID
+========================================================= */
+
+#shiftSummaryPopup .snapshot-grid {
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(4, minmax(190px, 1fr)) !important;
+
+    gap: 10px !important;
+
+    min-width: 850px !important;
+
+}
+
+
+/* =========================================================
+   🔥 SNAPSHOT ITEM
+========================================================= */
+
+#shiftSummaryPopup .snapshot-item {
+
+    min-height: 70px !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    justify-content: center !important;
+
+    align-items: center !important;
+
+    text-align: center !important;
+
+    padding: 10px !important;
+
+    border-radius: 12px !important;
+
+    border: 1px solid
+        rgba(0,255,150,0.55) !important;
+
+    background:
+        rgba(0,0,0,0.55) !important;
+
+    box-sizing: border-box !important;
+
+}
+
+
+/* =========================================================
+   🔥 SNAPSHOT BUTTON AREA
+========================================================= */
+
+#shiftSummaryPopup .popup-buttons {
+
+    flex: 0 0 auto !important;
+
+    width: 100% !important;
+
+    display: flex !important;
+
+    justify-content: center !important;
+
+    align-items: center !important;
+
+    gap: 20px !important;
+
+    margin-top: 15px !important;
+
+    padding-top: 10px !important;
+
+}
+
+
+/* =========================================================
+   🔥 BUTTONS
+========================================================= */
+
+#shiftSummaryPopup .popup-buttons button {
+
+    min-width: 170px !important;
+
+    height: 50px !important;
+
+    padding: 10px 22px !important;
+
+    font-size: 17px !important;
+
+    font-weight: 900 !important;
+
+    border-radius: 12px !important;
+
+}
+
+
+/* =========================================================
+   🔥 SCROLLBAR
+========================================================= */
+
+#shiftSummaryPopup .table-mobile-wrapper::-webkit-scrollbar {
+
+    width: 10px;
+
+    height: 10px;
+
+}
+
+
+#shiftSummaryPopup .table-mobile-wrapper::-webkit-scrollbar-thumb {
+
+    background: #00ff99;
+
+    border-radius: 10px;
+
+}
+
+
+#shiftSummaryPopup .table-mobile-wrapper::-webkit-scrollbar-track {
+
+    background: rgba(0,0,0,0.5);
 
 }
 
