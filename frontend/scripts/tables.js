@@ -2879,265 +2879,145 @@ function openShiftSummary() {
     }
 
 
-    // ==========================================
-    // SNAPSHOT CARD
-    // ==========================================
+// ==========================================
+// 🔥 HABIB STYLE SHIFT SNAPSHOT ROW
+// ==========================================
 
-    const makeShiftCard = (
-        shiftName,
-        data,
-        extraClass = ""
-    ) => {
+const makeShiftRow = (shiftName, data) => {
 
-        if (!data) {
-
-            return `
-                <div class="shift-snapshot-card empty">
-                    <div class="snapshot-card-title">
-                        ${shiftName}
-                    </div>
-
-                    <div class="snapshot-empty">
-                        Not Closed
-                    </div>
-                </div>
-            `;
-        }
-
-
-        const totalBalance =
-
-            Number(data.gameBalance || 0) +
-
-            Number(data.canteenBalance || 0);
-
+    if (!data) {
 
         return `
-
-            <div class="
-                shift-snapshot-card
-                ${extraClass}
-            ">
-
-                <div class="snapshot-card-title">
-                    ${shiftName}
-                </div>
-
-
-                <div class="snapshot-time">
-
-                    ${data.openTime || "-"}
-
-                    <span>→</span>
-
-                    ${data.closeTime || "-"}
-
-                </div>
-
-
-                <div class="snapshot-grid">
-
-
-                    <div class="snapshot-item">
-
-                        <span>🎱 Game Total</span>
-
-                        <strong>
-                            Rs. ${Number(
-                                data.gameTotal || 0
-                            ).toLocaleString()}
-                        </strong>
-
-                    </div>
-
-
-                    <div class="snapshot-item">
-
-                        <span>🍔 Canteen Total</span>
-
-                        <strong>
-                            Rs. ${Number(
-                                data.canteenTotal || 0
-                            ).toLocaleString()}
-                        </strong>
-
-                    </div>
-
-
-                    <div class="snapshot-item">
-
-                        <span>💰 Game Collection</span>
-
-                        <strong>
-                            Rs. ${Number(
-                                data.gameCollection || 0
-                            ).toLocaleString()}
-                        </strong>
-
-                    </div>
-
-
-                    <div class="snapshot-item">
-
-                        <span>🧾 Canteen Collection</span>
-
-                        <strong>
-                            Rs. ${Number(
-                                data.canteenCollection || 0
-                            ).toLocaleString()}
-                        </strong>
-
-                    </div>
-
-
-                    <div class="snapshot-item">
-
-                        <span>⚖️ Game Balance</span>
-
-                        <strong>
-                            Rs. ${Number(
-                                data.gameBalance || 0
-                            ).toLocaleString()}
-                        </strong>
-
-                    </div>
-
-
-                    <div class="snapshot-item">
-
-                        <span>⚖️ Canteen Balance</span>
-
-                        <strong>
-                            Rs. ${Number(
-                                data.canteenBalance || 0
-                            ).toLocaleString()}
-                        </strong>
-
-                    </div>
-
-
-                    <div class="snapshot-item">
-
-                        <span>🎁 Discount</span>
-
-                        <strong>
-                            Rs. ${Number(
-                                data.discount || 0
-                            ).toLocaleString()}
-                        </strong>
-
-                    </div>
-
-
-                    <div class="snapshot-item">
-
-                        <span>💸 Expenses</span>
-
-                        <strong>
-                            Rs. ${Number(
-                                data.expenses || 0
-                            ).toLocaleString()}
-                        </strong>
-
-                    </div>
-
-
-                    <div class="snapshot-item">
-
-                        <span>📲 EasyPaisa</span>
-
-                        <strong>
-                            Rs. ${Number(
-                                data.easypaisa || 0
-                            ).toLocaleString()}
-                        </strong>
-
-                    </div>
-
-
-                    <div class="
-                        snapshot-item
-                        snapshot-balance
-                    ">
-
-                        <span>⚖️ Total Balance</span>
-
-                        <strong>
-                            Rs. ${totalBalance.toLocaleString()}
-                        </strong>
-
-                    </div>
-
-
-                    <div class="
-                        snapshot-item
-                        snapshot-cash
-                    ">
-
-                        <span>💵 Closing Cash</span>
-
-                        <strong>
-                            Rs. ${Number(
-                                data.closingCash || 0
-                            ).toLocaleString()}
-                        </strong>
-
-                    </div>
-
-
-                </div>
-
-            </div>
-
+            <tr class="shift-not-closed-row">
+
+                <td> ${shiftName} </td>
+
+                <td> - </td>
+                <td> - </td>
+                <td> - </td>
+                <td> - </td>
+                <td> - </td>
+                <td> - </td>
+                <td> - </td>
+                <td> - </td>
+                <td> - </td>
+                <td> - </td>
+                <td> - </td>
+                <td> - </td>
+
+            </tr>
         `;
-    };
+    }
+
+
+    const money = value =>
+        Number(value || 0).toLocaleString();
+
+
+    return `
+        <tr class="shift-summary-row">
+
+            <!-- SHIFT -->
+            <td>
+                <strong>
+                    ${shiftName}
+                </strong>
+            </td>
+
+
+            <!-- GAME TOTAL -->
+            <td>
+                ${money(data.gameTotal)}
+            </td>
+
+
+            <!-- CANTEEN TOTAL -->
+            <td>
+                ${money(data.canteenTotal)}
+            </td>
+
+
+            <!-- GAME COLLECTION -->
+            <td>
+                ${money(data.gameCollection)}
+            </td>
+
+
+            <!-- CANTEEN COLLECTION -->
+            <td>
+                ${money(data.canteenCollection)}
+            </td>
+
+
+            <!-- GAME BALANCE -->
+            <td>
+                ${money(data.gameBalance)}
+            </td>
+
+
+            <!-- CANTEEN BALANCE -->
+            <td>
+                ${money(data.canteenBalance)}
+            </td>
+
+
+            <!-- DISCOUNT -->
+            <td>
+                ${money(data.discount)}
+            </td>
+
+
+            <!-- EXPENSES -->
+            <td>
+                ${money(data.expenses)}
+            </td>
+
+
+            <!-- EASYPAISA -->
+            <td>
+                ${money(data.easypaisa)}
+            </td>
+
+
+            <!-- CLOSING CASH -->
+            <td>
+                ${money(data.closingCash)}
+            </td>
+
+
+            <!-- OPEN TIME -->
+            <td>
+                ${data.openTime || "-"}
+            </td>
+
+
+            <!-- CLOSE TIME -->
+            <td>
+                ${data.closeTime || "-"}
+            </td>
+
+        </tr>
+    `;
+};
 
 
     // ==========================================
     // BUILD POPUP
     // ==========================================
 
-    summaryBody.innerHTML = `
+summaryBody.innerHTML = `
 
-        <tr>
+    ${makeShiftRow(
+        "Shift 1",
+        s1
+    )}
 
-            <td colspan="13">
+    ${makeShiftRow(
+        "Shift 2",
+        s2
+    )}
 
-                <div class="shift-snapshot-container">
-
-                    ${makeShiftCard(
-                        "SHIFT 1",
-                        s1,
-                        "shift1-card"
-                    )}
-
-
-                    ${makeShiftCard(
-                        "SHIFT 2",
-                        s2,
-                        "shift2-card"
-                    )}
-
-
-                    ${
-                        combined
-                        ?
-                        makeShiftCard(
-                            "COMBINED",
-                            combined,
-                            "combined-card"
-                        )
-                        :
-                        ""
-                    }
-
-                </div>
-
-            </td>
-
-        </tr>
-
-    `;
+`;
 
 
     // ==========================================
