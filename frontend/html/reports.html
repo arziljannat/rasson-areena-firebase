@@ -23,21 +23,72 @@
 
 
     <!-- MAIN REPORT PAGE -->
-    <main class="report-main">
+<main class="report-main">
 
-        <div class="report-container">
+    <!-- REPORT NAVIGATION -->
+    <aside class="report-sidebar">
 
-            <!-- LEFT SIDEBAR -->
-            <aside class="report-sidebar">
-                <h2 class="sidebar-title">📊 Reports</h2>
+        <h2 class="sidebar-title">📊 Reports</h2>
 
-<button class="report-btn active">Game Income Report</button>
-<button class="report-btn">Canteen Income Report</button>
-<button class="report-btn">Inventory Report</button>
-            </aside>
+        <button class="report-btn active">
+            🎮 Game Income Report
+        </button>
 
-            <!-- RIGHT CONTENT AREA -->
-            <section class="report-content">
+        <button class="report-btn">
+            🍔 Canteen Income Report
+        </button>
+
+        <button class="report-btn">
+            📦 Inventory Report
+        </button>
+
+    </aside>
+
+
+    <!-- REPORT CONTENT -->
+    <section class="report-content">
+
+        <div class="report-panel">
+
+            <h1>Branch Income Report</h1>
+
+            <p class="sub-heading">
+                Select options to filter report
+            </p>
+
+            <div class="filter-row">
+
+                <div>
+                    <label>From</label><br>
+                    <input type="date" id="fromDate">
+                </div>
+
+                <div>
+                    <label>To</label><br>
+                    <input type="date" id="toDate">
+                </div>
+
+                <button id="viewReportBtn">
+                    Generate Report
+                </button>
+
+                <button id="printReportBtn">
+                    🖨️ Print Report
+                </button>
+
+            </div>
+
+            <hr>
+
+            <div id="reportOutput" class="output-box">
+                Select date range and click “Generate Report”.
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
 
                 <div class="report-panel">
 
