@@ -1,278 +1,271 @@
 /* =========================================================
-   RASSON ARENA - REPORTS
-   Day History Style
+   RASSON ARENA - REPORTS PAGE
+   HABIB STYLE / ARENA THEME
    ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
 
 body {
     margin: 0;
     padding: 0;
-
     background: url('../assets/icon.png') no-repeat center center fixed;
     background-size: cover;
-
     font-family: Arial, sans-serif;
-
     color: #00ffcc;
 }
 
 
 /* =========================================================
-   MAIN REPORT AREA
+   MAIN PAGE
    ========================================================= */
 
 .report-main {
+    width: calc(100% - 30px);
+    margin: 110px 15px 30px;
+}
 
-    width: calc(100% - 40px);
 
-    margin: 115px 20px 40px;
+/* =========================================================
+   MAIN CONTAINER
+   ========================================================= */
 
+.report-container {
+    width: 100%;
     display: flex;
     flex-direction: column;
-
-    gap: 18px;
+    gap: 14px;
 }
 
 
 /* =========================================================
    REPORT MENU
-   NAVBAR KE BILKUL NEECHE
+   HABIB STYLE
    ========================================================= */
 
 .report-sidebar {
-
     width: 100%;
-
-    box-sizing: border-box;
-
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(0, 0, 0, 0.48);
 
     border: 2px solid #00ff9d;
-
-    border-radius: 15px;
+    border-radius: 14px;
 
     box-shadow:
-        0 0 15px #00ff9d,
-        inset 0 0 15px rgba(0, 255, 157, 0.08);
+        0 0 18px rgba(0, 255, 157, 0.65),
+        inset 0 0 14px rgba(0, 255, 157, 0.08);
 
     padding: 12px 18px;
 }
 
 
-/* TITLE */
+/* =========================================================
+   REPORT TITLE
+   ========================================================= */
 
 .sidebar-title {
-
-    margin: 0 0 12px;
+    margin: 0 0 10px;
 
     text-align: left;
 
     color: #00ffcc;
 
-    font-size: 22px;
+    font-size: 18px;
+    font-weight: bold;
 
     text-shadow:
-        0 0 8px #00ffcc,
-        0 0 15px #00ffcc;
+        0 0 7px #00ffcc,
+        0 0 12px #00ffcc;
 }
 
 
-/* BUTTONS VERTICAL */
+/* =========================================================
+   REPORT BUTTON ROW
+   ========================================================= */
 
 .report-menu {
+    width: 100%;
 
     display: flex;
-
-    flex-direction: column;
+    flex-direction: row;
 
     gap: 8px;
-
-    width: 100%;
 }
 
 
-/* REPORT BUTTON */
+/* =========================================================
+   REPORT BUTTON
+   SMALL + EQUAL WIDTH
+   ========================================================= */
 
 .report-btn {
+    flex: 1;
 
-    width: 100%;
+    width: auto;
 
-    box-sizing: border-box;
+    min-width: 0;
 
-    padding: 11px 15px;
+    height: 36px;
 
-    text-align: left;
+    padding: 6px 10px;
 
-    background: rgba(0, 0, 0, 0.65);
+    margin: 0;
+
+    background: rgba(0, 0, 0, 0.62);
 
     color: #00ffcc;
 
     border: 1px solid #00ff9d;
-
-    border-radius: 8px;
+    border-radius: 6px;
 
     cursor: pointer;
 
-    font-size: 15px;
-
+    font-size: 12px;
     font-weight: bold;
 
-    transition: 0.25s;
+    text-align: center;
+
+    transition: 0.2s ease;
 }
 
 
 .report-btn:hover {
+    background: rgba(0, 255, 200, 0.18);
 
-    background: rgba(0, 255, 200, 0.16);
+    box-shadow:
+        0 0 10px #00ffcc;
 
-    box-shadow: 0 0 12px #00ffcc;
-
-    transform: translateX(3px);
+    transform: translateY(-1px);
 }
 
 
 .report-btn.active {
+    background: rgba(0, 255, 200, 0.22);
 
-    background: rgba(0, 255, 200, 0.20);
+    color: #ffffff;
 
     border-color: #00ffcc;
 
     box-shadow:
-        0 0 12px #00ffcc,
-        inset 0 0 8px rgba(0, 255, 200, 0.12);
-
-    color: #ffffff;
+        0 0 10px #00ffcc,
+        inset 0 0 7px rgba(0, 255, 200, 0.12);
 }
 
 
 /* =========================================================
    REPORT CONTENT
-   SIDEBAR KE NEECHE
    ========================================================= */
 
 .report-content {
-
     width: 100%;
-
-    box-sizing: border-box;
+    padding: 0;
 }
 
 
 /* =========================================================
-   MAIN REPORT PANEL
+   BRANCH INCOME REPORT PANEL
    ========================================================= */
 
 .report-panel {
-
     width: 100%;
 
-    box-sizing: border-box;
-
-    background: rgba(0, 0, 0, 0.58);
+    background: rgba(0, 0, 0, 0.48);
 
     border: 2px solid #00ff9d;
-
-    border-radius: 15px;
+    border-radius: 14px;
 
     box-shadow:
-        0 0 20px #00ff9d,
-        inset 0 0 15px rgba(0, 255, 157, 0.06);
+        0 0 18px rgba(0, 255, 157, 0.65),
+        inset 0 0 14px rgba(0, 255, 157, 0.06);
 
-    padding: 22px;
+    padding: 18px 22px;
 }
 
 
 /* =========================================================
-   HEADER
+   REPORT HEADER
    ========================================================= */
 
-.report-header {
-
-    border-top: 1px solid rgba(0, 255, 157, 0.45);
-
-    border-bottom: 1px solid rgba(0, 255, 157, 0.45);
-
-    padding: 10px 0 12px;
-
-    margin-bottom: 18px;
-}
-
-
 .report-panel h1 {
-
     margin: 0;
+
+    padding-bottom: 8px;
 
     text-align: center;
 
     color: #00ffcc;
 
-    font-size: 25px;
+    font-size: 22px;
+    font-weight: bold;
+
+    border-bottom: 1px solid rgba(0, 255, 157, 0.45);
 
     text-shadow:
         0 0 8px #00ffcc,
-        0 0 15px #00ffcc;
+        0 0 14px #00ffcc;
 }
 
 
-.sub-heading,
-.report-header p {
-
-    margin: 7px 0 0;
+.sub-heading {
+    margin: 7px 0 15px;
 
     text-align: center;
 
     color: #00ffaa;
 
-    font-size: 14px;
+    font-size: 12px;
 }
 
 
 /* =========================================================
-   FILTER
+   FILTER ROW
    ========================================================= */
 
 .filter-row {
-
     display: flex;
 
+    justify-content: center;
     align-items: flex-end;
 
-    gap: 15px;
+    gap: 10px;
 
     flex-wrap: wrap;
 
-    margin-bottom: 15px;
+    padding-bottom: 12px;
+
+    border-bottom: 1px solid rgba(0, 255, 157, 0.45);
 }
 
 
-.date-box {
+/* =========================================================
+   DATE BOX
+   ========================================================= */
 
+.filter-row > div {
     display: flex;
 
     flex-direction: column;
 
-    gap: 5px;
+    gap: 3px;
 }
 
 
-.date-box label {
-
+.filter-row label {
     color: #00ffaa;
 
-    font-size: 13px;
-
+    font-size: 11px;
     font-weight: bold;
 }
 
 
-.date-box input {
+.filter-row input {
+    width: 135px;
 
-    min-width: 170px;
+    height: 32px;
 
-    padding: 9px 10px;
+    padding: 5px 8px;
 
-    box-sizing: border-box;
-
-    border-radius: 8px;
+    border-radius: 6px;
 
     border: 1px solid #00ff9d;
 
@@ -281,36 +274,38 @@ body {
     color: #00ffcc;
 
     outline: none;
+
+    font-size: 11px;
 }
 
 
-.date-box input:focus {
-
-    box-shadow: 0 0 12px #00ffcc;
+.filter-row input:focus {
+    box-shadow: 0 0 9px #00ffcc;
 }
 
 
 /* =========================================================
-   BUTTONS
+   GENERATE / PRINT BUTTONS
    ========================================================= */
 
-.generate-btn,
-.print-btn {
+.filter-row button {
+    height: 32px;
 
-    padding: 10px 18px;
+    padding: 5px 15px;
 
-    border-radius: 8px;
-
-    font-weight: bold;
+    border-radius: 6px;
 
     cursor: pointer;
+
+    font-size: 11px;
+
+    font-weight: bold;
 
     transition: 0.2s;
 }
 
 
-.generate-btn {
-
+#viewReportBtn {
     background: #00ff9d;
 
     color: #001a12;
@@ -319,9 +314,8 @@ body {
 }
 
 
-.print-btn {
-
-    background: rgba(0, 0, 0, 0.7);
+#printReportBtn {
+    background: rgba(0, 0, 0, 0.70);
 
     color: #00ffcc;
 
@@ -329,83 +323,67 @@ body {
 }
 
 
-.generate-btn:hover,
-.print-btn:hover {
-
-    box-shadow: 0 0 15px #00ffcc;
+.filter-row button:hover {
+    box-shadow: 0 0 12px #00ffcc;
 
     transform: translateY(-1px);
 }
 
 
 /* =========================================================
-   DIVIDER
-   ========================================================= */
-
-.report-divider {
-
-    height: 1px;
-
-    width: 100%;
-
-    background: rgba(0, 255, 157, 0.55);
-
-    margin: 10px 0 18px;
-}
-
-
-/* =========================================================
-   REPORT OUTPUT
+   OUTPUT AREA
    ========================================================= */
 
 .output-box {
-
     width: 100%;
 
-    box-sizing: border-box;
+    margin-top: 12px;
 
-    min-height: 350px;
+    padding: 12px;
 
-    background: rgba(0, 0, 0, 0.42);
+    min-height: 250px;
+
+    background: rgba(0, 0, 0, 0.40);
 
     border: 1px solid #00ff9d;
 
-    border-radius: 12px;
-
-    padding: 18px;
+    border-radius: 10px;
 
     color: #00ffcc;
 
     box-shadow:
-        inset 0 0 12px rgba(0, 255, 204, 0.12);
+        inset 0 0 10px rgba(0, 255, 204, 0.10);
+
+    overflow-x: auto;
 }
 
 
-.empty-report {
+/* =========================================================
+   EMPTY REPORT
+   ========================================================= */
 
-    min-height: 300px;
+.empty-report {
+    min-height: 220px;
 
     display: flex;
 
     align-items: center;
-
     justify-content: center;
 
     text-align: center;
 
     color: #00ffaa;
 
-    font-size: 15px;
+    font-size: 13px;
 }
 
 
 /* =========================================================
-   REPORT TABLES
-   JS SE JO TABLE GENERATE HOGA
+   REPORT TABLE
+   EXISTING JS TABLE
    ========================================================= */
 
 .output-box table {
-
     width: 100%;
 
     border-collapse: collapse;
@@ -415,12 +393,11 @@ body {
 
 
 .output-box th {
-
-    padding: 12px 9px;
+    padding: 8px 6px;
 
     color: #00ffcc;
 
-    font-size: 13px;
+    font-size: 10px;
 
     text-align: center;
 
@@ -431,58 +408,58 @@ body {
 
 
 .output-box td {
-
-    padding: 11px 9px;
+    padding: 7px 6px;
 
     color: #eafff8;
 
+    font-size: 10px;
+
     text-align: center;
 
-    border-bottom: 1px solid rgba(0, 255, 157, 0.35);
+    border-bottom: 1px solid rgba(0, 255, 157, 0.30);
 
     white-space: nowrap;
 }
 
 
 .output-box tr:hover td {
-
     background: rgba(0, 255, 200, 0.06);
 }
 
 
 /* =========================================================
-   SHIFT / COMBINED STYLE
+   SHIFT TITLE
    ========================================================= */
 
 .output-box .shift-title {
-
     text-align: center;
 
     color: #00ffcc;
 
-    font-size: 19px;
-
+    font-size: 16px;
     font-weight: bold;
 
-    margin: 12px 0;
+    margin: 10px 0;
 
     text-shadow: 0 0 8px #00ffcc;
 }
 
 
-.output-box .combined-title {
+/* =========================================================
+   COMBINED TITLE
+   ========================================================= */
 
+.output-box .combined-title {
     text-align: center;
 
     color: #00ffcc;
 
-    font-size: 20px;
-
+    font-size: 17px;
     font-weight: bold;
 
-    margin: 25px 0 12px;
+    margin: 20px 0 10px;
 
-    padding: 10px 0;
+    padding: 8px 0;
 
     border-top: 1px solid rgba(0, 255, 157, 0.5);
 
@@ -492,8 +469,11 @@ body {
 }
 
 
-.output-box .combined-row {
+/* =========================================================
+   COMBINED ROW
+   ========================================================= */
 
+.output-box .combined-row {
     background: rgba(255, 220, 0, 0.10);
 
     color: #ffe600;
@@ -511,179 +491,73 @@ body {
 @media (max-width: 800px) {
 
     .report-main {
+        width: calc(100% - 16px);
 
-        width: calc(100% - 20px);
+        margin: 100px 8px 25px;
+    }
 
-        margin: 105px 10px 30px;
+
+    .report-sidebar {
+        padding: 10px;
+    }
+
+
+    .sidebar-title {
+        text-align: center;
+
+        font-size: 17px;
+    }
+
+
+    .report-menu {
+        flex-direction: column;
+
+        gap: 6px;
+    }
+
+
+    .report-btn {
+        width: 100%;
+
+        height: 34px;
+
+        font-size: 11px;
     }
 
 
     .report-panel {
-
         padding: 14px;
     }
 
 
-    .filter-row {
+    .report-panel h1 {
+        font-size: 19px;
+    }
 
+
+    .filter-row {
         flex-direction: column;
 
         align-items: stretch;
     }
 
 
-    .date-box input {
-
+    .filter-row input {
         width: 100%;
-
-        min-width: 0;
     }
 
 
-    .generate-btn,
-    .print-btn {
-
+    .filter-row button {
         width: 100%;
     }
 
 
     .output-box {
-
         overflow-x: auto;
     }
 
 
     .output-box table {
-
         min-width: 850px;
     }
-}
-
-
-
-/* =========================================================
-   BRANCH INCOME REPORT
-   ========================================================= */
-
-.report-content {
-    width: 100%;
-
-    box-sizing: border-box;
-
-    padding: 0;
-}
-
-
-.report-panel {
-
-    width: 100%;
-
-    box-sizing: border-box;
-
-    padding: 25px 30px;
-
-    text-align: center;
-}
-
-
-/* MAIN REPORT HEADING */
-.report-panel h1 {
-
-    text-align: center;
-
-    margin-top: 0;
-
-    margin-bottom: 8px;
-
-    font-size: 28px;
-}
-
-
-/* SUBTITLE */
-.report-panel .sub-heading {
-
-    text-align: center;
-
-    margin-bottom: 22px;
-}
-
-
-/* DATE / FILTER CONTROLS */
-.filter-row {
-
-    justify-content: center;
-
-    align-items: flex-end;
-
-    flex-wrap: wrap;
-}
-
-
-/* GENERATE / PRINT BUTTONS */
-.filter-row button {
-
-    min-height: 42px;
-
-    padding: 10px 22px;
-
-    font-size: 14px;
-}
-
-
-/* OUTPUT */
-.output-box {
-
-    width: 100%;
-
-    box-sizing: border-box;
-}
-
-/* =========================================================
-   BRANCH INCOME REPORT
-   ========================================================= */
-
-.report-content {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0;
-}
-
-.report-panel {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 25px 30px;
-}
-
-/* Main report heading center */
-.report-panel h1 {
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: 8px;
-    font-size: 28px;
-}
-
-/* Subtitle center */
-.report-panel .sub-heading {
-    text-align: center;
-    margin-bottom: 22px;
-}
-
-/* Date/filter controls center */
-.filter-row {
-    justify-content: center;
-    align-items: flex-end;
-    flex-wrap: wrap;
-}
-
-/* Buttons proper size */
-.filter-row button {
-    min-height: 42px;
-    padding: 10px 22px;
-    font-size: 14px;
-}
-
-/* Output box full width */
-.output-box {
-    width: 100%;
-    box-sizing: border-box;
 }
