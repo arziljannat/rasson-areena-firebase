@@ -558,3 +558,87 @@ body {
         min-width: 850px;
     }
 }
+
+/* =========================================================
+   REPORTS PAGE - FINAL UI ALIGNMENT
+   ========================================================= */
+
+/* Reports sidebar ko navbar ke neeche full horizontal panel */
+.report-sidebar {
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+    padding: 18px 20px;
+    margin: 0;
+}
+
+/* Reports title center */
+.sidebar-title {
+    text-align: center;
+    margin: 0 0 15px 0;
+    font-size: 24px;
+}
+
+/* Report buttons - bade + centered */
+.report-btn {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/* =========================================================
+   BRANCH INCOME REPORT
+   ========================================================= */
+
+.report-content {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0;
+}
+
+.report-panel {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 25px 30px;
+}
+
+/* Main report heading center */
+.report-panel h1 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 28px;
+}
+
+/* Subtitle center */
+.report-panel .sub-heading {
+    text-align: center;
+    margin-bottom: 22px;
+}
+
+/* Date/filter controls center */
+.filter-row {
+    justify-content: center;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+/* Buttons proper size */
+.filter-row button {
+    min-height: 42px;
+    padding: 10px 22px;
+    font-size: 14px;
+}
+
+/* Output box full width */
+.output-box {
+    width: 100%;
+    box-sizing: border-box;
+}
