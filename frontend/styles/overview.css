@@ -620,3 +620,15 @@ body {
     }
 
 }
+
+/* =========================
+   ROOM OVERVIEW STATS
+========================= */
+
+.room-overview-stats{
+
+    margin-top:35px;
+
+    margin-bottom:25px;
+
+}
