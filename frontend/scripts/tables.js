@@ -2317,9 +2317,9 @@ document.getElementById(
 `History - ${t.name}`;
     body.innerHTML = "";
 
-    // 🔥 LATEST CHECKOUT FIRST
-t.history.sort((a, b) => {
-    return b.checkout - a.checkout;
+// 🔥 SORT COPY — ORIGINAL HISTORY ARRAY KO MODIFY NAHI KARNA
+const historyList = [...t.history].sort((a, b) => {
+    return Number(b.checkout || 0) - Number(a.checkout || 0);
 });
     
     if (t.history.length === 0) {
@@ -2327,7 +2327,7 @@ t.history.sort((a, b) => {
             <tr><td colspan="10" style="text-align:center;">No history found.</td></tr>
         `;
     } else {
-        t.history.forEach((h, index) => {
+        historyList.forEach((h, index) => {
             body.innerHTML += `
                 <tr>
                     <td>${index + 1}</td>
@@ -2346,7 +2346,7 @@ t.history.sort((a, b) => {
                                           <td>
     ${h.paid
         ? `<button class="paid-btn" disabled>PAID</button>`
-        : `<button class="unpaid-btn" onclick="openBillFromHistory('${id}', ${index})">UNPAID</button>`
+        : `<button class="unpaid-btn" onclick="openBillFromHistory('${id}', '${h.sessionId}')">UNPAID</button>`
     }
 </td>
 
@@ -2425,10 +2425,325 @@ alert(`${indexes.length} sessions deleted successfully ✅`);
   
 }
 
-function openBillFromHistory(tableId, historyIndex) {
+function openBillFromHistory(tableId, sessionId) {
 
-    let t = tables.find(x => String(x.id) === String(tableId));
-    let h = t.history[historyIndex];
+    const t = tables.find(
+        x => String(x.id) === String(tableId)
+    );
+
+    if (!t) {
+        console.error("❌ Table not found:", tableId);
+        return;
+    }
+
+    // 🔥 EXACT SESSION ID SE HISTORY RECORD FIND
+    const h = t.history.find(
+        x => String(x.sessionId) === String(sessionId)
+    );
+
+    if (!h) {
+        console.error(
+            "❌ History session not found:",
+            sessionId
+        );
+        return;
+    }
+
+    // Safety
+    if (h.paid === true) {
+        console.warn("⚠️ This bill is already paid.");
+        return;
+    }
+
+    let academy =
+        localStorage.getItem("academyName") ||
+        "Rasson Snooker Academy";
+
+    let branch = BRANCH || "Rasson1";
+
+    let checkin =
+        h.checkin
+            ? formatTime(h.checkin)
+            : "--";
+
+    let checkout =
+        h.checkout
+            ? formatTime(h.checkout)
+            : "--";
+
+    let playtime =
+        formatSeconds(h.playSeconds || 0);
+
+    let bill =
+        document.getElementById("billDetails");
+
+    if (!bill) {
+        console.error("❌ billDetails element missing");
+        return;
+    }
+
+    console.log(
+        "🔥 OPEN HISTORY BILL:",
+        {
+            tableId,
+            sessionId,
+            table: t.name,
+            total: h.total,
+            paid: h.paid
+        }
+    );
+
+    // ==========================================
+    // CANTEEN
+    // ==========================================
+
+    const canteenItems =
+        Object.values(h.canteenItems || {});
+
+    let canteenHTML = "";
+    let canteenTotal = 0;
+
+    canteenItems.forEach(item => {
+
+        const qty =
+            Number(item.qty || 0);
+
+        const price =
+            Number(item.price || 0);
+
+        const total =
+            qty * price;
+
+        canteenTotal += total;
+
+        canteenHTML += `
+            <div style="
+                display:flex;
+                justify-content:space-between;
+            ">
+                <span>${item.name} x${qty}</span>
+                <span>${total}</span>
+            </div>
+        `;
+    });
+
+    if (!canteenHTML) {
+        canteenHTML = "<p>No items</p>";
+    }
+
+    // ==========================================
+    // BILL CALCULATION
+    // ==========================================
+
+    const originalAmount =
+        Number(h.originalAmount || h.amount || 0);
+
+    const discount =
+        Number(h.discount || 0);
+
+    const gameAmount =
+        originalAmount - discount;
+
+    const finalTotal =
+        gameAmount + canteenTotal;
+
+    // ==========================================
+    // BILL HTML
+    // ==========================================
+
+    bill.innerHTML = `
+        <div style="
+            width:300px;
+            margin:auto;
+            font-family:monospace;
+            color:#000;
+            background:#fff;
+            padding:15px;
+            border-radius:10px;
+        ">
+
+            <center>
+                <img
+                    src="../assets/bill-logo.png"
+                    style="width:120px;"
+                >
+
+                <h2>${academy}</h2>
+                <div>${branch}</div>
+            </center>
+
+            <hr>
+
+            <div>
+                <b>Table:</b> ${t.name}
+            </div>
+
+            <div>
+                <b>Check-in:</b> ${checkin}
+            </div>
+
+            <div>
+                <b>Check-out:</b> ${checkout}
+            </div>
+
+            <div>
+                <b>Play Time:</b> ${playtime}
+            </div>
+
+            <hr>
+
+            <h3>GAME</h3>
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+            ">
+                <span>Original</span>
+                <span>Rs ${originalAmount}</span>
+            </div>
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+            ">
+                <span>Discount</span>
+                <span>Rs ${discount}</span>
+            </div>
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+            ">
+                <b>Game Total</b>
+                <b>Rs ${gameAmount}</b>
+            </div>
+
+            <hr>
+
+            <h3>CANTEEN</h3>
+
+            ${canteenHTML}
+
+            <hr>
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                font-size:20px;
+            ">
+                <b>TOTAL</b>
+                <b>Rs ${finalTotal}</b>
+            </div>
+
+            <hr>
+
+            <center>
+                <img
+                    src="../assets/QR-bill.png"
+                    style="width:100px;"
+                >
+
+                <br>
+                <small>Scan & Pay</small>
+            </center>
+
+        </div>
+    `;
+
+    // ==========================================
+    // SHOW BILL POPUP
+    // ==========================================
+
+    document
+        .getElementById("billPopup")
+        .classList
+        .remove("hidden");
+
+    // ==========================================
+    // 🔥 CLOSE BUTTON — IMPORTANT
+    // ==========================================
+
+    document
+        .getElementById("cancelBillBtn")
+        .onclick = () => {
+
+            document
+                .getElementById("billPopup")
+                .classList
+                .add("hidden");
+
+        };
+
+    // ==========================================
+    // PAID BUTTON
+    // ==========================================
+
+    document
+        .getElementById("paidBtn")
+        .onclick = async () => {
+
+            // exact session dobara find
+            const currentTable =
+                tables.find(
+                    x =>
+                        String(x.id) ===
+                        String(tableId)
+                );
+
+            if (!currentTable) return;
+
+            const currentHistory =
+                currentTable.history.find(
+                    x =>
+                        String(x.sessionId) ===
+                        String(sessionId)
+                );
+
+            if (!currentHistory) {
+                alert("History session not found ❌");
+                return;
+            }
+
+            if (currentHistory.paid === true) {
+                alert("This bill is already paid ✅");
+                return;
+            }
+
+            currentHistory.paid = true;
+            currentHistory.paidTime = Date.now();
+
+            // 🔥 EXACT FIREBASE DOCUMENT
+            await updateDoc(
+                doc(
+                    window.db,
+                    "sessions",
+                    sessionId
+                ),
+                {
+                    paid: true,
+                    paid_time:
+                        new Date().toISOString()
+                }
+            );
+
+            // CLOSE BILL
+            document
+                .getElementById("billPopup")
+                .classList
+                .add("hidden");
+
+            // REFRESH HISTORY
+            await rebuildHistoryFromSessions();
+
+            openHistory(tableId);
+
+            // PRINT
+            printThermalBill(
+                tableId,
+                currentHistory
+            );
+        };
+}
 
     let academy = localStorage.getItem("academyName") || "Rasson Snooker Academy";
     let branch = BRANCH || "Rasson1";
