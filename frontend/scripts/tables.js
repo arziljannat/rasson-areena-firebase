@@ -4316,11 +4316,51 @@ let closeTime = d.shift2?.endMs
 dateSel.innerHTML += `<option value="${i}">${operationalDate.getFullYear()}-${String(operationalDate.getMonth() + 1).padStart(2, "0")}-${String(operationalDate.getDate()).padStart(2, "0")} (${openTime} → ${closeTime})</option>`;
     });
 
-    let tableSel = document.getElementById("tableHistoryTableSelect");
-    tableSel.innerHTML = tables
-        .map(t => `<option value="${t.id}">${t.name}</option>`)
-        .join("");
+let tableSel = document.getElementById("tableHistoryTableSelect");
 
+const sortedHistoryTables = [...tables].sort((a, b) => {
+
+    const getType = (name = "") => {
+
+        const n = name
+            .toLowerCase()
+            .trim();
+
+        if (n.startsWith("table")) return 1;
+        if (n.startsWith("room")) return 2;
+        if (n.startsWith("pool")) return 3;
+
+        return 4;
+    };
+
+    const typeA = getType(a.name);
+    const typeB = getType(b.name);
+
+    // TABLE → ROOM → POOL
+    if (typeA !== typeB) {
+        return typeA - typeB;
+    }
+
+    // NUMBER ORDER
+    const numA =
+        parseInt(
+            (a.name || "").match(/\d+/)?.[0] || 0
+        );
+
+    const numB =
+        parseInt(
+            (b.name || "").match(/\d+/)?.[0] || 0
+        );
+
+    return numA - numB;
+
+});
+
+tableSel.innerHTML = sortedHistoryTables
+    .map(t =>
+        `<option value="${t.id}">${t.name}</option>`
+    )
+    .join("");
     document.getElementById("tableHistoryBranch").innerText =
         "Branch: " + (BRANCH || "Rasson1");
 
