@@ -4978,45 +4978,45 @@ function playWarningBeep() {
 
     try {
 
-        // 🔊 Har alarm ke liye NEW audio object
-        const alarmAudio =
-            new Audio("/assets/audio/warning.mp3");
+        if (!audioUnlocked) {
+            console.log("⚠️ Audio not unlocked yet");
+            return;
+        }
 
-        alarmAudio.preload = "auto";
-        alarmAudio.volume = 1;
+        if (!warningAudio) {
+            warningAudio =
+                new Audio("/assets/audio/warning.mp3");
 
-        // 🔊 Play only — pause/reset nahi karna
-        const playPromise = alarmAudio.play();
+            warningAudio.preload = "auto";
+            warningAudio.volume = 1;
+        }
+
+        // Agar previous sound chal rahi hai
+        // to safely reset karo
+        warningAudio.pause();
+        warningAudio.currentTime = 0;
+
+        const playPromise = warningAudio.play();
 
         if (playPromise !== undefined) {
 
             playPromise
                 .then(() => {
 
-                    console.log("🔊 Warning beep played");
+                    console.log(
+                        "🔊 Warning beep played"
+                    );
 
                 })
                 .catch(err => {
 
                     console.log(
-                        "⚠️ Warning sound blocked:",
+                        "⚠️ Warning sound failed:",
                         err
                     );
 
                 });
-
         }
-
-        // 🧹 Sound khatam hone ke baad object release
-        alarmAudio.addEventListener(
-            "ended",
-            () => {
-
-                alarmAudio.remove();
-
-            },
-            { once: true }
-        );
 
     } catch (err) {
 
@@ -5118,27 +5118,31 @@ let audioUnlocking = false;
 
 function unlockAudio() {
 
-    // Already unlocked
-    if (audioUnlocked) return;
+    if (audioUnlocked) {
+        return;
+    }
 
-    // Unlock already in progress
-    if (audioUnlocking) return;
+    if (audioUnlocking) {
+        return;
+    }
 
     audioUnlocking = true;
 
     try {
 
-        // 🔊 Separate unlock audio
-        const unlockSound =
-            new Audio("/assets/audio/warning.mp3");
+        if (!warningAudio) {
 
-        unlockSound.preload = "auto";
+            warningAudio =
+                new Audio("/assets/audio/warning.mp3");
 
-        // 🔇 Unlock ke waqt sound sunai nahi dega
-        unlockSound.volume = 0;
+            warningAudio.preload = "auto";
+            warningAudio.volume = 1;
+        }
+
+        warningAudio.volume = 0;
 
         const playPromise =
-            unlockSound.play();
+            warningAudio.play();
 
         if (playPromise !== undefined) {
 
@@ -5148,13 +5152,14 @@ function unlockAudio() {
                     audioUnlocked = true;
                     audioUnlocking = false;
 
+                    // Reset ONLY after browser accepted play
+                    warningAudio.pause();
+                    warningAudio.currentTime = 0;
+                    warningAudio.volume = 1;
+
                     console.log(
                         "✅ Audio unlocked"
                     );
-
-                    // Audio ko naturally stop hone do
-                    unlockSound.pause();
-                    unlockSound.currentTime = 0;
 
                 })
                 .catch(err => {
@@ -5167,7 +5172,6 @@ function unlockAudio() {
                     );
 
                 });
-
         }
 
     } catch (err) {
