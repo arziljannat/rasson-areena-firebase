@@ -174,46 +174,263 @@
 </div>
 
 
-<!-- HISTORY POPUP -->
+<!-- =====================================================
+     HISTORY POPUP
+===================================================== -->
+
 <div id="historyPopup" class="popup hidden">
+
     <div class="popup-box large-popup">
-        <h2 id="historyTableTitle">Table History</h2>
+
+        <!-- TITLE -->
+        <h2 id="historyTableTitle">
+            Table History
+        </h2>
+
+
+        <!-- =================================================
+             HISTORY SUMMARY
+        ================================================== -->
+
+        <div class="history-summary-counters">
+
+
+            <!-- TOTAL GAME -->
+
+            <div class="history-summary-box green">
+
+                <div class="history-card-title">
+                    🎮 TOTAL GAME
+                </div>
+
+                <div class="history-card-head">
+                    <span>Shift 1</span>
+                    <span>Shift 2</span>
+                </div>
+
+                <div class="history-card-values">
+
+                    <strong id="historyShift1Game">
+                        0
+                    </strong>
+
+                    <strong id="historyShift2Game">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- GUEST PLAY -->
+
+            <div class="history-summary-box green">
+
+                <div class="history-card-title">
+                    👤 GUEST PLAY
+                </div>
+
+                <div class="history-card-head">
+                    <span>Shift 1</span>
+                    <span>Shift 2</span>
+                </div>
+
+                <div class="history-card-values">
+
+                    <strong id="historyShift1Guest">
+                        0
+                    </strong>
+
+                    <strong id="historyShift2Guest">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- BOOKING PLAY -->
+
+            <div class="history-summary-box gold">
+
+                <div class="history-card-title">
+                    📅 BOOKING PLAY
+                </div>
+
+                <div class="history-card-head">
+                    <span>Shift 1</span>
+                    <span>Shift 2</span>
+                </div>
+
+                <div class="history-card-values">
+
+                    <strong id="historyShift1Booking">
+                        0
+                    </strong>
+
+                    <strong id="historyShift2Booking">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- PAID -->
+
+            <div class="history-summary-box green">
+
+                <div class="history-card-title">
+                    💰 PAID
+                </div>
+
+                <div class="history-card-head">
+                    <span>Shift 1</span>
+                    <span>Shift 2</span>
+                </div>
+
+                <div class="history-card-values">
+
+                    <strong id="historyShift1Paid">
+                        0
+                    </strong>
+
+                    <strong id="historyShift2Paid">
+                        0
+                    </strong>
+
+                </div>
+
+                <div class="history-card-amount">
+
+                    <span id="historyShift1PaidAmount">
+                        Rs. 0
+                    </span>
+
+                    <span id="historyShift2PaidAmount">
+                        Rs. 0
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- UNPAID -->
+
+            <div class="history-summary-box red">
+
+                <div class="history-card-title">
+                    ⚠️ UNPAID
+                </div>
+
+                <div class="history-card-head">
+                    <span>Shift 1</span>
+                    <span>Shift 2</span>
+                </div>
+
+                <div class="history-card-values">
+
+                    <strong id="historyShift1Unpaid">
+                        0
+                    </strong>
+
+                    <strong id="historyShift2Unpaid">
+                        0
+                    </strong>
+
+                </div>
+
+                <div class="history-card-amount">
+
+                    <span id="historyShift1UnpaidAmount">
+                        Rs. 0
+                    </span>
+
+                    <span id="historyShift2UnpaidAmount">
+                        Rs. 0
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             HISTORY TABLE
+        ================================================== -->
 
         <div class="table-mobile-wrapper">
 
-<table class="history-table">
-            <thead>
-            <tr>
-                <th>#</th>
-                <th>Check-in</th>
-                <th>Checkout</th>
-                <th>Play</th>
-                <th>Rate</th>
-                <th>Amount</th>
-                <th>Discount</th>
-                <th>Canteen</th>
-                <th>Total</th>
-                <th>Paid</th>
-            </tr>
-            </thead>
-            <tbody id="historyTableBody"></tbody>
-        </table>
+            <table class="history-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>#</th>
+
+                        <th>Check-in</th>
+
+                        <th>Checkout</th>
+
+                        <th>Play</th>
+
+                        <th>Rate</th>
+
+                        <th>Amount</th>
+
+                        <th>Discount</th>
+
+                        <th>Canteen</th>
+
+                        <th>Total</th>
+
+                        <th>Paid</th>
+
+                        <th>Delete</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="historyTableBody"></tbody>
+
+            </table>
+
         </div>
 
-       <div class="popup-buttons">
 
-    <button id="deleteSelectedHistoryBtn" class="neon-btn red hidden">
-        Delete Selected
-    </button>
+        <!-- =================================================
+             BUTTONS
+        ================================================== -->
 
-    <button id="closeHistoryBtn" class="neon-btn red">
-        Close
-    </button>
+        <div class="popup-buttons">
 
-</div>
+            <button
+                id="deleteSelectedHistoryBtn"
+                class="neon-btn red hidden"
+            >
+                Delete Selected
+            </button>
+
+            <button
+                id="closeHistoryBtn"
+                class="neon-btn red"
+            >
+                Close
+            </button>
+
+        </div>
+
     </div>
-</div>
 
+</div>
 
 <!-- SHIFT SUMMARY POPUP (NEW FULL SUMMARY) -->
 <div id="shiftSummaryPopup" class="popup hidden">
