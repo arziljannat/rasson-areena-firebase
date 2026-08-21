@@ -1123,3 +1123,143 @@ body * {
         transform: translate(-50%, -50%) scale(1.03);
     }
 }
+
+/* ============================================================
+   🔥 FINAL RASSON TABLE / ROOM LAYOUT
+   5 TOP + 4 CENTERED BELOW
+============================================================ */
+
+.resource-section {
+    width: 100%;
+    max-width: 1650px;
+    margin: 45px auto 70px;
+    text-align: center;
+}
+
+.resource-section-title {
+    width: fit-content;
+    margin: 0 auto 30px;
+
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: 6px;
+
+    color: #00ffcc;
+
+    text-shadow:
+        0 0 8px #00ff88,
+        0 0 18px #00ff88,
+        0 0 35px #00ff88;
+
+    border-bottom: 2px solid #00ff88;
+
+    padding: 10px 45px 12px;
+
+    border-radius: 12px;
+}
+
+
+/* ============================================================
+   🔥 FLEX LAYOUT
+   5 CARDS FIRST ROW
+   4 CARDS SECOND ROW CENTER
+============================================================ */
+
+.tables-grid {
+    width: 100%;
+    max-width: 1650px;
+
+    margin: 0 auto;
+
+    display: flex;
+    flex-wrap: wrap;
+
+    justify-content: center;
+    align-items: flex-start;
+
+    gap: 28px;
+}
+
+
+/* ============================================================
+   🔥 CARD SIZE
+============================================================ */
+
+.tables-grid .table-box {
+    width: 300px;
+    max-width: 300px;
+
+    flex: 0 0 300px;
+
+    box-sizing: border-box;
+}
+
+
+/* ============================================================
+   🔥 ROOMS SECTION
+============================================================ */
+
+.rooms-section {
+    margin-top: 80px;
+}
+
+
+/* ============================================================
+   🔥 MOBILE
+============================================================ */
+
+@media (max-width: 1650px) {
+
+    .tables-grid {
+        gap: 22px;
+    }
+
+    .tables-grid .table-box {
+        width: 285px;
+        max-width: 285px;
+        flex-basis: 285px;
+    }
+
+}
+
+
+@media (max-width: 1250px) {
+
+    .tables-grid .table-box {
+        width: 280px;
+        max-width: 280px;
+        flex-basis: 280px;
+    }
+
+}
+
+
+@media (max-width: 900px) {
+
+    .tables-grid .table-box {
+        width: 300px;
+        max-width: 300px;
+        flex-basis: 300px;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .resource-section {
+        margin-top: 30px;
+    }
+
+    .resource-section-title {
+        font-size: 26px;
+        padding: 8px 25px 10px;
+    }
+
+    .tables-grid .table-box {
+        width: 95%;
+        max-width: 360px;
+        flex-basis: 95%;
+    }
+
+}
