@@ -15,24 +15,24 @@ document.addEventListener(
 
         if (!container) return;
 
-        // =========================
-        // SINGLE BRANCH
-        // =========================
+        // =====================================
+        // RASSON AREENA - SINGLE BRANCH
+        // =====================================
 
         const branch = "rasson1";
 
-        // =========================
+        // =====================================
         // LOAD TABLES
-        // =========================
+        // =====================================
 
         const tablesSnap =
             await getDocs(
                 collection(window.db, "tables")
             );
 
-        // =========================
+        // =====================================
         // LOAD SESSIONS
-        // =========================
+        // =====================================
 
         const sessionsQuery = query(
             collection(window.db, "sessions"),
@@ -42,18 +42,16 @@ document.addEventListener(
         const sessionsSnap =
             await getDocs(sessionsQuery);
 
-        // =========================
+        // =====================================
         // STORE DATA
-        // =========================
+        // =====================================
 
-        let tables = [];
-        let sessions = [];
+        const tables = [];
+        const sessions = [];
 
         tablesSnap.forEach(doc => {
 
-            const t = doc.data();
-
-            tables.push(t);
+            tables.push(doc.data());
 
         });
 
@@ -68,23 +66,28 @@ document.addEventListener(
 
         });
 
-        // =========================
-        // GET RASSON1 TABLES
-        // =========================
+        // =====================================
+        // GET THIS BRANCH TABLES
+        // =====================================
 
-        let rawBranchTables =
-            tables.filter(t =>
+        const rawBranchTables =
+            tables.filter(t => {
 
-                (t.branch || "")
-                    .toLowerCase() === branch
+                return (
+                    (t.branch || "")
+                        .toLowerCase()
+                        .trim()
+                    ===
+                    branch
+                );
 
-            );
+            });
 
-        // =========================
+        // =====================================
         // REMOVE DUPLICATES
-        // =========================
+        // =====================================
 
-        let uniqueTablesMap = {};
+        const uniqueTablesMap = {};
 
         rawBranchTables.forEach(t => {
 
@@ -94,24 +97,59 @@ document.addEventListener(
                     t.name ||
                     ""
                 )
-                .trim()
-                .toLowerCase();
+                .trim();
 
             if (!tableName)
                 return;
 
-            uniqueTablesMap[tableName] = t;
+            uniqueTablesMap[
+                tableName.toLowerCase()
+            ] = t;
 
         });
 
-        let branchTables =
+        const branchTables =
             Object.values(uniqueTablesMap);
 
-        // =========================
-        // SORT TABLES / ROOMS
-        // =========================
+        // =====================================
+        // SEPARATE TABLES / ROOMS
+        // =====================================
 
-        branchTables.sort((a, b) => {
+        const normalTables =
+            branchTables.filter(t => {
+
+                const name =
+                    (
+                        t.table_id ||
+                        t.name ||
+                        ""
+                    )
+                    .toLowerCase();
+
+                return !name.includes("room");
+
+            });
+
+        const rooms =
+            branchTables.filter(t => {
+
+                const name =
+                    (
+                        t.table_id ||
+                        t.name ||
+                        ""
+                    )
+                    .toLowerCase();
+
+                return name.includes("room");
+
+            });
+
+        // =====================================
+        // SORT FUNCTION
+        // =====================================
+
+        const sortResources = (a, b) => {
 
             const aName =
                 a.table_id ||
@@ -122,22 +160,6 @@ document.addEventListener(
                 b.table_id ||
                 b.name ||
                 "";
-
-            const aRoom =
-                aName
-                    .toLowerCase()
-                    .includes("room");
-
-            const bRoom =
-                bName
-                    .toLowerCase()
-                    .includes("room");
-
-            if (aRoom && !bRoom)
-                return 1;
-
-            if (!aRoom && bRoom)
-                return -1;
 
             const aNum =
                 parseInt(
@@ -151,17 +173,76 @@ document.addEventListener(
 
             return aNum - bNum;
 
-        });
+        };
 
-        // =========================
-        // COUNT ACTIVE TABLES
-        // =========================
+        normalTables.sort(sortResources);
+        rooms.sort(sortResources);
+
+        // =====================================
+        // ACTIVE CHECK
+        // =====================================
+
+        const isRunning = (resource) => {
+
+            const resourceName =
+                resource.table_id ||
+                resource.name ||
+                "";
+
+            return sessions.some(s => {
+
+                return (
+
+                    (s.branch || "")
+                        .toLowerCase()
+                        .trim()
+                    ===
+                    branch
+
+                    &&
+
+                    (
+                        s.table_id === resourceName
+                        ||
+                        s.table === resourceName
+                    )
+
+                    &&
+
+                    (
+                        s.check_in_time
+                        ||
+                        s.start_time
+                    )
+
+                    &&
+
+                    !s.end_time
+                    &&
+                    !s.checkout_time
+                    &&
+                    !s.close_time
+
+                );
+
+            });
+
+        };
+
+        // =====================================
+        // TABLE COUNTS
+        // =====================================
 
         let activeTables = 0;
+        let activeRooms = 0;
 
-        let html = "";
+        // =====================================
+        // RENDER TABLES
+        // =====================================
 
-        branchTables.forEach(table => {
+        let tablesHTML = "";
+
+        normalTables.forEach(table => {
 
             const tableName =
                 table.table_id ||
@@ -169,51 +250,17 @@ document.addEventListener(
                 "Table";
 
             const running =
-                sessions.some(s => {
-
-                    return (
-
-                        (s.branch || "")
-                            .toLowerCase()
-                            === branch
-
-                        &&
-
-                        (
-                            s.table_id === tableName
-                            ||
-                            s.table === tableName
-                        )
-
-                        &&
-
-                        (
-                            s.check_in_time
-                            ||
-                            s.start_time
-                        )
-
-                        &&
-
-                        !s.end_time
-                        &&
-                        !s.checkout_time
-                        &&
-                        !s.close_time
-
-                    );
-
-                });
+                isRunning(table);
 
             if (running)
                 activeTables++;
 
-            html += `
+            tablesHTML += `
 
-                <div class="table-box
+                <div class="overview-resource-box
                     ${running
-                        ? "table-active"
-                        : "table-free"}">
+                        ? "resource-active"
+                        : "resource-free"}">
 
                     <h2>${tableName}</h2>
 
@@ -229,17 +276,61 @@ document.addEventListener(
 
         });
 
-        // =========================
-        // FREE TABLES
-        // =========================
+        // =====================================
+        // RENDER ROOMS
+        // =====================================
+
+        let roomsHTML = "";
+
+        rooms.forEach(room => {
+
+            const roomName =
+                room.table_id ||
+                room.name ||
+                "Room";
+
+            const running =
+                isRunning(room);
+
+            if (running)
+                activeRooms++;
+
+            roomsHTML += `
+
+                <div class="overview-resource-box
+                    ${running
+                        ? "resource-active"
+                        : "resource-free"}">
+
+                    <h2>${roomName}</h2>
+
+                    <p>
+                        ${running
+                            ? "ACTIVE"
+                            : "FREE"}
+                    </p>
+
+                </div>
+
+            `;
+
+        });
+
+        // =====================================
+        // FREE COUNTS
+        // =====================================
 
         const freeTables =
-            branchTables.length -
+            normalTables.length -
             activeTables;
 
-        // =========================
-        // SINGLE BRANCH OVERVIEW
-        // =========================
+        const freeRooms =
+            rooms.length -
+            activeRooms;
+
+        // =====================================
+        // FINAL OVERVIEW
+        // =====================================
 
         container.innerHTML = `
 
@@ -247,64 +338,78 @@ document.addEventListener(
 
                 <div class="overview-header">
 
-                    <h1>Rasson Snooker Areena</h1>
+                    <h1>RASSON SNOOKER AREENA</h1>
 
-                    <p>Branch Overview</p>
+                    <p>BRANCH OVERVIEW</p>
+
+                </div>
+
+
+                <div class="overview-stats">
+
+                    <div class="stat-box">
+
+                        <h3>TOTAL TABLES</h3>
+
+                        <p>
+                            ${normalTables.length}
+                        </p>
+
+                    </div>
+
+
+                    <div class="stat-box">
+
+                        <h3>ACTIVE TABLES</h3>
+
+                        <p>
+                            ${activeTables}
+                        </p>
+
+                    </div>
+
+
+                    <div class="stat-box">
+
+                        <h3>FREE TABLES</h3>
+
+                        <p>
+                            ${freeTables}
+                        </p>
+
+                    </div>
 
                 </div>
 
 
-                <div class="branch-card">
+                <section class="overview-section">
 
-                    <div class="branch-title">
-                        RASSON SNOOKER AREENA
-                    </div>
+                    <h2 class="section-heading">
+                        TABLES
+                    </h2>
 
+                    <div class="overview-tables-grid">
 
-                    <div class="branch-stats">
-
-                        <div class="stat-box">
-
-                            <h3>Total Tables</h3>
-
-                            <p>
-                                ${branchTables.length}
-                            </p>
-
-                        </div>
-
-
-                        <div class="stat-box">
-
-                            <h3>Active Tables</h3>
-
-                            <p>
-                                ${activeTables}
-                            </p>
-
-                        </div>
-
-
-                        <div class="stat-box">
-
-                            <h3>Free Tables</h3>
-
-                            <p>
-                                ${freeTables}
-                            </p>
-
-                        </div>
+                        ${tablesHTML}
 
                     </div>
 
+                </section>
 
-                    <div class="tables-grid">
 
-                        ${html}
+                <section class="overview-section rooms-section">
+
+                    <h2 class="section-heading">
+                        ROOMS
+                    </h2>
+
+                    <div class="overview-rooms-grid">
+
+                        ${roomsHTML}
 
                     </div>
 
-                </div>
+                </section>
 
             </div>
 
