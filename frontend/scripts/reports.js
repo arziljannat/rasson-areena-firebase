@@ -80,123 +80,43 @@ async function loadOperationalDays() {
         if (!dayId) return;
 
 
-        // ==========================================
-        // 🔥 ACTUAL OPERATIONAL DATE
-        // ==========================================
+// ==========================================
+// 🔥 ACTUAL OPERATIONAL DATE
+// DAYS DOCUMENT KI `date` FIELD
+// ==========================================
 
-        let date = null;
+let date = null;
+
+if (d.date) {
+
+    const testDate = new Date(d.date);
+
+    if (!isNaN(testDate.getTime())) {
+        date = testDate;
+    }
+}
 
 
-        // 1️⃣ SHIFT 1 START
-        const shift1StartMs = Number(
-            d.shift1?.start_ms ||
-            d.shift1?.startMs ||
-            0
-        );
+// ==========================================
+// INVALID DATE
+// ==========================================
 
-        if (
-            shift1StartMs > 1000000000000
-        ) {
+if (
+    !date ||
+    isNaN(date.getTime())
+) {
 
-            date = new Date(
-                shift1StartMs
-            );
-
+    console.warn(
+        "⚠️ REPORT INVALID DAY:",
+        {
+            dayId,
+            branch: d.branch,
+            date: d.date
         }
+    );
 
-
-        // 2️⃣ SHIFT 2 START
-        if (!date) {
-
-            const shift2StartMs = Number(
-                d.shift2?.start_ms ||
-                d.shift2?.startMs ||
-                0
-            );
-
-            if (
-                shift2StartMs > 1000000000000
-            ) {
-
-                date = new Date(
-                    shift2StartMs
-                );
-
-            }
-        }
-
-
-        // 3️⃣ SAVED DATE
-        if (!date && d.date) {
-
-            const testDate =
-                new Date(d.date);
-
-            if (
-                !isNaN(
-                    testDate.getTime()
-                )
-            ) {
-
-                date = testDate;
-
-            }
-        }
-
-
-        // 4️⃣ START TIME
-        if (!date && d.start_time) {
-
-            const testDate =
-                new Date(d.start_time);
-
-            if (
-                !isNaN(
-                    testDate.getTime()
-                )
-            ) {
-
-                date = testDate;
-
-            }
-        }
-
-
-        // 5️⃣ CREATED AT
-        if (!date && d.created_at) {
-
-            const testDate =
-                new Date(d.created_at);
-
-            if (
-                !isNaN(
-                    testDate.getTime()
-                )
-            ) {
-
-                date = testDate;
-
-            }
-        }
-
-
-        // 6️⃣ DAY ID TIMESTAMP
-        if (!date) {
-
-            const dayIdNumber =
-                Number(dayId);
-
-            if (
-                Number.isFinite(dayIdNumber) &&
-                dayIdNumber > 1000000000000
-            ) {
-
-                date =
-                    new Date(dayIdNumber);
-
-            }
-        }
-
+    return;
+}
 
         // ==========================================
         // INVALID DATE
@@ -447,25 +367,8 @@ async function loadReport() {
             // PAKISTAN DATE
             // ======================================
 
-            const operationalKey =
-                new Intl.DateTimeFormat(
-                    "en-CA",
-                    {
-                        timeZone:
-                            "Asia/Karachi",
-
-                        year:
-                            "numeric",
-
-                        month:
-                            "2-digit",
-
-                        day:
-                            "2-digit"
-                    }
-                ).format(
-                    operationalDate
-                );
+const operationalKey =
+    String(d.date || "").trim();
 
             // ======================================
             // DATE FILTER
