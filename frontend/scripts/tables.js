@@ -2104,9 +2104,8 @@ async function deleteTableConfirm() {
 
     document.getElementById("deletePopup").classList.add("hidden");
 }
-
 /******************************************************
- * OPEN HISTORY POPUP — CLEAN FINAL VERSION
+ * OPEN HISTORY POPUP — FINAL SINGLE VERSION
  ******************************************************/
 function openHistory(id) {
 
@@ -2119,11 +2118,8 @@ function openHistory(id) {
         return;
     }
 
-    const body =
-        document.getElementById("historyTableBody");
-
-    const title =
-        document.getElementById("historyTableTitle");
+    const body = document.getElementById("historyTableBody");
+    const title = document.getElementById("historyTableTitle");
 
     if (!body) {
         console.error("❌ historyTableBody not found");
@@ -2134,94 +2130,208 @@ function openHistory(id) {
         title.innerText = `History - ${t.name}`;
     }
 
-    body.innerHTML = "";
+    // ==================================================
+    // 🔥 COPY HISTORY — ORIGINAL ARRAY TOUCH NAHI KARNA
+    // ==================================================
 
-    // ==========================================
-    // 🔥 HISTORY COPY
-    // ORIGINAL ARRAY KO MODIFY NAHI KARNA
-    // ==========================================
+    let historyList = Array.isArray(t.history)
+        ? [...t.history]
+        : [];
 
-// ==========================================
-// 🔥 HISTORY COPY + DUPLICATE PROTECTION
-// ==========================================
+    // ==================================================
+    // 🔥 DUPLICATE SESSION REMOVE
+    // ==================================================
 
-let historyList = Array.isArray(t.history)
-    ? [...t.history]
-    : [];
+    const seenSessions = new Set();
 
-// 🔥 EXACT SAME SESSION ID DUPLICATE REMOVE
-const sessionIds = new Set();
+    historyList = historyList.filter(h => {
 
-historyList = historyList.filter(h => {
+        if (!h.sessionId) {
+            return true;
+        }
 
-    if (h.sessionId) {
+        const key = String(h.sessionId);
 
-        const key =
-            String(h.sessionId);
-
-        if (sessionIds.has(key)) {
+        if (seenSessions.has(key)) {
             console.warn(
-                "⚠️ DUPLICATE HISTORY HIDDEN:",
+                "⚠️ DUPLICATE SESSION HIDDEN:",
                 key
             );
             return false;
         }
 
-        sessionIds.add(key);
-    }
+        seenSessions.add(key);
 
-    return true;
-});
+        return true;
+    });
 
+    // ==================================================
+    // 🔥 SORT — LATEST FIRST
+    // ==================================================
 
-// ==========================================
-// 🔥 EXACT SAME BILL DUPLICATE PROTECTION
-// ==========================================
+    historyList.sort((a, b) =>
+        Number(b.checkout || 0) -
+        Number(a.checkout || 0)
+    );
 
-const billKeys = new Set();
+    // ==================================================
+    // 🔥 SHIFT SPLIT
+    // ==================================================
 
-historyList = historyList.filter(h => {
+    const shift1History = historyList.filter(
+        h => Number(h.shiftNumber || 1) === 1
+    );
 
-    const key = [
-        h.checkin || 0,
-        h.checkout || 0,
-        h.playSeconds || 0,
-        h.originalAmount || h.amount || 0,
-        h.discount || 0,
-        h.canteenAmount || 0,
-        h.total || 0,
-        h.paid ? 1 : 0
-    ].join("|");
+    const shift2History = historyList.filter(
+        h => Number(h.shiftNumber || 1) === 2
+    );
 
-    if (billKeys.has(key)) {
+    // ==================================================
+    // 🎮 TOTAL GAME
+    // ==================================================
 
-        console.warn(
-            "⚠️ DUPLICATE BILL HIDDEN:",
-            key
+    const shift1Game = shift1History.length;
+    const shift2Game = shift2History.length;
+
+    // ==================================================
+    // 👤 GUEST PLAY
+    // ==================================================
+
+    const shift1Guest = shift1History.filter(
+        h => h.fromBooking !== true
+    ).length;
+
+    const shift2Guest = shift2History.filter(
+        h => h.fromBooking !== true
+    ).length;
+
+    // ==================================================
+    // 📅 BOOKING PLAY
+    // ==================================================
+
+    const shift1Booking = shift1History.filter(
+        h => h.fromBooking === true
+    ).length;
+
+    const shift2Booking = shift2History.filter(
+        h => h.fromBooking === true
+    ).length;
+
+    // ==================================================
+    // 💰 PAID
+    // ==================================================
+
+    const shift1Paid = shift1History.filter(
+        h => h.paid === true
+    ).length;
+
+    const shift2Paid = shift2History.filter(
+        h => h.paid === true
+    ).length;
+
+    // ==================================================
+    // ⚠️ UNPAID
+    // ==================================================
+
+    const shift1Unpaid = shift1History.filter(
+        h => h.paid !== true
+    ).length;
+
+    const shift2Unpaid = shift2History.filter(
+        h => h.paid !== true
+    ).length;
+
+    // ==================================================
+    // 💵 PAID AMOUNT
+    // ==================================================
+
+    const shift1PaidAmount = shift1History
+        .filter(h => h.paid === true)
+        .reduce(
+            (sum, h) =>
+                sum + Number(h.total || 0),
+            0
         );
 
-        return false;
-    }
+    const shift2PaidAmount = shift2History
+        .filter(h => h.paid === true)
+        .reduce(
+            (sum, h) =>
+                sum + Number(h.total || 0),
+            0
+        );
 
-    billKeys.add(key);
+    // ==================================================
+    // 💸 UNPAID AMOUNT
+    // ==================================================
 
-    return true;
-});
+    const shift1UnpaidAmount = shift1History
+        .filter(h => h.paid !== true)
+        .reduce(
+            (sum, h) =>
+                sum + Number(h.total || 0),
+            0
+        );
 
+    const shift2UnpaidAmount = shift2History
+        .filter(h => h.paid !== true)
+        .reduce(
+            (sum, h) =>
+                sum + Number(h.total || 0),
+            0
+        );
 
-// ==========================================
-// 🔥 LATEST CHECKOUT FIRST
-// ==========================================
+    // ==================================================
+    // 🔥 UPDATE TOP CARDS
+    // ==================================================
 
-historyList.sort((a, b) => {
+    document.getElementById("historyShift1Game").textContent =
+        shift1Game;
 
-    return Number(b.checkout || 0)
-         - Number(a.checkout || 0);
+    document.getElementById("historyShift2Game").textContent =
+        shift2Game;
 
-});
-    // ==========================================
-    // EMPTY HISTORY
-    // ==========================================
+    document.getElementById("historyShift1Guest").textContent =
+        shift1Guest;
+
+    document.getElementById("historyShift2Guest").textContent =
+        shift2Guest;
+
+    document.getElementById("historyShift1Booking").textContent =
+        shift1Booking;
+
+    document.getElementById("historyShift2Booking").textContent =
+        shift2Booking;
+
+    document.getElementById("historyShift1Paid").textContent =
+        shift1Paid;
+
+    document.getElementById("historyShift2Paid").textContent =
+        shift2Paid;
+
+    document.getElementById("historyShift1PaidAmount").textContent =
+        `Rs. ${shift1PaidAmount.toLocaleString()}`;
+
+    document.getElementById("historyShift2PaidAmount").textContent =
+        `Rs. ${shift2PaidAmount.toLocaleString()}`;
+
+    document.getElementById("historyShift1Unpaid").textContent =
+        shift1Unpaid;
+
+    document.getElementById("historyShift2Unpaid").textContent =
+        shift2Unpaid;
+
+    document.getElementById("historyShift1UnpaidAmount").textContent =
+        `Rs. ${shift1UnpaidAmount.toLocaleString()}`;
+
+    document.getElementById("historyShift2UnpaidAmount").textContent =
+        `Rs. ${shift2UnpaidAmount.toLocaleString()}`;
+
+    // ==================================================
+    // 🔥 RENDER HISTORY
+    // ==================================================
+
+    body.innerHTML = "";
 
     if (historyList.length === 0) {
 
@@ -2236,10 +2346,6 @@ historyList.sort((a, b) => {
 
     } else {
 
-        // ==========================================
-        // 🔥 RENDER HISTORY
-        // ==========================================
-
         historyList.forEach((h, index) => {
 
             body.innerHTML += `
@@ -2251,7 +2357,7 @@ historyList.sort((a, b) => {
                         ${formatTime(h.checkin)}
 
                         ${
-                            h.fromBooking
+                            h.fromBooking === true
                             ? `
                                 <div style="
                                     margin-top:4px;
@@ -2301,53 +2407,22 @@ historyList.sort((a, b) => {
                     </td>
 
                     <td>
-                        ${
-                            h.fromBooking &&
-                            Number(h.bookingAdvance || 0) > 0
-                            ? `
-                                <div>
-                                    ${
-                                        h.totalBillAmount ||
-                                        h.total ||
-                                        0
-                                    }
-                                </div>
-
-                                <small
-                                    style="color:#00ff9d;">
-                                    Advance:
-                                    Rs ${
-                                        h.bookingAdvance || 0
-                                    }
-                                </small>
-                              `
-                            : `
-                                ${h.total || 0}
-                              `
-                        }
+                        ${h.total || 0}
                     </td>
 
                     <td>
                         ${
-                            h.paid
-                            ? `
-                                <button
-                                    class="paid-btn"
-                                    disabled>
-                                    PAID
-                                </button>
-                              `
+                            h.paid === true
+                            ? `<button class="paid-btn" disabled>PAID</button>`
                             : `
-                          <button
-                              class="unpaid-btn"
-                              onclick="
-                                  openBillFromHistory(
-                                      '${id}',
-                                      '${h.sessionId}'
-                                  )
-                              ">
-                              UNPAID
-                          </button>
+                                <button
+                                    class="unpaid-btn"
+                                    onclick="openBillFromHistory(
+                                        '${id}',
+                                        ${t.history.indexOf(h)}
+                                    )">
+                                    UNPAID
+                                </button>
                               `
                         }
                     </td>
@@ -2359,7 +2434,7 @@ historyList.sort((a, b) => {
                                 <input
                                     type="checkbox"
                                     class="historyDeleteCheck"
-                                    value="${h.sessionId || ""}"
+                                    value="${t.history.indexOf(h)}"
                                 >
                               `
                             : "-"
@@ -2371,94 +2446,86 @@ historyList.sort((a, b) => {
         });
     }
 
-    // ==========================================
-    // SHOW POPUP
-    // ==========================================
+    // ==================================================
+    // 🔥 OPEN POPUP
+    // ==================================================
 
     document
         .getElementById("historyPopup")
         .classList.remove("hidden");
 
-    // ==========================================
-    // CLOSE HISTORY BUTTON
-    // ==========================================
+    // ==================================================
+    // CLOSE
+    // ==================================================
 
     const closeBtn =
         document.getElementById("closeHistoryBtn");
 
     if (closeBtn) {
-
-        closeBtn.onclick = () => {
-
+        closeBtn.onclick = () =>
             document
                 .getElementById("historyPopup")
                 .classList.add("hidden");
-
-        };
-
     }
 
-    // ==========================================
-    // DELETE SELECTED HISTORY
-    // ==========================================
+    // ==================================================
+    // DELETE SELECTED
+    // ==================================================
 
     const deleteBtn =
         document.getElementById(
             "deleteSelectedHistoryBtn"
         );
 
-    if (!deleteBtn) return;
+    if (deleteBtn) {
 
-    if (ROLE === "admin") {
+        if (ROLE === "admin") {
 
-        deleteBtn.classList.remove("hidden");
+            deleteBtn.classList.remove("hidden");
 
-        deleteBtn.onclick = async () => {
+            deleteBtn.onclick = async () => {
 
-            const checks =
-                document.querySelectorAll(
-                    ".historyDeleteCheck:checked"
+                const checks =
+                    document.querySelectorAll(
+                        ".historyDeleteCheck:checked"
+                    );
+
+                if (checks.length === 0) {
+                    alert("Select history first ❌");
+                    return;
+                }
+
+                const ok = confirm(
+                    `Delete ${checks.length} sessions ?`
                 );
 
-            if (checks.length === 0) {
-                alert("Select history first ❌");
-                return;
-            }
+                if (!ok) return;
 
-            const ok = confirm(
-                `Delete ${checks.length} sessions ?`
-            );
-
-            if (!ok) return;
-
-            const indexes =
-                [...checks]
+                const indexes = [...checks]
                     .map(c => Number(c.value))
                     .sort((a, b) => b - a);
 
-            // DELETE FROM HIGH INDEX → LOW INDEX
-            for (const i of indexes) {
-                await softDeleteSession(id, i);
-            }
+                for (const i of indexes) {
+                    await softDeleteSession(id, i);
+                }
 
-            await rebuildHistoryFromSessions();
+                await rebuildHistoryFromSessions();
 
-            renderTables();
+                renderTables();
 
-            openHistory(id);
+                openHistory(id);
 
-            alert(
-                `${indexes.length} sessions deleted successfully ✅`
-            );
-        };
+                alert(
+                    `${indexes.length} sessions deleted successfully ✅`
+                );
+            };
 
-    } else {
+        } else {
 
-        deleteBtn.classList.add("hidden");
-
+            deleteBtn.classList.add("hidden");
+        }
     }
 }
-
 
 
 function openBillFromHistory(tableId, sessionId) {
