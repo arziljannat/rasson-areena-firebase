@@ -561,3 +561,129 @@ body {
         min-width: 850px;
     }
 }
+/* =========================================================
+   HABIB STYLE REPORT RESULT
+   ========================================================= */
+
+.report-result-title {
+
+    color: #00ffcc;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    margin-bottom: 8px;
+
+    padding-bottom: 7px;
+
+    border-bottom: 1px solid rgba(0,255,157,0.45);
+
+    text-shadow:
+        0 0 7px #00ffcc;
+}
+
+
+.report-table-wrapper {
+
+    width: 100%;
+
+    overflow-x: auto;
+
+    border: 1px solid #00ff9d;
+
+    border-radius: 8px;
+
+    background: rgba(0,0,0,0.28);
+}
+
+
+.report-table {
+
+    width: 100%;
+
+    min-width: 1250px;
+
+    border-collapse: collapse;
+
+    font-size: 9px;
+}
+
+
+.report-table th {
+
+    padding: 6px 5px;
+
+    background: rgba(0,255,157,0.08);
+
+    color: #00ffcc;
+
+    border: 1px solid rgba(0,255,157,0.35);
+
+    text-align: center;
+
+    white-space: nowrap;
+
+    font-size: 9px;
+}
+
+
+.report-table td {
+
+    padding: 6px 5px;
+
+    color: #eafff8;
+
+    border: 1px solid rgba(0,255,157,0.22);
+
+    text-align: center;
+
+    white-space: nowrap;
+
+    font-size: 9px;
+}
+
+
+.report-table tbody tr:hover td {
+
+    background: rgba(0,255,200,0.08);
+}
+
+
+.report-table .total-cell {
+
+    color: #00ffcc;
+
+    font-weight: bold;
+}
+
+
+.report-table .closing-cell {
+
+    color: #ffe600;
+
+    font-weight: bold;
+
+    background: rgba(255,220,0,0.08);
+}
+
+
+.report-table .timing-cell {
+
+    color: #00ffcc;
+
+    font-weight: bold;
+}
+
+
+.report-total-row td {
+
+    color: #00ffcc !important;
+
+    font-weight: bold;
+
+    background: rgba(0,255,157,0.10);
+
+    border-top: 2px solid #00ff9d;
+
+}
