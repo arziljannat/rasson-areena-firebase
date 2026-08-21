@@ -764,10 +764,11 @@ setTimeout(() => {
 // 🔥 FINAL TABLE + ROOM SECTION LAYOUT
 // ============================================================
 
-// Existing cards ko temporarily collect karo
+// Existing cards collect karo
 const allCards = [...box.querySelectorAll(".table-box")];
 
 box.innerHTML = "";
+
 
 // ============================================================
 // 🎱 TABLES SECTION
@@ -806,7 +807,7 @@ roomsSection.appendChild(roomsGrid);
 
 
 // ============================================================
-// 🔥 CARDS KO TABLE / ROOM KE MUTABIQ SEPARATE KARO
+// 🔥 TABLES / ROOMS SEPARATE KARO
 // ============================================================
 
 allCards.forEach(card => {
@@ -838,10 +839,9 @@ if (tablesGrid.children.length > 0) {
 
 if (roomsGrid.children.length > 0) {
     box.appendChild(roomsSection);
-}
+      }
   
 }
-
 /******************************************************
  * CHANGE RATE
  ******************************************************/
