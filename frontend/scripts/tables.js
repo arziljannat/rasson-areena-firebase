@@ -2873,7 +2873,15 @@ bill.innerHTML = `
  * SHIFT TABLE POPUP (OPEN)
  ******************************************************/
 function openTableShift(id) {
-    let t = tables.find(x => String(x.id) === String(id));
+
+    const t = tables.find(
+        x => String(x.id) === String(id)
+    );
+
+    if (!t) {
+        console.error("❌ Source table not found:", id);
+        return;
+    }
 
     if (!t.isRunning) {
         alert("Only running tables can be shifted.");
@@ -2882,57 +2890,136 @@ function openTableShift(id) {
 
     window._shiftSourceTable = id;
 
-    let sel = document.getElementById("shiftTableSelect");
-    sel.innerHTML = "";
+    const sel =
+        document.getElementById("shiftTableSelect");
 
-    // ✅ SORT SAME LIKE UI (Tables first, then Rooms)
-const sortedTables = [...tables].sort((a, b) => {
-
-    const getType = (name = "") => {
-    name = String(name).toLowerCase();
-
-    if (name.startsWith("table")) return 1;
-    if (name.startsWith("room")) return 2;
-
-    return 3;
-};
-
-    const typeA = getType(a.name);
-    const typeB = getType(b.name);
-
-    if (typeA !== typeB) return typeA - typeB;
-
-const numA =
-Number(((a.name || "").match(/\d+/) || [0])[0]);
-
-const numB =
-Number(((b.name || "").match(/\d+/) || [0])[0]);
-
-    return numA - numB;
-});
-
-
-// ✅ LOOP ON SORTED DATA
-sortedTables.forEach(tb => {
-    if (!tb.isRunning && tb.id !== id) {
-        sel.innerHTML += `<option value="${tb.id}">${tb.name}</option>`;
-    }
-});
-
-    if (sel.innerHTML === "") {
-        alert("No free tables available to shift.");
+    if (!sel) {
+        console.error("❌ shiftTableSelect not found");
         return;
     }
 
-    document.getElementById("shiftTablePopup").classList.remove("hidden");
+    sel.innerHTML = "";
 
-    document.getElementById("cancelShiftTableBtn").onclick =
-        () => document.getElementById("shiftTablePopup").classList.add("hidden");
+    // ==========================================
+    // SORT — TABLES FIRST, ROOMS AFTER
+    // ==========================================
 
-    document.getElementById("confirmShiftTableBtn").onclick =
-        shiftPlayerToNewTable;
+    const sortedTables = [...tables].sort((a, b) => {
+
+        const getType = (name = "") => {
+
+            const n =
+                String(name)
+                    .toLowerCase()
+                    .trim();
+
+            if (n.startsWith("table")) return 1;
+            if (n.startsWith("room")) return 2;
+            if (n.startsWith("pool")) return 3;
+
+            return 4;
+        };
+
+        const typeA = getType(a.name);
+        const typeB = getType(b.name);
+
+        if (typeA !== typeB) {
+            return typeA - typeB;
+        }
+
+        const numA =
+            Number(
+                ((a.name || "").match(/\d+/) || [0])[0]
+            );
+
+        const numB =
+            Number(
+                ((b.name || "").match(/\d+/) || [0])[0]
+            );
+
+        return numA - numB;
+    });
+
+    // ==========================================
+    // ONLY FREE TABLES
+    // ==========================================
+
+    sortedTables.forEach(tb => {
+
+        if (
+            !tb.isRunning &&
+            String(tb.id) !== String(id)
+        ) {
+
+            sel.innerHTML += `
+                <option value="${tb.id}">
+                    ${tb.name}
+                </option>
+            `;
+        }
+    });
+
+    // ==========================================
+    // NO FREE TABLE
+    // ==========================================
+
+    if (!sel.value) {
+
+        alert(
+            "No free tables available to shift."
+        );
+
+        return;
+    }
+
+    // ==========================================
+    // OPEN POPUP
+    // ==========================================
+
+    const popup =
+        document.getElementById("shiftTablePopup");
+
+    if (!popup) {
+        console.error("❌ shiftTablePopup not found");
+        return;
+    }
+
+    popup.classList.remove("hidden");
+
+    // ==========================================
+    // CANCEL
+    // ==========================================
+
+    const cancelBtn =
+        document.getElementById(
+            "cancelShiftTableBtn"
+        );
+
+    if (cancelBtn) {
+
+        cancelBtn.onclick = () => {
+
+            popup.classList.add("hidden");
+
+            window._shiftSourceTable = null;
+        };
+    }
+
+    // ==========================================
+    // CONFIRM
+    // ==========================================
+
+    const confirmBtn =
+        document.getElementById(
+            "confirmShiftTableBtn"
+        );
+
+    if (confirmBtn) {
+
+        confirmBtn.onclick =
+            shiftPlayerToNewTable;
+    }
 }
-
 /******************************************************
  * SHIFT PLAYER TO NEW TABLE (MAIN LOGIC)
  ******************************************************/
