@@ -4967,10 +4967,11 @@ console.log("🔥 HISTORY:", h);
 
     } catch (err) {
 
-        console.error(err);
+        console.error("❌ Delete failed:", err);
 
-   }
-}        alert("Delete failed ❌");
+        alert("Delete failed ❌");
+    }
+}
  
 
 function playWarningBeep() {
