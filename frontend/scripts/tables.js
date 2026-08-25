@@ -276,10 +276,16 @@ selectedRate:
                 playSeconds: 0,
                 liveAmount: 0,
 
-                canteenTotal: 0,
-                canteenItems: {},
+canteenTotal: 0,
+canteenItems: {},
 
-                history: []
+// 🔥 PLAYERS
+player1Name: "",
+player2Name: "",
+checkoutPlayer: "",
+checkoutPlayerNumber: null,
+
+history: []
             });
         });
 
@@ -306,10 +312,17 @@ selectedRate:
 
         discount: old?.discount || 0,
 
-        canteenTotal: old?.canteenTotal || 0,
-        canteenItems: old?.canteenItems || {},
+canteenTotal: old?.canteenTotal || 0,
+canteenItems: old?.canteenItems || {},
 
-        history: []
+// 🔥 PLAYERS PRESERVE
+player1Name: old?.player1Name || "",
+player2Name: old?.player2Name || "",
+checkoutPlayer: old?.checkoutPlayer || "",
+checkoutPlayerNumber:
+    old?.checkoutPlayerNumber || null,
+
+history: []
     };
 });
 
@@ -554,9 +567,15 @@ tables.push({
     liveAmount: 0,
     canteenTotal: 0,
 
-    canteenItems: {}, // ✅ FIX
+canteenItems: {}, // ✅ FIX
 
-    history: []
+// 🔥 PLAYERS
+player1Name: "",
+player2Name: "",
+checkoutPlayer: "",
+checkoutPlayerNumber: null,
+
+history: []
 });
     });
 
@@ -686,6 +705,32 @@ Century - 14 / min
 </select>
 
 </div>
+
+
+<div class="players-section">
+
+    <div class="players-display">
+
+        <span>
+            👤 ${t.player1Name || "Player 1"}
+        </span>
+
+        <b>VS</b>
+
+        <span>
+            👤 ${t.player2Name || "Player 2"}
+        </span>
+
+    </div>
+
+    <button
+        class="player-btn"
+        onclick="openPlayers('${t.id}')"
+    >
+        👥 PLAYERS
+    </button>
+
+</div> 
 
             <div class="timer-box">
                 <div class="timer-line"><span>Check-in:</span><span id="checkin-${t.id}">--:--:--</span></div>
