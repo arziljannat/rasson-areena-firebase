@@ -1036,12 +1036,6 @@ updateButtons(id, "idle");
     t.canteenTotal = 0;
     t.canteenItems = {};
 
-  // 🔥 NEW GAME → RESET PLAYER DATA
-t.player1Name = "";
-t.player2Name = "";
-t.checkoutPlayer = "";
-t.checkoutPlayerNumber = null;
-
     updateButtons(id, "running");
     runTimer(id);
     
