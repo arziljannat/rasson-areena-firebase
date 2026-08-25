@@ -3441,3 +3441,94 @@ body * {
     margin-bottom: 8px !important;
 
 }
+
+/* =====================================================
+   🔥 PLAYERS DISPLAY — TABLE CARD
+   ===================================================== */
+
+.players-section {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 6px 0 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.players-display {
+    width: 100%;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    padding: 4px 6px;
+
+    min-height: 24px;
+
+    overflow: hidden;
+}
+
+.players-display span {
+    display: block;
+
+    max-width: 45%;
+
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    line-height: 18px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    text-align: center;
+
+    text-shadow:
+        0 0 4px #000,
+        0 0 7px #00ffd5;
+}
+
+.players-display b {
+    flex: 0 0 auto;
+
+    color: #d4af37;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    line-height: 18px;
+
+    text-shadow:
+        0 0 5px #d4af37;
+}
+
+.player-btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: auto;
+    min-width: 75px;
+
+    height: 22px;
+
+    padding: 2px 8px;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    line-height: 1;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+}
