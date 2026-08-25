@@ -4585,14 +4585,61 @@ unpaidBillsSnap.forEach(docSnap => {
         return;
     }
 
-    // 🔴 Completed + unpaid → BLOCK
-    unpaidBills.push({
-        id: docSnap.id,
-        tableId: data.table_id || data.tableId || "Unknown",
-        player1: data.player1_name || data.player1Name || "Player 1",
-        player2: data.player2_name || data.player2Name || "Player 2",
-        total: Number(data.total || data.game_total || 0)
-    });
+unpaidBills.push({
+    id: docSnap.id,
+
+    tableId:
+        data.table_id ||
+        data.tableId ||
+        "Unknown",
+
+    player1:
+        data.player1_name ||
+        data.player1Name ||
+        "Player 1",
+
+    player2:
+        data.player2_name ||
+        data.player2Name ||
+        "Player 2",
+
+    // 🔥 FULL BILL
+    total:
+        Number(
+            data.total_bill_amount ??
+            (
+                Number(
+                    data.final_game_amount ||
+                    data.final_amount ||
+                    0
+                ) +
+                Number(
+                    data.canteen_total ||
+                    data.canteen_amount ||
+                    0
+                )
+            )
+        ),
+
+    // 🔥 REMAINING / DUE
+    remaining:
+        Number(
+            data.remaining_payment ??
+            data.total_bill_amount ??
+            (
+                Number(
+                    data.final_game_amount ||
+                    data.final_amount ||
+                    0
+                ) +
+                Number(
+                    data.canteen_total ||
+                    data.canteen_amount ||
+                    0
+                )
+            )
+        )
+});
 });
 
 
@@ -4606,14 +4653,15 @@ if (unpaidBills.length > 0) {
         "Shift 2 Close nahi ho sakti ❌\n\n" +
         "Pehle ye unpaid bills paid karein:\n\n";
 
-    unpaidBills.forEach(bill => {
+unpaidBills.forEach(bill => {
 
-        message +=
-            `Table ${bill.tableId} — ` +
-            `${bill.player1} VS ${bill.player2}` +
-            ` — Rs.${bill.total}\n`;
+    message +=
+        `Table ${bill.tableId} — ` +
+        `${bill.player1} VS ${bill.player2}\n` +
+        `Total: Rs.${Number(bill.total || 0)} | ` +
+        `Remaining: Rs.${Number(bill.remaining || 0)}\n\n`;
 
-    });
+});
 
     alert(message);
 
