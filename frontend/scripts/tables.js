@@ -6365,6 +6365,21 @@ body {
 <div class="line"></div>
 
 <div class="row"><span>Table</span><span>${t.name}</span></div>
+<div class="row">
+    <span>Players</span>
+    <span>
+        ${h?.player1Name || h?.player1_name || t.player1Name || "Player 1"}
+        VS
+        ${h?.player2Name || h?.player2_name || t.player2Name || "Player 2"}
+    </span>
+</div>
+
+<div class="row">
+    <span>Game Off</span>
+    <span>
+        ${h?.checkout_player || h?.game_off_player || t.checkoutPlayer || "--"}
+    </span>
+</div>
 <div class="row"><span>In</span><span>${checkin}</span></div>
 <div class="row"><span>Out</span><span>${checkout}</span></div>
 <div class="row"><span>Time</span><span>${playtime}</span></div>
