@@ -4545,12 +4545,7 @@ if (!snap.empty) {
     return;
 }
 
-    // cannot close if any table still running
-    let running = tables.some(t => t.isRunning);
-    if (running) {
-        alert("Close all tables in Shift 2");
-        return;
-    }
+
 
     let now = Date.now();
 
