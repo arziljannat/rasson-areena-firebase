@@ -2137,6 +2137,16 @@ async function showBill(id) {
 
     let bill = document.getElementById("billDetails");
 
+  const player1 =
+    t.player1Name ||
+    t.player1 ||
+    "Player 1";
+
+const player2 =
+    t.player2Name ||
+    t.player2 ||
+    "Player 2";
+
     let canteenDetails = "";
     let canteenTotal = 0;
 
