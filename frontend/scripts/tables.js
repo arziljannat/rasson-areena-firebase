@@ -280,10 +280,17 @@ canteenTotal: 0,
 canteenItems: {},
 
 // 🔥 PLAYERS
-player1Name: "",
-player2Name: "",
-checkoutPlayer: "",
-checkoutPlayerNumber: null,
+player1Name:
+    t.player1_name || "",
+
+player2Name:
+    t.player2_name || "",
+
+checkoutPlayer:
+    t.checkout_player || "",
+
+checkoutPlayerNumber:
+    t.checkout_player_number || null,
 
 history: []
             });
@@ -1029,6 +1036,12 @@ updateButtons(id, "idle");
     t.canteenTotal = 0;
     t.canteenItems = {};
 
+  // 🔥 NEW GAME → RESET PLAYER DATA
+t.player1Name = "";
+t.player2Name = "";
+t.checkoutPlayer = "";
+t.checkoutPlayerNumber = null;
+
     updateButtons(id, "running");
     runTimer(id);
     
@@ -1091,6 +1104,7 @@ window.checkIn = checkIn;
 window.checkOut = checkOut;
 window.showBill = showBill;
 window.openHistory = openHistory;
+window.openPlayers = openPlayers;
 window.editTable = editTable;
 window.deleteTableOpen = deleteTableOpen;
 window.openCanteen = openCanteen;
@@ -1098,7 +1112,176 @@ window.openTableShift = openTableShift;
 window.handleRateChange = handleRateChange;
 
 
+/******************************************************
+ * 🔥 SELECT PLAYER AT CHECKOUT
+ ******************************************************/
+function selectCheckoutPlayer(t) {
 
+    return new Promise(resolve => {
+
+        let popup =
+            document.getElementById(
+                "checkoutPlayerPopup"
+            );
+
+        if (!popup) {
+
+            popup =
+                document.createElement("div");
+
+            popup.id =
+                "checkoutPlayerPopup";
+
+            popup.style.cssText = `
+                position:fixed;
+                inset:0;
+                background:rgba(0,0,0,.8);
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                z-index:100000;
+            `;
+
+            popup.innerHTML = `
+
+                <div style="
+                    width:380px;
+                    max-width:90%;
+                    background:#111;
+                    border:1px solid #d4af37;
+                    border-radius:18px;
+                    padding:25px;
+                    text-align:center;
+                ">
+
+                    <h2 style="
+                        color:#d4af37;
+                        margin-top:0;
+                    ">
+                        WHO IS CHECKING OUT?
+                    </h2>
+
+                    <div style="
+                        display:flex;
+                        gap:15px;
+                        margin-top:25px;
+                    ">
+
+                        <button
+                            id="checkoutPlayer1Btn"
+                            style="
+                                flex:1;
+                                padding:20px 10px;
+                                border-radius:12px;
+                                border:1px solid #d4af37;
+                                background:#222;
+                                color:white;
+                                cursor:pointer;
+                                font-size:18px;
+                            "
+                        >
+                            PLAYER 1
+                            <br>
+                            <b id="checkoutPlayer1Name"></b>
+                        </button>
+
+                        <button
+                            id="checkoutPlayer2Btn"
+                            style="
+                                flex:1;
+                                padding:20px 10px;
+                                border-radius:12px;
+                                border:1px solid #d4af37;
+                                background:#222;
+                                color:white;
+                                cursor:pointer;
+                                font-size:18px;
+                            "
+                        >
+                            PLAYER 2
+                            <br>
+                            <b id="checkoutPlayer2Name"></b>
+                        </button>
+
+                    </div>
+
+                    <button
+                        id="cancelCheckoutPlayerBtn"
+                        style="
+                            margin-top:20px;
+                            width:100%;
+                            padding:12px;
+                            border:0;
+                            border-radius:8px;
+                            cursor:pointer;
+                        "
+                    >
+                        CANCEL
+                    </button>
+
+                </div>
+            `;
+
+            document.body.appendChild(popup);
+        }
+
+        document.getElementById(
+            "checkoutPlayer1Name"
+        ).innerText =
+            t.player1Name || "Player 1";
+
+        document.getElementById(
+            "checkoutPlayer2Name"
+        ).innerText =
+            t.player2Name || "Player 2";
+
+        popup.style.display =
+            "flex";
+
+        document.getElementById(
+            "checkoutPlayer1Btn"
+        ).onclick = () => {
+
+            popup.style.display =
+                "none";
+
+            resolve({
+                name:
+                    t.player1Name ||
+                    "Player 1",
+
+                number: 1
+            });
+        };
+
+        document.getElementById(
+            "checkoutPlayer2Btn"
+        ).onclick = () => {
+
+            popup.style.display =
+                "none";
+
+            resolve({
+                name:
+                    t.player2Name ||
+                    "Player 2",
+
+                number: 2
+            });
+        };
+
+        document.getElementById(
+            "cancelCheckoutPlayerBtn"
+        ).onclick = () => {
+
+            popup.style.display =
+                "none";
+
+            resolve(null);
+        };
+
+    });
+}
 
 
 /******************************************************
@@ -1107,6 +1290,21 @@ window.handleRateChange = handleRateChange;
 async function checkOut(id) {
 
     let t = tables.find(x => String(x.id) === String(id));
+
+
+  // 🔥 ASK WHICH PLAYER IS CHECKING OUT
+const checkoutPlayer =
+    await selectCheckoutPlayer(t);
+
+if (!checkoutPlayer) {
+    return;
+}
+
+t.checkoutPlayer =
+    checkoutPlayer.name;
+
+t.checkoutPlayerNumber =
+    checkoutPlayer.number;
 
 
 // 🔥 FINAL FREEZE (IMPORTANT)
@@ -1179,6 +1377,21 @@ if (latestSession) {
    await updateDoc(doc(window.db, "sessions", latestSession.id), {
     end_time: new Date().toISOString(),
 
+
+     // 🔥 PLAYER DATA
+player1_name:
+    t.player1Name || "",
+
+player2_name:
+    t.player2Name || "",
+
+checkout_player:
+    t.checkoutPlayer || "",
+
+checkout_player_number:
+    t.checkoutPlayerNumber || null,
+     
+
 original_game_amount: t.finalAmount,
 
 discount: t.discount || 0,
@@ -1207,6 +1420,235 @@ selected_play_type: t.selectedPlayType || t.playType,
 
     updateButtons(id, "afterCheckout");
     updateDisplay(id);
+}
+
+
+/******************************************************
+ * 🔥 PLAYER NAMES POPUP
+ ******************************************************/
+async function openPlayers(id) {
+
+    const t =
+        tables.find(
+            x => String(x.id) === String(id)
+        );
+
+    if (!t) return;
+
+    // 🔥 CREATE POPUP IF NOT EXISTS
+    let popup =
+        document.getElementById(
+            "playersPopup"
+        );
+
+    if (!popup) {
+
+        popup =
+            document.createElement("div");
+
+        popup.id =
+            "playersPopup";
+
+        popup.style.cssText = `
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.75);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            z-index:99999;
+        `;
+
+        popup.innerHTML = `
+
+            <div style="
+                width:360px;
+                max-width:90%;
+                background:#111;
+                border:1px solid #d4af37;
+                border-radius:15px;
+                padding:25px;
+                box-shadow:0 0 30px rgba(212,175,55,.4);
+            ">
+
+                <h2 style="
+                    text-align:center;
+                    color:#d4af37;
+                    margin-top:0;
+                ">
+                    👥 PLAYERS
+                </h2>
+
+                <label style="
+                    display:block;
+                    color:#fff;
+                    margin-bottom:6px;
+                ">
+                    PLAYER 1
+                </label>
+
+                <input
+                    id="player1Input"
+                    type="text"
+                    placeholder="Player 1 name"
+                    style="
+                        width:100%;
+                        box-sizing:border-box;
+                        padding:12px;
+                        margin-bottom:18px;
+                        border-radius:8px;
+                        border:1px solid #555;
+                    "
+                >
+
+                <label style="
+                    display:block;
+                    color:#fff;
+                    margin-bottom:6px;
+                ">
+                    PLAYER 2
+                </label>
+
+                <input
+                    id="player2Input"
+                    type="text"
+                    placeholder="Player 2 name"
+                    style="
+                        width:100%;
+                        box-sizing:border-box;
+                        padding:12px;
+                        margin-bottom:20px;
+                        border-radius:8px;
+                        border:1px solid #555;
+                    "
+                >
+
+                <div style="
+                    display:flex;
+                    gap:10px;
+                ">
+
+                    <button
+                        id="cancelPlayersBtn"
+                        style="
+                            flex:1;
+                            padding:12px;
+                            border:0;
+                            border-radius:8px;
+                            cursor:pointer;
+                        "
+                    >
+                        CANCEL
+                    </button>
+
+                    <button
+                        id="savePlayersBtn"
+                        style="
+                            flex:1;
+                            padding:12px;
+                            border:0;
+                            border-radius:8px;
+                            background:#d4af37;
+                            cursor:pointer;
+                            font-weight:bold;
+                        "
+                    >
+                        SAVE
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+
+        document.body.appendChild(popup);
+    }
+
+    // 🔥 LOAD CURRENT NAMES
+    document.getElementById(
+        "player1Input"
+    ).value =
+        t.player1Name || "";
+
+    document.getElementById(
+        "player2Input"
+    ).value =
+        t.player2Name || "";
+
+    popup.style.display =
+        "flex";
+
+    // 🔥 CANCEL
+    document.getElementById(
+        "cancelPlayersBtn"
+    ).onclick = () => {
+
+        popup.style.display =
+            "none";
+    };
+
+    // 🔥 SAVE
+    document.getElementById(
+        "savePlayersBtn"
+    ).onclick = async () => {
+
+        const player1 =
+            document.getElementById(
+                "player1Input"
+            ).value.trim();
+
+        const player2 =
+            document.getElementById(
+                "player2Input"
+            ).value.trim();
+
+        t.player1Name =
+            player1;
+
+        t.player2Name =
+            player2;
+
+        try {
+
+            await updateDoc(
+                doc(
+                    window.db,
+                    "tables",
+                    String(t.id)
+                ),
+                {
+                    player1_name:
+                        player1,
+
+                    player2_name:
+                        player2
+                }
+            );
+
+            popup.style.display =
+                "none";
+
+            renderTables();
+
+            console.log(
+                "✅ PLAYERS SAVED:",
+                t.name,
+                player1,
+                player2
+            );
+
+        } catch (error) {
+
+            console.error(
+                "❌ PLAYER SAVE ERROR:",
+                error
+            );
+
+            alert(
+                "Players save failed ❌"
+            );
+        }
+    };
 }
 
 
@@ -1734,6 +2176,41 @@ originalAmount - discount;
     <hr>
 
     <p><b>Table:</b> ${t.name}</p>
+    <p>
+    <b>Players:</b>
+
+    <span style="
+        ${
+            Number(t.checkoutPlayerNumber) === 1
+            ? "background:#d4af37;color:#000;padding:3px 6px;border-radius:5px;font-weight:bold;"
+            : ""
+        }
+    ">
+        ${
+            Number(t.checkoutPlayerNumber) === 1
+            ? "⭐ "
+            : ""
+        }
+        ${t.player1Name || "Player 1"}
+    </span>
+
+    <b> VS </b>
+
+    <span style="
+        ${
+            Number(t.checkoutPlayerNumber) === 2
+            ? "background:#d4af37;color:#000;padding:3px 6px;border-radius:5px;font-weight:bold;"
+            : ""
+        }
+    ">
+        ${
+            Number(t.checkoutPlayerNumber) === 2
+            ? "⭐ "
+            : ""
+        }
+        ${t.player2Name || "Player 2"}
+    </span>
+</p>
     <p><b>Check-in:</b> ${checkin}</p>
     <p><b>Checkout:</b> ${checkout}</p>
     <p><b>Play Time:</b> ${playtime}</p>
@@ -2389,12 +2866,62 @@ function openHistory(id) {
 
                 <tr>
 
-                    <td>
-                        ${index + 1}
-                    </td>
+<td>
+    ${index + 1}
+</td>
 
-                    <td>
-                        ${formatTime(h.checkin)}
+<!-- 🔥 PLAYERS -->
+<td>
+    <div style="
+        display:flex;
+        flex-direction:column;
+        gap:4px;
+        min-width:130px;
+    ">
+
+        <div style="
+            ${
+                Number(h.checkoutPlayerNumber) === 1
+                ? "background:#d4af37;color:#000;padding:4px 7px;border-radius:5px;font-weight:bold;"
+                : ""
+            }
+        ">
+            ${
+                Number(h.checkoutPlayerNumber) === 1
+                ? "⭐ "
+                : ""
+            }
+            ${h.player1Name || "Player 1"}
+        </div>
+
+        <div style="
+            text-align:center;
+            font-size:10px;
+            opacity:.6;
+        ">
+            VS
+        </div>
+
+        <div style="
+            ${
+                Number(h.checkoutPlayerNumber) === 2
+                ? "background:#d4af37;color:#000;padding:4px 7px;border-radius:5px;font-weight:bold;"
+                : ""
+            }
+        ">
+            ${
+                Number(h.checkoutPlayerNumber) === 2
+                ? "⭐ "
+                : ""
+            }
+            ${h.player2Name || "Player 2"}
+        </div>
+
+    </div>
+</td>
+
+<td>
+    ${formatTime(h.checkin)}
 
                         ${
                             h.fromBooking
@@ -2843,6 +3370,58 @@ function openBillFromHistory(tableId, sessionId) {
             </center>
 
             <hr>
+
+            <div style="
+    margin:10px 0;
+    padding:8px;
+    border:1px solid #999;
+    border-radius:6px;
+">
+
+    <b>PLAYERS</b>
+
+    <div style="
+        margin-top:7px;
+        font-size:15px;
+    ">
+
+        <span style="
+            ${
+                Number(h.checkoutPlayerNumber) === 1
+                ? "background:#d4af37;color:#000;padding:3px 6px;border-radius:5px;font-weight:bold;"
+                : ""
+            }
+        ">
+            ${
+                Number(h.checkoutPlayerNumber) === 1
+                ? "⭐ "
+                : ""
+            }
+
+            ${h.player1Name || "Player 1"}
+        </span>
+
+        <b> VS </b>
+
+        <span style="
+            ${
+                Number(h.checkoutPlayerNumber) === 2
+                ? "background:#d4af37;color:#000;padding:3px 6px;border-radius:5px;font-weight:bold;"
+                : ""
+            }
+        ">
+            ${
+                Number(h.checkoutPlayerNumber) === 2
+                ? "⭐ "
+                : ""
+            }
+
+            ${h.player2Name || "Player 2"}
+        </span>
+
+    </div>
+
+</div>
 
             <div>
                 <b>Table:</b>
@@ -3408,6 +3987,20 @@ async function shiftPlayerToNewTable() {
     newT.canteenTotal = oldT.canteenTotal;
     newT.canteenItems = { ...oldT.canteenItems };
 
+
+  // 🔥 MOVE PLAYERS WITH RUNNING SESSION
+newT.player1Name =
+    oldT.player1Name || "";
+
+newT.player2Name =
+    oldT.player2Name || "";
+
+newT.checkoutPlayer =
+    oldT.checkoutPlayer || "";
+
+newT.checkoutPlayerNumber =
+    oldT.checkoutPlayerNumber || null;
+
     runTimer(newT.id);
 
     // 🔥 RESET OLD TABLE
@@ -3418,6 +4011,12 @@ async function shiftPlayerToNewTable() {
     oldT.liveAmount = 0;
     oldT.canteenTotal = 0;
     oldT.canteenItems = {};
+
+  // 🔥 CLEAR OLD TABLE PLAYERS
+oldT.player1Name = "";
+oldT.player2Name = "";
+oldT.checkoutPlayer = "";
+oldT.checkoutPlayerNumber = null;
 
      
     renderTables();
@@ -5195,7 +5794,7 @@ function renderHistoryPage() {
     if (!t || !Array.isArray(t.history) || t.history.length === 0) {
 
         body.innerHTML =
-            "<tr><td colspan='10'>No history found.</td></tr>";
+            "<tr><td colspan='11'>No history found.</td></tr>";
 
         return;
     }
@@ -5259,6 +5858,56 @@ function renderHistoryPage() {
             <tr>
 
                 <td>${rowNumber}</td>
+
+                <td>
+    <div style="
+        display:flex;
+        flex-direction:column;
+        gap:4px;
+    ">
+
+        <div style="
+            font-weight:bold;
+            ${
+                Number(h.checkoutPlayerNumber) === 1
+                ? "background:#d4af37;color:#000;padding:4px 7px;border-radius:5px;"
+                : ""
+            }
+        ">
+            ${
+                Number(h.checkoutPlayerNumber) === 1
+                ? "⭐ "
+                : ""
+            }
+            ${h.player1Name || "Player 1"}
+        </div>
+
+        <div style="
+            text-align:center;
+            font-size:10px;
+            opacity:.6;
+        ">
+            VS
+        </div>
+
+        <div style="
+            font-weight:bold;
+            ${
+                Number(h.checkoutPlayerNumber) === 2
+                ? "background:#d4af37;color:#000;padding:4px 7px;border-radius:5px;"
+                : ""
+            }
+        ">
+            ${
+                Number(h.checkoutPlayerNumber) === 2
+                ? "⭐ "
+                : ""
+            }
+            ${h.player2Name || "Player 2"}
+        </div>
+
+    </div>
+</td>
 
                 <td>
                     ${formatTime(h.checkin)}
@@ -6164,6 +6813,19 @@ playType:
     s.play_type ||
     "frame",
 
+  // 🔥 PLAYERS
+player1Name:
+    s.player1_name || "",
+
+player2Name:
+    s.player2_name || "",
+
+checkoutPlayer:
+    s.checkout_player || "",
+
+checkoutPlayerNumber:
+    s.checkout_player_number || null,
+
 canteenItems: s.canteen_items || {}
         });
 
@@ -6250,6 +6912,21 @@ playType:
     s.play_type ||
     "frame",
 
+
+          // 🔥 PLAYERS
+player1Name:
+    s.player1_name || "",
+
+player2Name:
+    s.player2_name || "",
+
+checkoutPlayer:
+    s.checkout_player || "",
+
+checkoutPlayerNumber:
+    s.checkout_player_number || null,
+
+          
             canteenItems: s.canteen_items || {}
         });
 
