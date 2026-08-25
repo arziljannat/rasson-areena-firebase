@@ -1722,23 +1722,27 @@ if (t.tableType !== "room") {
 if (t.tableType === "room") {
 
     let minutes =
-    Math.ceil(t.playSeconds / 60);
+        Math.ceil(t.playSeconds / 60);
 
-    if (minutes <= 60) {
+    // 🔥 ROOM:
+    // First 30 minutes = Rs.400 minimum
+    // After 30 minutes = Rs.14 per extra minute
 
-        t.liveAmount = 800;
-    }
+    if (minutes <= 30) {
 
-    else {
+        t.liveAmount = 400;
+
+    } else {
 
         t.liveAmount =
-        800 + ((minutes - 60) * 14);
+            400 + ((minutes - 30) * 14);
+
     }
 
     t.liveAmount =
-    smartRoundAmount(
-        t.liveAmount
-    );
+        smartRoundAmount(
+            t.liveAmount
+        );
 
   // 🔥 ROOM ALARM SYSTEM
 
