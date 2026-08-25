@@ -1724,9 +1724,9 @@ if (t.tableType === "room") {
     let minutes =
         Math.ceil(t.playSeconds / 60);
 
-    // 🔥 ROOM:
-    // First 30 minutes = Rs.400 minimum
-    // After 30 minutes = Rs.14 per extra minute
+    // 🔥 ROOM BILLING
+    // First 30 minutes = Rs.400 fixed
+    // After 30 minutes = Rs.13.33 per minute
 
     if (minutes <= 30) {
 
@@ -1735,14 +1735,14 @@ if (t.tableType === "room") {
     } else {
 
         t.liveAmount =
-            400 + ((minutes - 30) * 14);
+            400 + ((minutes - 30) * 13.33);
 
     }
 
+    // 🔥 ROUND TO NEAREST Rs.10
     t.liveAmount =
-        smartRoundAmount(
-            t.liveAmount
-        );
+        Math.round(t.liveAmount / 10) * 10;
+}
 
   // 🔥 ROOM ALARM SYSTEM
 
