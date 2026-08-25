@@ -3532,3 +3532,172 @@ body * {
 
     cursor: pointer;
 }
+/* =========================================================
+   🔥 PLAYERS — FINAL CARD STYLE
+   ========================================================= */
+
+.players-section {
+    width: 100%;
+    margin: 5px 0 7px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    box-sizing: border-box;
+}
+
+
+/* ---------- PLAYER NAMES ---------- */
+
+.players-display {
+    width: 100%;
+    min-height: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 2px 4px;
+
+    box-sizing: border-box;
+}
+
+
+/* PLAYER NAME */
+
+.players-display span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    max-width: 43%;
+
+    padding: 3px 6px;
+
+    border-radius: 6px;
+
+    background: rgba(0, 20, 25, 0.80);
+
+    border: 1px solid rgba(0, 255, 210, 0.65);
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    line-height: 17px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    text-align: center;
+
+    text-shadow:
+        0 0 4px #00ffe1,
+        0 0 8px rgba(0, 255, 225, 0.65);
+
+    box-shadow:
+        0 0 5px rgba(0, 255, 210, 0.25);
+
+    box-sizing: border-box;
+}
+
+
+/* VS */
+
+.players-display b {
+    flex: 0 0 auto;
+
+    color: #ffd84d;
+
+    font-size: 12px;
+    font-weight: 900;
+
+    line-height: 18px;
+
+    text-shadow:
+        0 0 5px #ffd84d,
+        0 0 10px rgba(255, 216, 77, 0.7);
+}
+
+
+/* =========================================================
+   🔥 PLAYERS BUTTON
+   ========================================================= */
+
+.player-btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 92px;
+    height: 27px;
+
+    padding: 3px 12px;
+
+    border-radius: 7px;
+
+    border: 1px solid #00ffe1;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0, 255, 225, 0.16),
+            rgba(0, 20, 25, 0.92)
+        );
+
+    color: #ffffff;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 0.4px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    text-shadow:
+        0 0 5px #00ffe1;
+
+    box-shadow:
+        0 0 5px rgba(0, 255, 225, 0.55),
+        inset 0 0 7px rgba(0, 255, 225, 0.12);
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        background 0.15s ease;
+}
+
+
+/* HOVER */
+
+.player-btn:hover {
+    transform: translateY(-1px);
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0, 255, 225, 0.30),
+            rgba(0, 35, 40, 0.95)
+        );
+
+    box-shadow:
+        0 0 8px rgba(0, 255, 225, 0.85),
+        0 0 15px rgba(0, 255, 225, 0.35),
+        inset 0 0 8px rgba(0, 255, 225, 0.18);
+}
+
+
+/* CLICK */
+
+.player-btn:active {
+    transform: scale(0.96);
+}
