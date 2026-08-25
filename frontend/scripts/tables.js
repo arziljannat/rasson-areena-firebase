@@ -5215,6 +5215,27 @@ discount += d;
     })
     .reduce((sum, e) => sum + Number(e.amount || 0), 0);
 
+
+  // ======================================
+// 🔥 ADD RUNNING TABLE LIVE AMOUNT
+// ======================================
+
+tables.forEach(t => {
+
+    if(!t.isRunning) return;
+
+    let liveAmount = Number(t.liveAmount || 0);
+
+    if(liveAmount > 0){
+
+        gameTotal += liveAmount;
+
+        gameBalance += liveAmount;
+
+    }
+
+});
+
     // =========================
     // 🔥 FINAL BALANCE FIX
     // =========================
