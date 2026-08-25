@@ -4545,6 +4545,84 @@ if (!snap.empty) {
     return;
 }
 
+  // ======================================================
+// 🔥 SHIFT 2 CLOSE — UNPAID BILL CHECK
+// Running tables allowed hain.
+// Sirf COMPLETED + UNPAID bills Shift 2 Close ko block karenge.
+// ======================================================
+
+const unpaidBillsQuery = query(
+    collection(window.db, "sessions"),
+    where("branch", "==", BRANCH),
+    where("day_id", "==", window.currentDayId)
+);
+
+const unpaidBillsSnap = await getDocs(unpaidBillsQuery);
+
+const unpaidBills = [];
+
+unpaidBillsSnap.forEach(docSnap => {
+
+    const data = docSnap.data();
+
+    // Deleted session ignore
+    if (data.is_deleted === true) {
+        return;
+    }
+
+    // 🔥 Running game hai → ignore
+    if (!data.end_time) {
+        return;
+    }
+
+    // 🔥 Explicit Shift 1 bill → Shift 2 ko block nahi karega
+    if (Number(data.shift_number) === 1) {
+        return;
+    }
+
+    // Paid bill → ignore
+    if (data.paid === true) {
+        return;
+    }
+
+    // 🔴 Completed + unpaid → BLOCK
+    unpaidBills.push({
+        id: docSnap.id,
+        tableId: data.table_id || data.tableId || "Unknown",
+        player1: data.player1_name || data.player1Name || "Player 1",
+        player2: data.player2_name || data.player2Name || "Player 2",
+        total: Number(data.total || data.game_total || 0)
+    });
+});
+
+
+// ======================================================
+// 🔴 UNPAID BILLS MIL GAYE → SHIFT 2 CLOSE BLOCK
+// ======================================================
+
+if (unpaidBills.length > 0) {
+
+    let message =
+        "Shift 2 Close nahi ho sakti ❌\n\n" +
+        "Pehle ye unpaid bills paid karein:\n\n";
+
+    unpaidBills.forEach(bill => {
+
+        message +=
+            `Table ${bill.tableId} — ` +
+            `${bill.player1} VS ${bill.player2}` +
+            ` — Rs.${bill.total}\n`;
+
+    });
+
+    alert(message);
+
+    return;
+}
+
+console.log(
+    "✅ SHIFT 2 CLOSE — No unpaid completed bills"
+);
 
 
     let now = Date.now();
