@@ -660,7 +660,7 @@ ${(t.selectedPlayType || "frame") === "frame"
 && (t.selectedRate || 100) == 100
 ? "selected" : ""}>
 
-Frame (Single) - 100 / 25min
+Frame (Single) - 100 / 30Min
 
 </option>
 
@@ -669,7 +669,7 @@ ${(t.selectedPlayType || "frame") === "frame"
 && (t.selectedRate || 100) == 200
 ? "selected" : ""}>
 
-Frame (Double) - 200 / 25min
+Frame (Double) - 200 / 30Min
 
 </option>
 
@@ -677,7 +677,7 @@ Frame (Double) - 200 / 25min
 ${(t.selectedPlayType || "frame") === "century"
 ? "selected" : ""}>
 
-Century - 8 / min
+Century - 8 / Min
 
 </option>
 
@@ -692,7 +692,7 @@ ${(t.selectedPlayType || "frame") === "frame"
 && (t.selectedRate || 10) == 10
 ? "selected" : ""}>
 
-Frame - 14 / min
+Frame - 14 / Min
 
 </option>
 
@@ -701,7 +701,7 @@ ${(t.selectedPlayType || "frame") === "century"
 && (t.selectedRate || 10) == 10
 ? "selected" : ""}>
 
-Century - 14 / min
+Century - 14 / Min
 
 </option>
 
@@ -1834,7 +1834,7 @@ else {
     // 🔥 FRAME SYSTEM
     else {
 
-// 🔥 FRAME SYSTEM (20 MIN PLAY + 5 MIN GRACE)
+// 🔥 FRAME SYSTEM (20 MIN PLAY + 10 MIN GRACE)
 
 let playedMinutes =
 Math.floor(t.playSeconds / 60);
@@ -1842,11 +1842,11 @@ Math.floor(t.playSeconds / 60);
 let frameRate =
 t.selectedRate || 100;
 
-// 🔥 1 FRAME = 25 MIN TOTAL
+// 🔥 1 FRAME = 30 MIN TOTAL
 // 20 MIN PLAY
-// 5 MIN GRACE
+// 10 MIN GRACE
 
-let cycleMinutes = 25;
+let cycleMinutes = 30;
 
 // 🔥 FRAME COUNT
 let frameCount =
