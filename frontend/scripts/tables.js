@@ -4963,27 +4963,138 @@ const q = query(
 
 const snap = await getDocs(q);
 
+// ======================================================
+// 🔥 DAY CLOSE → NEW DAY
+// ======================================================
+
+// OLD DAY ID save karo
+const oldDayId = window.currentDayId;
+
+// NEW DAY ID
 const newDayId = Date.now();
 
-snap.forEach(async (d) => {
-    await updateDoc(doc(window.db, "system", d.id), {
-        day_id: newDayId,
-        created_at: new Date().toISOString()
-    });
-});
+
+// ======================================================
+// 🔥 UPDATE CENTRAL CURRENT DAY
+// ======================================================
+
+for (const d of snap.docs) {
+
+    await updateDoc(
+        doc(window.db, "system", d.id),
+        {
+            day_id: newDayId,
+            created_at: new Date().toISOString()
+        }
+    );
+
+}
+
+
+// ======================================================
+// 🔥 FIND ALL CURRENTLY RUNNING SESSIONS
+// ======================================================
+
+const runningSessionsQuery = query(
+    collection(window.db, "sessions"),
+    where("branch", "==", BRANCH),
+    where("end_time", "==", null)
+);
+
+const runningSessionsSnap =
+    await getDocs(runningSessionsQuery);
+
+
+// ======================================================
+// 🔥 MOVE RUNNING SESSIONS → NEW DAY
+// ======================================================
+
+for (const sessionDoc of runningSessionsSnap.docs) {
+
+    const sessionData = sessionDoc.data();
+
+    // Deleted session ignore
+    if (sessionData.is_deleted === true) {
+        continue;
+    }
+
+    console.log(
+        "🔥 DAY CLOSE → CARRY FORWARD:",
+        sessionData.table_id,
+        sessionData.start_time
+    );
+
+
+    await updateDoc(
+        doc(window.db, "sessions", sessionDoc.id),
+        {
+
+            // NEW DAY
+            day_id: newDayId,
+
+            // NEW DAY = SHIFT 1
+            shift_number: 1,
+
+            // 🔥 ORIGINAL CHECK-IN TIME SAME
+            start_time: sessionData.start_time,
+
+            // 🔥 STILL RUNNING
+            end_time: null,
+
+            // Information for debugging/history
+            carried_forward: true,
+            carried_from_day_id: oldDayId,
+            carried_at: new Date().toISOString()
+        }
+    );
+}
+
+
+// ======================================================
+// 🔥 UPDATE LOCAL TABLES
+// ======================================================
 
 window.currentDayId = newDayId;
 
-    tables.forEach(t => {
+
+tables.forEach(t => {
+
+    // 🔥 RUNNING TABLE KO RESET NAHI KARNA
+    if (t.isRunning) {
+
+        console.log(
+            "🔥 TABLE CARRIED TO NEW DAY:",
+            t.name
+        );
+
+        // History clear karni hai,
+        // lekin running session preserve karna hai.
         t.history = [];
-        t.isRunning = false;
-        t.checkinTime = null;
+
         t.checkoutTime = null;
-        t.playSeconds = 0;
-        t.liveAmount = 0;
-        t.canteenTotal = 0;
-        t.canteenItems = {};
-    });
+
+        // Timer/session information preserve
+        // t.isRunning remains true
+        // t.checkinTime remains same
+        // t.playSeconds will continue
+
+        return;
+    }
+
+
+    // ==================================================
+    // FREE TABLE → NORMAL RESET
+    // ==================================================
+
+    t.history = [];
+    t.isRunning = false;
+    t.checkinTime = null;
+    t.checkoutTime = null;
+    t.playSeconds = 0;
+    t.liveAmount = 0;
+    t.canteenTotal = 0;
+    t.canteenItems = {};
+});
 
      
     renderTables();
