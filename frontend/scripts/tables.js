@@ -1715,9 +1715,9 @@ if (t.tableType !== "room") {
         `button[onclick="checkIn('${t.id}')"]`
     )?.closest(".table-box");
 
-    /* =====================================
-       ROOM SYSTEM
-    ===================================== */
+/* =====================================
+   ROOM SYSTEM
+===================================== */
 
 if (t.tableType === "room") {
 
@@ -1727,6 +1727,7 @@ if (t.tableType === "room") {
     // 🔥 ROOM BILLING
     // First 30 minutes = Rs.400 fixed
     // After 30 minutes = Rs.13.33 per minute
+    // Final amount rounded to nearest Rs.10
 
     if (minutes <= 30) {
 
@@ -1734,82 +1735,77 @@ if (t.tableType === "room") {
 
     } else {
 
-        t.liveAmount =
+        const rawAmount =
             400 + ((minutes - 30) * 13.33);
 
+        t.liveAmount =
+            Math.round(rawAmount / 10) * 10;
     }
 
-    // 🔥 ROUND TO NEAREST Rs.10
-    t.liveAmount =
-        Math.round(t.liveAmount / 10) * 10;
-}
 
-  // 🔥 ROOM ALARM SYSTEM
+    // 🔥 ROOM ALARM SYSTEM
 
-const roomAlertStart = 58 * 60; // 58 min
-const roomAlertEnd   = 60 * 60; // 60 min
+    const roomAlertStart = 58 * 60;
+    const roomAlertEnd   = 60 * 60;
 
-if (
-    t.playSeconds >= roomAlertStart &&
-    t.playSeconds < roomAlertEnd
-) {
+    if (
+        t.playSeconds >= roomAlertStart &&
+        t.playSeconds < roomAlertEnd
+    ) {
 
-    showTableWarning(t.id);
+        showTableWarning(t.id);
 
-    if (tableBox) {
-        tableBox.classList.add("frame-complete");
-    }
-
-    // 🔥 every 30 sec alert
-    if (t.playSeconds % 30 === 0) {
-
-        const oldGif =
-        tableBox?.querySelector(".alert-gif");
-
-        if (oldGif) {
-            oldGif.remove();
+        if (tableBox) {
+            tableBox.classList.add("frame-complete");
         }
 
-        playWarningBeep();
+        // 🔥 every 30 sec alert
+        if (t.playSeconds % 30 === 0) {
 
-        const gif =
-        document.createElement("img");
+            const oldGif =
+                tableBox?.querySelector(".alert-gif");
 
-        gif.src = "/assets/alert.gif";
+            if (oldGif) {
+                oldGif.remove();
+            }
 
-        gif.className = "alert-gif";
+            playWarningBeep();
 
-        tableBox?.appendChild(gif);
+            const gif =
+                document.createElement("img");
 
-        setTimeout(() => {
+            gif.src = "/assets/alert.gif";
 
-            gif.remove();
+            gif.className = "alert-gif";
 
-        }, 1500);
+            tableBox?.appendChild(gif);
+
+            setTimeout(() => {
+                gif.remove();
+            }, 1500);
+        }
+
+        // 🔥 voice only once
+        if (!t.roomVoicePlayed) {
+
+            playTableVoice(
+                `${t.name} room time alert`
+            );
+
+            t.roomVoicePlayed = true;
+        }
+
+    } else {
+
+        hideTableWarning(t.id);
+
+        if (tableBox) {
+            tableBox.classList.remove("frame-complete");
+        }
+
+        t.roomVoicePlayed = false;
     }
 
-    // 🔥 voice only once
-    if (!t.roomVoicePlayed) {
-
-        playTableVoice(
-            `${t.name} room time alert`
-        );
-
-        t.roomVoicePlayed = true;
-    }
-
-} else {
-
-    hideTableWarning(t.id);
-
-    if (tableBox) {
-        tableBox.classList.remove("frame-complete");
-    }
-
-    t.roomVoicePlayed = false;
-}
-
-  
 }
 
 
