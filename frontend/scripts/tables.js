@@ -3635,18 +3635,6 @@ console.log(
 // 🔥 MUST BE GLOBAL FOR HTML ONCLICK
 window.openBillFromHistory = openBillFromHistory;
 
-    let academy = localStorage.getItem("academyName") || "Rasson Snooker Academy";
-    let branch = BRANCH || "Rasson1";
-
-    let checkin = h.checkin ? formatTime(h.checkin) : "--";
-    let checkout = h.checkout ? formatTime(h.checkout) : "--";
-    let playtime = formatSeconds(h.playSeconds || 0);
-
-    let bill = document.getElementById("billDetails");
-
-    
-
-    const canteenItems = Object.values(h.canteenItems || {});
 document.getElementById("paidBtn").onclick = async () => {
 
     let t = tables.find(x => String(x.id) === String(tableId));
