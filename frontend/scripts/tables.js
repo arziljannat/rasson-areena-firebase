@@ -2160,6 +2160,11 @@ originalAmount - discount;
 
     bill.innerHTML = `
 <div style="width:300px; margin:auto; font-family:monospace; color:#000; background:#fff; padding:15px; border-radius:10px;">
+<div style="text-align:center; margin:8px 0; font-weight:bold;">
+    ${player1 || "Player 1"} VS ${player2 || "Player 2"}
+</div>
+
+<hr>
 
     <center>
     <img src="../assets/bill-logo.png" style="width:120px; margin-bottom:5px;">
@@ -3718,6 +3723,17 @@ originalAmount - discount;
 
 const finalTotal =
 gameAmount + canteenTotal;
+
+// 🔥 PLAYER NAMES FOR BILL
+const player1 =
+    h.player1Name ||
+    h.player1_name ||
+    "";
+
+const player2 =
+    h.player2Name ||
+    h.player2_name ||
+    "";
 
 bill.innerHTML = `
 <div style="width:300px; margin:auto; font-family:monospace; color:#000; background:#fff; padding:15px; border-radius:10px;">
