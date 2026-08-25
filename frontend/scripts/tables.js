@@ -634,7 +634,7 @@ ${(t.selectedPlayType || "frame") === "frame"
 && (t.selectedRate || 100) == 100
 ? "selected" : ""}>
 
-Frame (Single) - 100 / 30min
+Frame (Single) - 100 / 25min
 
 </option>
 
@@ -643,7 +643,7 @@ ${(t.selectedPlayType || "frame") === "frame"
 && (t.selectedRate || 100) == 200
 ? "selected" : ""}>
 
-Frame (Double) - 200 / 30min
+Frame (Double) - 200 / 25min
 
 </option>
 
