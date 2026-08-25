@@ -1353,7 +1353,7 @@ else {
     // 🔥 FRAME SYSTEM
     else {
 
-// 🔥 FRAME SYSTEM (30 MIN + 5 MIN GRACE)
+// 🔥 FRAME SYSTEM (20 MIN PLAY + 5 MIN GRACE)
 
 let playedMinutes =
 Math.floor(t.playSeconds / 60);
@@ -1361,12 +1361,11 @@ Math.floor(t.playSeconds / 60);
 let frameRate =
 t.selectedRate || 100;
 
-// 🔥 1 FRAME = 30 MIN
-// 25 MIN PLAY
+// 🔥 1 FRAME = 25 MIN TOTAL
+// 20 MIN PLAY
 // 5 MIN GRACE
 
-// 30 minute frame
-let cycleMinutes = 30;
+let cycleMinutes = 25;
 
 // 🔥 FRAME COUNT
 let frameCount =
@@ -1379,21 +1378,10 @@ frameCount * frameRate;
 let currentCycleMinute =
 playedMinutes % cycleMinutes;
 
-// 🔥 GRACE TIME
+// 🔥 GRACE STARTS AFTER 20 MINUTES
 let inGraceTime =
-currentCycleMinute >= 25;
+currentCycleMinute >= 20;
 
-// 🔥 AUTO NEXT FRAME
-if (currentCycleMinute >= 30) {
-
-    frameCount =
-    Math.floor(
-        playedMinutes / cycleMinutes
-    ) + 1;
-
-    t.liveAmount =
-    frameCount * frameRate;
-}
 
 // 🔥 WARNING SYSTEM
 if (inGraceTime) {
