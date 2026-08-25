@@ -3765,3 +3765,35 @@ body * {
 
     border-radius: 6px;
 }
+
+/* ================================
+   PLAYERS ONE-LINE DISPLAY
+================================ */
+
+.player-vs-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    white-space: nowrap !important;
+    flex-wrap: nowrap !important;
+    overflow: hidden !important;
+}
+
+.player-vs-row .player-name {
+    color: #00ffff !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 90px !important;
+}
+
+.player-vs-row .vs-text {
+    color: #ffd700 !important;
+    font-size: 12px !important;
+    font-weight: 900 !important;
+    flex-shrink: 0 !important;
+}
