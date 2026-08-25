@@ -3797,3 +3797,46 @@ body * {
     font-weight: 900 !important;
     flex-shrink: 0 !important;
 }
+
+/* =========================================================
+   🔥 HISTORY — PLAYERS ALWAYS ONE ROW
+   ========================================================= */
+
+.history-table td:nth-child(2),
+.history-table th:nth-child(2) {
+    white-space: nowrap !important;
+    min-width: 150px !important;
+    width: 150px !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+.history-table td:nth-child(2) {
+    overflow: hidden !important;
+}
+
+/* Player names inside History */
+.history-table td:nth-child(2) span,
+.history-table td:nth-child(2) strong,
+.history-table td:nth-child(2) div {
+    display: inline !important;
+    white-space: nowrap !important;
+    vertical-align: middle !important;
+}
+
+/* VS ko bhi same line mein rakho */
+.history-table td:nth-child(2) b {
+    display: inline !important;
+    white-space: nowrap !important;
+    margin: 0 6px !important;
+    color: #ffd700 !important;
+}
+
+/* Player name text */
+.history-table td:nth-child(2) {
+    color: #00ffff !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    text-shadow:
+        0 0 5px #00ffff !important;
+}
