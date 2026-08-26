@@ -7624,3 +7624,40 @@ document
     .classList.remove("hidden");
 
 });
+
+console.log("PLAYER HISTORY TEST LOADED");
+
+
+setTimeout(()=>{
+
+    const btn = document.getElementById("playerHistoryBtn");
+
+    console.log("PLAYER BUTTON FOUND:", btn);
+
+
+    if(btn){
+
+        btn.onclick = function(){
+
+            console.log("PLAYER BUTTON CLICKED");
+
+
+            const popup =
+            document.getElementById("playerHistoryPopup");
+
+
+            console.log("POPUP:", popup);
+
+
+            if(popup){
+
+                popup.classList.remove("hidden");
+
+            }
+
+        };
+
+    }
+
+
+},1000);
