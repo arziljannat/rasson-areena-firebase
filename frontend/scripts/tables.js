@@ -7557,3 +7557,56 @@ function unlockAudio() {
     }
 }
 //fix deployment issues
+
+// ==========================================
+// 👤 PLAYER HISTORY
+// ==========================================
+
+window.openPlayerHistory = function(){
+
+    const popup =
+    document.getElementById("playerHistoryPopup");
+
+
+    if(!popup){
+        console.log("Player popup missing");
+        return;
+    }
+
+
+    popup.classList.remove("hidden");
+
+
+    console.log("PLAYER HISTORY OPEN");
+
+};
+
+
+
+// CLOSE BUTTON
+
+document
+.getElementById("closePlayerHistoryBtn")
+?.addEventListener("click",()=>{
+
+
+    document
+    .getElementById("playerHistoryPopup")
+    .classList.add("hidden");
+
+
+});
+
+
+
+// OPEN BUTTON
+
+document
+.getElementById("playerHistoryBtn")
+?.addEventListener("click",()=>{
+
+
+    window.openPlayerHistory();
+
+
+});
