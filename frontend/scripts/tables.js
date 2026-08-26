@@ -7559,15 +7559,12 @@ function unlockAudio() {
 //fix deployment issues
 
 // ==========================================
-// 👤 PLAYER HISTORY
+// 👤 PLAYER HISTORY - FINAL
 // ==========================================
 
 window.openPlayerHistory = async function () {
 
-    console.log("PLAYER HISTORY CLICKED");
-
-    const popup =
-        document.getElementById("playerHistoryPopup");
+    const popup = document.getElementById("playerHistoryPopup");
 
     if (!popup) {
         console.error("❌ playerHistoryPopup NOT FOUND");
@@ -7576,7 +7573,7 @@ window.openPlayerHistory = async function () {
 
     popup.classList.remove("hidden");
 
-    console.log("✅ PLAYER HISTORY POPUP OPENED");
+    console.log("✅ PLAYER HISTORY OPENED");
 
     await loadPlayerHistory();
 };
@@ -7595,14 +7592,14 @@ async function loadPlayerHistory() {
         document.getElementById("playerSearchInput");
 
     if (!body || !searchInput) {
-        console.error("❌ Player History elements missing");
+        console.error("❌ PLAYER HISTORY ELEMENTS NOT FOUND");
         return;
     }
 
     const search =
         searchInput.value
-            .toLowerCase()
-            .trim();
+            .trim()
+            .toLowerCase();
 
     body.innerHTML = `
         <tr>
@@ -7614,6 +7611,7 @@ async function loadPlayerHistory() {
 
     try {
 
+        // 🔥 ALL SESSIONS OF CURRENT BRANCH
         const q = query(
             collection(window.db, "sessions"),
             where("branch", "==", BRANCH)
@@ -7629,44 +7627,137 @@ async function loadPlayerHistory() {
 
             const h = docSnap.data();
 
+            // ❌ Deleted history skip
             if (h.is_deleted === true) {
                 return;
             }
 
+
+            // ======================================
+            // 🔥 SUPPORT OLD + NEW PLAYER FIELDS
+            // ======================================
+
+            const player1 =
+                h.player1_name ||
+                h.player1Name ||
+                h.player1 ||
+                "";
+
+            const player2 =
+                h.player2_name ||
+                h.player2Name ||
+                h.player2 ||
+                "";
+
+
+            const checkoutPlayer =
+                h.checkout_player ||
+                h.game_off_player ||
+                "";
+
+
+            // ======================================
+            // 🔍 SEARCH
+            // ======================================
+
             const p1 =
-                (h.player1_name || "").toLowerCase();
+                String(player1)
+                    .toLowerCase();
 
             const p2 =
-                (h.player2_name || "").toLowerCase();
+                String(player2)
+                    .toLowerCase();
+
+            const cp =
+                String(checkoutPlayer)
+                    .toLowerCase();
+
 
             if (
                 search &&
                 !p1.includes(search) &&
-                !p2.includes(search)
+                !p2.includes(search) &&
+                !cp.includes(search)
             ) {
                 return;
             }
 
+
             count++;
+
+
+            // ======================================
+            // 🔥 DATE
+            // ======================================
+
+            let date = "-";
+
+            if (h.start_time) {
+
+                const d =
+                    new Date(h.start_time);
+
+                if (!isNaN(d.getTime())) {
+
+                    date =
+                        d.toLocaleDateString(
+                            "en-PK",
+                            {
+                                timeZone:
+                                    "Asia/Karachi"
+                            }
+                        );
+                }
+            }
+
+
+            // ======================================
+            // 🔥 AMOUNT
+            // ======================================
+
+            const amount =
+                Number(
+                    h.final_amount ??
+                    h.final_game_amount ??
+                    h.total ??
+                    0
+                );
+
+
+            // ======================================
+            // 🔥 STATUS
+            // ======================================
+
+            const status =
+                h.paid === true
+                    ? "Paid"
+                    : "Unpaid";
+
+
+            // ======================================
+            // 🔥 ROW
+            // ======================================
 
             body.innerHTML += `
                 <tr>
+
                     <td>${count}</td>
 
                     <td>
-                        ${
-                            h.start_time
-                            ? new Date(h.start_time)
-                                .toLocaleDateString()
-                            : "-"
-                        }
+                        ${date}
                     </td>
 
-                    <td>${h.player1_name || "-"}</td>
+                    <td>
+                        ${player1 || "-"}
+                    </td>
 
-                    <td>${h.player2_name || "-"}</td>
+                    <td>
+                        ${player2 || "-"}
+                    </td>
 
-                    <td>${h.table_id || "-"}</td>
+                    <td>
+                        ${h.table_id || "-"}
+                    </td>
 
                     <td>
                         ${
@@ -7677,19 +7768,21 @@ async function loadPlayerHistory() {
                     </td>
 
                     <td>
-                        Rs ${
-                            h.final_amount ||
-                            h.total ||
-                            0
-                        }
+                        Rs ${amount}
                     </td>
 
                     <td>
-                        ${h.paid ? "Paid" : "Unpaid"}
+                        ${status}
                     </td>
+
                 </tr>
             `;
         });
+
+
+        // ======================================
+        // ❌ NOTHING FOUND
+        // ======================================
 
         if (count === 0) {
 
@@ -7703,10 +7796,18 @@ async function loadPlayerHistory() {
 
         }
 
-    } catch (error) {
+
+        console.log(
+            "✅ PLAYER HISTORY RESULTS:",
+            count
+        );
+
+    }
+
+    catch (error) {
 
         console.error(
-            "❌ Player History Error:",
+            "❌ PLAYER HISTORY ERROR:",
             error
         );
 
@@ -7718,43 +7819,62 @@ async function loadPlayerHistory() {
             </tr>
         `;
     }
-};
+}
 
 
 // ==========================================
-// PLAYER HISTORY CLOSE + SEARCH
+// PLAYER HISTORY BUTTON EVENTS
 // ==========================================
 
-document.addEventListener("DOMContentLoaded", function () {
+// 🔥 OPEN
+document.addEventListener("click", function (e) {
 
-    const closeBtn =
-        document.getElementById("closePlayerHistoryBtn");
+    if (
+        e.target &&
+        e.target.id === "playerHistoryBtn"
+    ) {
 
-    const searchBtn =
-        document.getElementById("searchPlayerBtn");
-
-
-    if (closeBtn) {
-
-        closeBtn.addEventListener("click", function () {
-
-            document
-                .getElementById("playerHistoryPopup")
-                .classList.add("hidden");
-
-        });
-
+        window.openPlayerHistory();
     }
 
+});
 
-    if (searchBtn) {
 
-        searchBtn.addEventListener("click", function () {
+// 🔥 SEARCH
+document.addEventListener("click", function (e) {
 
-            loadPlayerHistory();
+    if (
+        e.target &&
+        e.target.id === "searchPlayerBtn"
+    ) {
 
-        });
+        loadPlayerHistory();
+    }
 
+});
+
+
+// 🔥 CLOSE
+document.addEventListener("click", function (e) {
+
+    if (
+        e.target &&
+        e.target.id === "closePlayerHistoryBtn"
+    ) {
+
+        const popup =
+            document.getElementById(
+                "playerHistoryPopup"
+            );
+
+        if (popup) {
+
+            popup.classList.add("hidden");
+
+            console.log(
+                "✅ PLAYER HISTORY CLOSED"
+            );
+        }
     }
 
 });
