@@ -29,7 +29,7 @@
     id="playerHistoryBtn"
     type="button"
     class="neon-btn add-table-btn"
-    onclick="if(window.openPlayerHistory){ window.openPlayerHistory(); } else { document.getElementById('playerHistoryPopup').classList.remove('hidden'); }"
+    onclick="window.openPlayerHistory()"
 >
     👤 Player History
 </button>
@@ -655,6 +655,7 @@ Close
 
 <!-- ✅ STEP 2: TABLES JS -->
 <script type="module" src="../scripts/tables.js"></script>
+<script type="module" src="../scripts/player-history.js?v=1"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
