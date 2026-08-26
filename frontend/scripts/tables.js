@@ -7559,114 +7559,85 @@ function unlockAudio() {
 //fix deployment issues
 
 // ==========================================
-// 👤 PLAYER HISTORY - FINAL
+// 👤 PLAYER HISTORY - FINAL VERSION
 // ==========================================
 
 window.openPlayerHistory = async function () {
 
-    console.log("✅ PLAYER HISTORY CLICKED");
-
-    const popup =
-        document.getElementById("playerHistoryPopup");
+    const popup = document.getElementById("playerHistoryPopup");
 
     if (!popup) {
-        console.error("❌ playerHistoryPopup NOT FOUND");
+        console.error("❌ playerHistoryPopup not found");
         return;
     }
 
     popup.classList.remove("hidden");
+
+    console.log("✅ PLAYER HISTORY OPENED");
 
     await loadPlayerHistory();
 };
 
 
 // ==========================================
-// 🔎 LOAD / SEARCH PLAYER HISTORY
+// LOAD PLAYER HISTORY
 // ==========================================
 
-window.loadPlayerHistory = async function () {
+async function loadPlayerHistory() {
 
-    const body =
-        document.getElementById("playerHistoryBody");
+    const body = document.getElementById("playerHistoryBody");
+    const input = document.getElementById("playerSearchInput");
 
-    const searchInput =
-        document.getElementById("playerSearchInput");
-
-    if (!body || !searchInput) {
+    if (!body || !input) {
         console.error("❌ Player History elements missing");
         return;
     }
 
-    const search =
-        searchInput.value
-            .toLowerCase()
-            .trim();
+    const search = input.value.trim().toLowerCase();
 
     body.innerHTML = `
         <tr>
-            <td colspan="8">
-                Loading...
-            </td>
+            <td colspan="8">Loading...</td>
         </tr>
     `;
 
     try {
 
-        // 🔥 ACTUAL DATA COLLECTION
+        // 🔥 USE CURRENT SESSIONS COLLECTION
         const q = query(
             collection(window.db, "sessions"),
             where("branch", "==", BRANCH)
         );
 
-        const snap =
-            await getDocs(q);
+        const snap = await getDocs(q);
 
-        body.innerHTML = "";
-
+        let html = "";
         let count = 0;
 
         snap.forEach(docSnap => {
 
             const h = docSnap.data();
 
-            // Deleted sessions skip
+            // Deleted sessions ignore
             if (h.is_deleted === true) {
                 return;
             }
 
-
-            // ==================================
-            // 🔥 PLAYER NAME - ALL VERSIONS
-            // ==================================
-
+            // Player names - both possible formats
             const player1 =
                 h.player1_name ||
                 h.player1Name ||
-                h.player1 ||
                 "";
 
             const player2 =
                 h.player2_name ||
                 h.player2Name ||
-                h.player2 ||
                 "";
 
+            const p1 = String(player1).toLowerCase();
+            const p2 = String(player2).toLowerCase();
 
-            const p1 =
-                String(player1)
-                    .toLowerCase()
-                    .trim();
-
-            const p2 =
-                String(player2)
-                    .toLowerCase()
-                    .trim();
-
-
-            // ==================================
-            // 🔎 SEARCH
-            // ==================================
-
+            // 🔥 SEARCH
             if (
                 search &&
                 !p1.includes(search) &&
@@ -7675,31 +7646,19 @@ window.loadPlayerHistory = async function () {
                 return;
             }
 
-
             count++;
 
+            const date =
+                h.start_time
+                    ? new Date(h.start_time).toLocaleDateString()
+                    : "-";
 
-            // ==================================
-            // DATE
-            // ==================================
-
-            let date = "-";
-
-            if (h.start_time) {
-
-                const d =
-                    new Date(h.start_time);
-
-                if (!isNaN(d.getTime())) {
-                    date =
-                        d.toLocaleDateString();
-                }
-            }
-
-
-            // ==================================
-            // AMOUNT
-            // ==================================
+            const play =
+                h.selected_play_type ||
+                h.selectedPlayType ||
+                h.play_type ||
+                h.playType ||
+                "-";
 
             const amount =
                 Number(
@@ -7709,56 +7668,28 @@ window.loadPlayerHistory = async function () {
                     0
                 );
 
-
-            // ==================================
-            // PLAY TYPE
-            // ==================================
-
-            const playType =
-                h.selected_play_type ||
-                h.play_type ||
-                "-";
-
-
-            // ==================================
-            // STATUS
-            // ==================================
-
             const status =
                 h.paid === true
                     ? "Paid"
                     : "Unpaid";
 
-
-            // ==================================
-            // TABLE ROW
-            // ==================================
-
-            body.innerHTML += `
+            html += `
                 <tr>
 
                     <td>${count}</td>
 
                     <td>${date}</td>
 
+                    <td>${player1 || "-"}</td>
+
+                    <td>${player2 || "-"}</td>
+
                     <td>
-                        ${player1 || "-"}
+                        ${h.table_id || "-"}
                     </td>
 
                     <td>
-                        ${player2 || "-"}
-                    </td>
-
-                    <td>
-                        ${
-                            h.table_id ||
-                            h.tableId ||
-                            "-"
-                        }
-                    </td>
-
-                    <td>
-                        ${playType}
+                        ${play}
                     </td>
 
                     <td>
@@ -7774,13 +7705,9 @@ window.loadPlayerHistory = async function () {
         });
 
 
-        // ==================================
-        // NOTHING FOUND
-        // ==================================
-
         if (count === 0) {
 
-            body.innerHTML = `
+            html = `
                 <tr>
                     <td colspan="8">
                         No player history found
@@ -7790,15 +7717,14 @@ window.loadPlayerHistory = async function () {
 
         }
 
+        body.innerHTML = html;
 
         console.log(
             "✅ PLAYER HISTORY RESULTS:",
             count
         );
 
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.error(
             "❌ PLAYER HISTORY ERROR:",
@@ -7813,114 +7739,85 @@ window.loadPlayerHistory = async function () {
             </tr>
         `;
     }
-};
+}
 
 
 // ==========================================
-// 👤 PLAYER HISTORY EVENTS
+// PLAYER HISTORY BUTTONS
+// 🔥 EVENT DELEGATION - NO DOM TIMING ISSUE
 // ==========================================
 
-// 🔥 EVENT DELEGATION
-// Is se DOM timing ka masla nahi hoga.
+document.addEventListener("click", function (event) {
 
-document.addEventListener(
-    "click",
-    function (e) {
+    const target = event.target;
 
-        const target =
-            e.target.closest(
-                "#playerHistoryBtn, #searchPlayerBtn, #closePlayerHistoryBtn"
-            );
+    // OPEN
+    if (
+        target &&
+        target.closest &&
+        target.closest("#playerHistoryBtn")
+    ) {
 
-        if (!target) {
-            return;
-        }
+        event.preventDefault();
 
+        window.openPlayerHistory();
 
-        // ==============================
-        // OPEN
-        // ==============================
-
-        if (
-            target.id ===
-            "playerHistoryBtn"
-        ) {
-
-            window.openPlayerHistory();
-
-            return;
-        }
-
-
-        // ==============================
-        // SEARCH
-        // ==============================
-
-        if (
-            target.id ===
-            "searchPlayerBtn"
-        ) {
-
-            window.loadPlayerHistory();
-
-            return;
-        }
-
-
-        // ==============================
-        // CLOSE
-        // ==============================
-
-        if (
-            target.id ===
-            "closePlayerHistoryBtn"
-        ) {
-
-            const popup =
-                document.getElementById(
-                    "playerHistoryPopup"
-                );
-
-            if (popup) {
-
-                popup.classList.add(
-                    "hidden"
-                );
-
-                console.log(
-                    "✅ PLAYER HISTORY CLOSED"
-                );
-            }
-
-            return;
-        }
-
+        return;
     }
-);
 
 
-// ==========================================
-// ⌨️ ENTER KEY SEARCH
-// ==========================================
+    // SEARCH
+    if (
+        target &&
+        target.closest &&
+        target.closest("#searchPlayerBtn")
+    ) {
 
-document.addEventListener(
-    "keydown",
-    function (e) {
+        event.preventDefault();
 
-        if (
-            e.key === "Enter" &&
-            e.target &&
-            e.target.id ===
-            "playerSearchInput"
-        ) {
+        loadPlayerHistory();
 
-            window.loadPlayerHistory();
+        return;
+    }
+
+
+    // CLOSE
+    if (
+        target &&
+        target.closest &&
+        target.closest("#closePlayerHistoryBtn")
+    ) {
+
+        event.preventDefault();
+
+        const popup =
+            document.getElementById("playerHistoryPopup");
+
+        if (popup) {
+
+            popup.classList.add("hidden");
+
+            console.log("✅ PLAYER HISTORY CLOSED");
         }
 
+        return;
     }
-);
+
+});
 
 
-console.log(
-    "✅ FINAL PLAYER HISTORY CODE LOADED"
-);
+// ENTER KEY = SEARCH
+document.addEventListener("keydown", function (event) {
+
+    if (
+        event.key === "Enter" &&
+        document.activeElement &&
+        document.activeElement.id === "playerSearchInput"
+    ) {
+
+        event.preventDefault();
+
+        loadPlayerHistory();
+    }
+
+});
