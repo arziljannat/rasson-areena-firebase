@@ -7556,4 +7556,228 @@ function unlockAudio() {
         );
     }
 }
+
+
+/******************************************************
+ * 👤 PLAYER HISTORY
+ ******************************************************/
+
+async function openPlayerHistory(){
+
+    const popup =
+    document.getElementById("playerHistoryPopup");
+
+    if(!popup) return;
+
+    popup.classList.remove("hidden");
+
+    loadPlayerHistory();
+}
+
+
+
+async function loadPlayerHistory(){
+
+    const search =
+    document.getElementById("playerSearchInput")
+    .value
+    .toLowerCase()
+    .trim();
+
+
+    const body =
+    document.getElementById("playerHistoryBody");
+
+
+    body.innerHTML =
+    `
+    <tr>
+    <td colspan="8">
+    Loading...
+    </td>
+    </tr>
+    `;
+
+
+    const q = query(
+        collection(window.db,"sessions"),
+        where("branch","==",BRANCH)
+    );
+
+
+    const snap =
+    await getDocs(q);
+
+
+    body.innerHTML="";
+
+
+    let count=0;
+
+
+    snap.forEach(docSnap=>{
+
+        const h = docSnap.data();
+
+
+        if(h.is_deleted === true)
+        return;
+
+
+        const p1 =
+        (h.player1_name || "")
+        .toLowerCase();
+
+
+        const p2 =
+        (h.player2_name || "")
+        .toLowerCase();
+
+
+
+        if(
+            search &&
+            !p1.includes(search) &&
+            !p2.includes(search)
+        ){
+            return;
+        }
+
+
+
+        count++;
+
+
+        body.innerHTML += `
+
+        <tr>
+
+        <td>${count}</td>
+
+        <td>
+        ${new Date(
+        h.start_time
+        ).toLocaleDateString()}
+        </td>
+
+
+        <td>
+        ${h.player1_name || "-"}
+        </td>
+
+
+        <td>
+        ${h.player2_name || "-"}
+        </td>
+
+
+        <td>
+        ${h.table_id || "-"}
+        </td>
+
+
+        <td>
+        ${h.selected_play_type || "-"}
+        </td>
+
+
+        <td>
+        Rs ${
+        h.final_amount ||
+        h.total ||
+        0
+        }
+        </td>
+
+
+        <td>
+        ${
+        h.paid
+        ?
+        "Paid"
+        :
+        "Unpaid"
+        }
+        </td>
+
+
+        </tr>
+
+        `;
+
+
+    });
+
+
+    if(count===0){
+
+        body.innerHTML =
+        `
+        <tr>
+        <td colspan="8">
+        No player history found
+        </td>
+        </tr>
+        `;
+
+    }
+
+}
+
+
+
+document.addEventListener(
+"DOMContentLoaded",
+()=>{
+
+
+const btn =
+document.getElementById(
+"playerHistoryBtn"
+);
+
+
+if(btn){
+
+btn.onclick =
+openPlayerHistory;
+
+}
+
+
+const search =
+document.getElementById(
+"searchPlayerBtn"
+);
+
+
+if(search){
+
+search.onclick =
+loadPlayerHistory;
+
+}
+
+
+const close =
+document.getElementById(
+"closePlayerHistoryBtn"
+);
+
+
+if(close){
+
+close.onclick =
+()=>{
+
+document
+.getElementById("playerHistoryPopup")
+.classList.add("hidden");
+
+};
+
+}
+
+
+});
 //fix deployment issues
