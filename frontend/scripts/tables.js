@@ -7610,3 +7610,17 @@ document
 
 
 });
+
+console.log("TABLES JS LOADED");
+
+document
+.getElementById("playerHistoryBtn")
+?.addEventListener("click",()=>{
+
+    console.log("PLAYER BUTTON CLICKED");
+
+    document
+    .getElementById("playerHistoryPopup")
+    .classList.remove("hidden");
+
+});
