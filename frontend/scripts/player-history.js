@@ -41,7 +41,6 @@ function getPlayers(session) {
         "player2"
     ]);
 
-    // Support sessions that may store players as an array.
     const players = Array.isArray(session?.players) ? session.players : [];
 
     if (!player1 && players[0]) {
@@ -101,11 +100,69 @@ function getPlay(session) {
     );
 }
 
+// --------------------------------------------------
+// CURRENT DAY ID
+// --------------------------------------------------
+// Prefer tables.js value. If it is not ready yet, read
+// the latest current_day record for this branch without
+// requiring a Firestore composite index.
+async function getCurrentDayId() {
+    if (window.currentDayId !== undefined && window.currentDayId !== null) {
+        return window.currentDayId;
+    }
+
+    if (!window.db) {
+        throw new Error("Firebase database is not ready yet.");
+    }
+
+    const q = query(
+        collection(window.db, "system"),
+        where("branch", "==", getBranch()),
+        where("type", "==", "current_day")
+    );
+
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+        throw new Error("Current day not found.");
+    }
+
+    let latest = null;
+
+    snap.forEach(docSnap => {
+        const data = docSnap.data();
+
+        if (!latest) {
+            latest = data;
+            return;
+        }
+
+        const a = new Date(latest.created_at || 0).getTime();
+        const b = new Date(data.created_at || 0).getTime();
+
+        if (b > a) latest = data;
+    });
+
+    if (latest?.day_id === undefined || latest?.day_id === null) {
+        throw new Error("Current day ID is missing.");
+    }
+
+    window.currentDayId = latest.day_id;
+    return latest.day_id;
+}
+
+// --------------------------------------------------
+// LOAD ONLY CURRENT DAY PLAYER HISTORY
+// --------------------------------------------------
 async function fetchPlayerHistory() {
     if (!window.db) {
         throw new Error("Firebase database is not ready yet.");
     }
 
+    const currentDayId = await getCurrentDayId();
+
+    // Keep the Firebase query simple so no new composite
+    // index is required. Current-day filtering is done below.
     const q = query(
         collection(window.db, "sessions"),
         where("branch", "==", getBranch())
@@ -117,6 +174,8 @@ async function fetchPlayerHistory() {
     snap.forEach(docSnap => {
         const session = docSnap.data();
 
+        // IMPORTANT: Player History = CURRENT DAY ONLY.
+        if (String(session?.day_id) !== String(currentDayId)) return;
         if (session?.is_deleted === true) return;
         if (!session?.end_time) return;
 
@@ -135,6 +194,9 @@ async function fetchPlayerHistory() {
         const tb = new Date(b.session?.end_time || b.session?.start_time || 0).getTime();
         return tb - ta;
     });
+
+    console.log("PLAYER HISTORY CURRENT DAY:", currentDayId);
+    console.log("PLAYER HISTORY RESULTS:", records.length);
 
     return records;
 }
@@ -198,8 +260,6 @@ async function searchPlayerHistory() {
             `;
         }).join("");
 
-        console.log("PLAYER HISTORY RESULTS:", filtered.length);
-
     } catch (error) {
         console.error("PLAYER HISTORY ERROR:", error);
 
@@ -231,20 +291,49 @@ function closePlayerHistory() {
     if (popup) popup.classList.add("hidden");
 }
 
-// Expose ONLY these functions globally for the three HTML buttons.
+// --------------------------------------------------
+// GLOBAL FUNCTIONS
+// --------------------------------------------------
 window.openPlayerHistory = openPlayerHistory;
 window.searchPlayerHistory = searchPlayerHistory;
 window.closePlayerHistory = closePlayerHistory;
 
-// Enter key inside search box.
-document.addEventListener("keydown", event => {
-    if (
-        event.key === "Enter" &&
-        document.activeElement?.id === "playerSearchInput"
-    ) {
-        event.preventDefault();
-        searchPlayerHistory();
-    }
-});
+// --------------------------------------------------
+// BUTTONS + ENTER KEY
+// --------------------------------------------------
+function bindPlayerHistoryButtons() {
+    const searchBtn = document.getElementById("searchPlayerBtn");
+    const closeBtn = document.getElementById("closePlayerHistoryBtn");
+    const input = document.getElementById("playerSearchInput");
 
-console.log("PLAYER HISTORY MODULE LOADED");
+    if (searchBtn) {
+        searchBtn.onclick = event => {
+            event.preventDefault();
+            searchPlayerHistory();
+        };
+    }
+
+    if (closeBtn) {
+        closeBtn.onclick = event => {
+            event.preventDefault();
+            closePlayerHistory();
+        };
+    }
+
+    if (input) {
+        input.addEventListener("keydown", event => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                searchPlayerHistory();
+            }
+        });
+    }
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindPlayerHistoryButtons, { once: true });
+} else {
+    bindPlayerHistoryButtons();
+}
+
+console.log("PLAYER HISTORY MODULE LOADED - FIXED");
