@@ -6,7 +6,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ==========================================
-// PLAYER HISTORY - STANDALONE MODULE
+// PLAYER HISTORY - CURRENT DAY
 // ==========================================
 
 function getBranch() {
@@ -77,17 +77,39 @@ function formatDate(value) {
     if (Number.isNaN(date.getTime())) return "-";
 
     return date.toLocaleDateString("en-PK", {
-        timeZone: "Asia/Karachi"
+        timeZone: "Asia/Karachi",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
     });
 }
 
-function getAmount(session) {
-    return Number(
-        session?.final_amount ??
-        session?.final_game_amount ??
-        session?.original_game_amount ??
-        0
-    );
+function formatTime(value) {
+    if (!value) return "-";
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "-";
+
+    return date.toLocaleTimeString("en-PK", {
+        timeZone: "Asia/Karachi",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+    });
+}
+
+function formatDuration(seconds) {
+    let total = Math.max(0, Number(seconds || 0));
+
+    if (!Number.isFinite(total)) total = 0;
+
+    total = Math.floor(total);
+
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
 function getPlay(session) {
@@ -100,12 +122,58 @@ function getPlay(session) {
     );
 }
 
+function getRate(session) {
+    return Number(
+        session?.selected_rate ??
+        session?.selectedRate ??
+        (getPlay(session) === "century"
+            ? session?.century_rate
+            : session?.frame_rate) ??
+        0
+    );
+}
+
+function getGameAmount(session) {
+    return Number(
+        session?.final_game_amount ??
+        session?.final_amount ??
+        session?.original_game_amount ??
+        0
+    );
+}
+
+function getCanteenAmount(session) {
+    return Number(session?.canteen_total || 0);
+}
+
+function getTotalAmount(session) {
+    return getGameAmount(session) + getCanteenAmount(session);
+}
+
+function getDiscount(session) {
+    return Number(session?.discount || 0);
+}
+
+function getShift(session) {
+    const shift = Number(session?.shift_number);
+    return shift === 2 ? 2 : 1;
+}
+
+function isBooking(session) {
+    return Boolean(
+        session?.booking_id ||
+        session?.bookingId ||
+        session?.is_booking === true ||
+        session?.isBooking === true ||
+        session?.booking === true ||
+        session?.source === "booking" ||
+        session?.source === "online_booking"
+    );
+}
+
 // --------------------------------------------------
 // CURRENT DAY ID
 // --------------------------------------------------
-// Prefer tables.js value. If it is not ready yet, read
-// the latest current_day record for this branch without
-// requiring a Firestore composite index.
 async function getCurrentDayId() {
     if (window.currentDayId !== undefined && window.currentDayId !== null) {
         return window.currentDayId;
@@ -152,7 +220,7 @@ async function getCurrentDayId() {
 }
 
 // --------------------------------------------------
-// LOAD ONLY CURRENT DAY PLAYER HISTORY
+// LOAD CURRENT DAY ONLY
 // --------------------------------------------------
 async function fetchPlayerHistory() {
     if (!window.db) {
@@ -161,8 +229,6 @@ async function fetchPlayerHistory() {
 
     const currentDayId = await getCurrentDayId();
 
-    // Keep the Firebase query simple so no new composite
-    // index is required. Current-day filtering is done below.
     const q = query(
         collection(window.db, "sessions"),
         where("branch", "==", getBranch())
@@ -174,7 +240,7 @@ async function fetchPlayerHistory() {
     snap.forEach(docSnap => {
         const session = docSnap.data();
 
-        // IMPORTANT: Player History = CURRENT DAY ONLY.
+        // PLAYER HISTORY = CURRENT DAY ONLY
         if (String(session?.day_id) !== String(currentDayId)) return;
         if (session?.is_deleted === true) return;
         if (!session?.end_time) return;
@@ -201,17 +267,179 @@ async function fetchPlayerHistory() {
     return records;
 }
 
+// --------------------------------------------------
+// MAKE PLAYER HISTORY LOOK LIKE TABLE HISTORY
+// --------------------------------------------------
+function ensurePlayerHistoryLayout() {
+    const popup = getPopup();
+    if (!popup) return null;
+
+    const box = popup.querySelector(".popup-box");
+    if (!box) return null;
+
+    // Create the same summary-card area used by Table History.
+    let summary = document.getElementById("playerHistorySummary");
+
+    if (!summary) {
+        summary = document.createElement("div");
+        summary.id = "playerHistorySummary";
+        summary.className = "history-summary-counters";
+
+        summary.innerHTML = `
+            <div class="history-summary-box green">
+                <div class="history-card-title">🎮 TOTAL GAME</div>
+                <div class="history-card-head"><span>Shift 1</span><span>Shift 2</span></div>
+                <div class="history-card-values">
+                    <strong id="playerHistoryS1Game">0</strong>
+                    <strong id="playerHistoryS2Game">0</strong>
+                </div>
+            </div>
+
+            <div class="history-summary-box green">
+                <div class="history-card-title">👤 GUEST PLAY</div>
+                <div class="history-card-head"><span>Shift 1</span><span>Shift 2</span></div>
+                <div class="history-card-values">
+                    <strong id="playerHistoryS1Guest">0</strong>
+                    <strong id="playerHistoryS2Guest">0</strong>
+                </div>
+            </div>
+
+            <div class="history-summary-box gold">
+                <div class="history-card-title">📅 BOOKING PLAY</div>
+                <div class="history-card-head"><span>Shift 1</span><span>Shift 2</span></div>
+                <div class="history-card-values">
+                    <strong id="playerHistoryS1Booking">0</strong>
+                    <strong id="playerHistoryS2Booking">0</strong>
+                </div>
+            </div>
+
+            <div class="history-summary-box green">
+                <div class="history-card-title">💰 PAID</div>
+                <div class="history-card-head"><span>Shift 1</span><span>Shift 2</span></div>
+                <div class="history-card-values">
+                    <strong id="playerHistoryS1Paid">0</strong>
+                    <strong id="playerHistoryS2Paid">0</strong>
+                </div>
+                <div class="history-card-amount">
+                    <span id="playerHistoryS1PaidAmount">Rs. 0</span>
+                    <span id="playerHistoryS2PaidAmount">Rs. 0</span>
+                </div>
+            </div>
+
+            <div class="history-summary-box red">
+                <div class="history-card-title">⚠️ UNPAID</div>
+                <div class="history-card-head"><span>Shift 1</span><span>Shift 2</span></div>
+                <div class="history-card-values">
+                    <strong id="playerHistoryS1Unpaid">0</strong>
+                    <strong id="playerHistoryS2Unpaid">0</strong>
+                </div>
+                <div class="history-card-amount">
+                    <span id="playerHistoryS1UnpaidAmount">Rs. 0</span>
+                    <span id="playerHistoryS2UnpaidAmount">Rs. 0</span>
+                </div>
+            </div>
+        `;
+
+        const tableWrapper = box.querySelector(".table-mobile-wrapper");
+        if (tableWrapper) {
+            box.insertBefore(summary, tableWrapper);
+        } else {
+            box.appendChild(summary);
+        }
+    }
+
+    // Replace the simple Player History columns with the same detailed
+    // information shown in Table History.
+    const table = box.querySelector("table.history-table");
+    const thead = table?.querySelector("thead");
+
+    if (thead) {
+        thead.innerHTML = `
+            <tr>
+                <th>#</th>
+                <th>PLAYERS</th>
+                <th>Check-in</th>
+                <th>Checkout</th>
+                <th>Play</th>
+                <th>Rate</th>
+                <th>Amount</th>
+                <th>Discount</th>
+                <th>Canteen</th>
+                <th>Total</th>
+                <th>Paid</th>
+            </tr>
+        `;
+    }
+
+    return summary;
+}
+
+function updatePlayerSummary(records) {
+    ensurePlayerHistoryLayout();
+
+    const stats = {
+        1: { game: 0, guest: 0, booking: 0, paid: 0, paidAmount: 0, unpaid: 0, unpaidAmount: 0 },
+        2: { game: 0, guest: 0, booking: 0, paid: 0, paidAmount: 0, unpaid: 0, unpaidAmount: 0 }
+    };
+
+    records.forEach(item => {
+        const s = item.session;
+        const shift = getShift(s);
+        const st = stats[shift];
+        const total = getTotalAmount(s);
+
+        st.game += 1;
+
+        if (isBooking(s)) st.booking += 1;
+        else st.guest += 1;
+
+        if (s.paid === true) {
+            st.paid += 1;
+            st.paidAmount += total;
+        } else {
+            st.unpaid += 1;
+            st.unpaidAmount += total;
+        }
+    });
+
+    const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+    };
+
+    setText("playerHistoryS1Game", stats[1].game);
+    setText("playerHistoryS2Game", stats[2].game);
+
+    setText("playerHistoryS1Guest", stats[1].guest);
+    setText("playerHistoryS2Guest", stats[2].guest);
+
+    setText("playerHistoryS1Booking", stats[1].booking);
+    setText("playerHistoryS2Booking", stats[2].booking);
+
+    setText("playerHistoryS1Paid", stats[1].paid);
+    setText("playerHistoryS2Paid", stats[2].paid);
+    setText("playerHistoryS1PaidAmount", `Rs. ${stats[1].paidAmount}`);
+    setText("playerHistoryS2PaidAmount", `Rs. ${stats[2].paidAmount}`);
+
+    setText("playerHistoryS1Unpaid", stats[1].unpaid);
+    setText("playerHistoryS2Unpaid", stats[2].unpaid);
+    setText("playerHistoryS1UnpaidAmount", `Rs. ${stats[1].unpaidAmount}`);
+    setText("playerHistoryS2UnpaidAmount", `Rs. ${stats[2].unpaidAmount}`);
+}
+
 async function searchPlayerHistory() {
     const body = document.getElementById("playerHistoryBody");
     const input = document.getElementById("playerSearchInput");
 
     if (!body || !input) return;
 
+    ensurePlayerHistoryLayout();
+
     const search = input.value.trim().toLowerCase();
 
     body.innerHTML = `
         <tr>
-            <td colspan="8">Loading...</td>
+            <td colspan="11">Loading...</td>
         </tr>
     `;
 
@@ -232,10 +460,13 @@ async function searchPlayerHistory() {
             })
             : records;
 
+        // Summary always follows the currently searched player.
+        updatePlayerSummary(filtered);
+
         if (!filtered.length) {
             body.innerHTML = `
                 <tr>
-                    <td colspan="8">No player history found</td>
+                    <td colspan="11">No player history found</td>
                 </tr>
             `;
             return;
@@ -243,18 +474,24 @@ async function searchPlayerHistory() {
 
         body.innerHTML = filtered.map((item, index) => {
             const s = item.session;
-            const amount = getAmount(s);
-            const status = s.paid === true ? "Paid" : "Unpaid";
+            const gameAmount = getGameAmount(s);
+            const discount = getDiscount(s);
+            const canteen = getCanteenAmount(s);
+            const total = getTotalAmount(s);
+            const status = s.paid === true ? "PAID" : "UNPAID";
 
             return `
                 <tr>
                     <td>${index + 1}</td>
-                    <td>${escapeHtml(formatDate(s.end_time || s.start_time))}</td>
-                    <td>${escapeHtml(item.player1 || "-")}</td>
-                    <td>${escapeHtml(item.player2 || "-")}</td>
-                    <td>${escapeHtml(s.table_id || "-")}</td>
-                    <td>${escapeHtml(getPlay(s))}</td>
-                    <td>Rs ${amount}</td>
+                    <td>${escapeHtml(`${item.player1 || "-"} VS ${item.player2 || "-"}`)}</td>
+                    <td>${escapeHtml(formatTime(s.start_time))}</td>
+                    <td>${escapeHtml(formatTime(s.end_time))}</td>
+                    <td>${escapeHtml(formatDuration(s.final_seconds))}</td>
+                    <td>${escapeHtml(getRate(s))}</td>
+                    <td>Rs ${gameAmount}</td>
+                    <td>Rs ${discount}</td>
+                    <td>Rs ${canteen}</td>
+                    <td>Rs ${total}</td>
                     <td>${escapeHtml(status)}</td>
                 </tr>
             `;
@@ -263,9 +500,11 @@ async function searchPlayerHistory() {
     } catch (error) {
         console.error("PLAYER HISTORY ERROR:", error);
 
+        updatePlayerSummary([]);
+
         body.innerHTML = `
             <tr>
-                <td colspan="8">Error loading player history</td>
+                <td colspan="11">Error loading player history</td>
             </tr>
         `;
     }
@@ -277,6 +516,8 @@ function openPlayerHistory() {
         console.error("playerHistoryPopup not found");
         return;
     }
+
+    ensurePlayerHistoryLayout();
 
     popup.classList.remove("hidden");
 
@@ -336,4 +577,4 @@ if (document.readyState === "loading") {
     bindPlayerHistoryButtons();
 }
 
-console.log("PLAYER HISTORY MODULE LOADED - FIXED");
+console.log("PLAYER HISTORY MODULE LOADED - TABLE HISTORY STYLE");
