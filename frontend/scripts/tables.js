@@ -7571,7 +7571,7 @@ window.openPlayerHistory = async function(){
 
     popup.classList.remove("hidden");
 
-    loadPlayerHistory();
+    await loadPlayerHistory();
 }
 
 
