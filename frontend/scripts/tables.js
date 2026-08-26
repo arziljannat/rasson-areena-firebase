@@ -7781,4 +7781,54 @@ document
 
 });
 
+
+// ===============================
+// PLAYER HISTORY BUTTON FIX
+// ===============================
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const btn = document.getElementById("playerHistoryBtn");
+    const popup = document.getElementById("playerHistoryPopup");
+    const closeBtn = document.getElementById("closePlayerHistoryBtn");
+
+    console.log("PLAYER HISTORY INIT", btn, popup);
+
+    if(btn){
+
+        btn.onclick = async ()=>{
+
+            console.log("PLAYER HISTORY CLICKED");
+
+            if(!popup){
+                console.log("POPUP NOT FOUND");
+                return;
+            }
+
+            popup.classList.remove("hidden");
+
+            console.log("POPUP OPEN");
+
+            if(typeof loadPlayerHistory === "function"){
+                await loadPlayerHistory();
+            }
+
+        };
+
+    }
+
+
+    if(closeBtn){
+
+        closeBtn.onclick = ()=>{
+
+            popup.classList.add("hidden");
+
+        };
+
+    }
+
+
+});
+
 //fix deployment issues
