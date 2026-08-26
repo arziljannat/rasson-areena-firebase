@@ -27,8 +27,9 @@
     <button id="tableHistoryBtn" class="neon-btn add-table-btn">Table History</button>
 <button
     id="playerHistoryBtn"
-    class="neon-btn add-table-btn"
     type="button"
+    class="neon-btn add-table-btn"
+    onclick="if(window.openPlayerHistory){ window.openPlayerHistory(); } else { document.getElementById('playerHistoryPopup').classList.remove('hidden'); }"
 >
     👤 Player History
 </button>
