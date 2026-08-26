@@ -7562,7 +7562,7 @@ function unlockAudio() {
  * 👤 PLAYER HISTORY
  ******************************************************/
 
-async function openPlayerHistory(){
+window.openPlayerHistory = async function(){
 
     const popup =
     document.getElementById("playerHistoryPopup");
@@ -7740,7 +7740,7 @@ document.getElementById(
 if(btn){
 
 btn.onclick =
-openPlayerHistory;
+window.openPlayerHistory;
 
 }
 
