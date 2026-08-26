@@ -559,6 +559,77 @@
         </div>
     </div>
 </div>
+
+<!-- PLAYER HISTORY POPUP -->
+<div id="playerHistoryPopup" class="popup hidden">
+
+<div class="popup-box large-popup">
+
+<h2>👤 Player History</h2>
+
+
+<label>Search Player:</label>
+
+<input 
+id="playerSearchInput"
+type="text"
+placeholder="Enter player name"
+>
+
+
+<button 
+id="searchPlayerBtn"
+class="neon-btn">
+Search
+</button>
+
+
+<div class="table-mobile-wrapper">
+
+<table class="history-table neon-table">
+
+<thead>
+
+<tr>
+<th>#</th>
+<th>Date</th>
+<th>Player 1</th>
+<th>Player 2</th>
+<th>Table</th>
+<th>Play</th>
+<th>Amount</th>
+<th>Status</th>
+</tr>
+
+</thead>
+
+
+<tbody id="playerHistoryBody"></tbody>
+
+
+</table>
+
+</div>
+
+
+<div class="popup-buttons">
+
+<button 
+id="closePlayerHistoryBtn"
+class="neon-btn red">
+Close
+</button>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+
+    
     <!-- SHIFT TABLE POPUP -->
     <div id="shiftTablePopup" class="popup hidden">
         <div class="popup-content">
