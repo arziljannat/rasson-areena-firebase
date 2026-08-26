@@ -7562,102 +7562,258 @@ function unlockAudio() {
 // 👤 PLAYER HISTORY
 // ==========================================
 
-window.openPlayerHistory = function(){
+window.openPlayerHistory = async function () {
+
+    console.log("PLAYER HISTORY CLICKED");
 
     const popup =
-    document.getElementById("playerHistoryPopup");
+        document.getElementById("playerHistoryPopup");
 
-
-    if(!popup){
-        console.log("Player popup missing");
+    if (!popup) {
+        console.error("❌ playerHistoryPopup NOT FOUND");
         return;
     }
 
-
     popup.classList.remove("hidden");
 
+    console.log("✅ PLAYER HISTORY POPUP OPENED");
 
-    console.log("PLAYER HISTORY OPEN");
-
+    await loadPlayerHistory();
 };
 
 
+// ==========================================
+// LOAD PLAYER HISTORY
+// ==========================================
 
-// CLOSE BUTTON
+async function loadPlayerHistory() {
 
-document
-.getElementById("closePlayerHistoryBtn")
-?.addEventListener("click",()=>{
+    const body =
+        document.getElementById("playerHistoryBody");
 
+    const searchInput =
+        document.getElementById("playerSearchInput");
 
-    document
-    .getElementById("playerHistoryPopup")
-    .classList.add("hidden");
-
-
-});
-
-
-
-// OPEN BUTTON
-
-document
-.getElementById("playerHistoryBtn")
-?.addEventListener("click",()=>{
-
-
-    window.openPlayerHistory();
-
-
-});
-
-console.log("TABLES JS LOADED");
-
-document
-.getElementById("playerHistoryBtn")
-?.addEventListener("click",()=>{
-
-    console.log("PLAYER BUTTON CLICKED");
-
-    document
-    .getElementById("playerHistoryPopup")
-    .classList.remove("hidden");
-
-});
-
-console.log("PLAYER HISTORY TEST LOADED");
-
-
-setTimeout(()=>{
-
-    const btn = document.getElementById("playerHistoryBtn");
-
-    console.log("PLAYER BUTTON FOUND:", btn);
-
-
-    if(btn){
-
-        btn.onclick = function(){
-
-            console.log("PLAYER BUTTON CLICKED");
-
-
-            const popup =
-            document.getElementById("playerHistoryPopup");
-
-
-            console.log("POPUP:", popup);
-
-
-            if(popup){
-
-                popup.classList.remove("hidden");
-
-            }
-
-        };
-
+    if (!body || !searchInput) {
+        console.error("❌ Player History elements missing");
+        return;
     }
 
+    const search =
+        searchInput.value
+            .toLowerCase()
+            .trim();
 
-},1000);
+    body.innerHTML = `
+        <tr>
+            <td colspan="8">
+                Loading...
+            </td>
+        </tr>
+    `;
+
+    try {
+
+        const q = query(
+            collection(window.db, "sessions"),
+            where("branch", "==", BRANCH)
+        );
+
+        const snap = await getDocs(q);
+
+        body.innerHTML = "";
+
+        let count = 0;
+
+        snap.forEach(docSnap => {
+
+            const h = docSnap.data();
+
+            if (h.is_deleted === true) {
+                return;
+            }
+
+            const p1 =
+                (h.player1_name || "")
+                    .toLowerCase();
+
+            const p2 =
+                (h.player2_name || "")
+                    .toLowerCase();
+
+            if (
+                search &&
+                !p1.includes(search) &&
+                !p2.includes(search)
+            ) {
+                return;
+            }
+
+            count++;
+
+            body.innerHTML += `
+                <tr>
+
+                    <td>${count}</td>
+
+                    <td>
+                        ${
+                            h.start_time
+                            ? new Date(h.start_time)
+                                .toLocaleDateString()
+                            : "-"
+                        }
+                    </td>
+
+                    <td>
+                        ${h.player1_name || "-"}
+                    </td>
+
+                    <td>
+                        ${h.player2_name || "-"}
+                    </td>
+
+                    <td>
+                        ${h.table_id || "-"}
+                    </td>
+
+                    <td>
+                        ${
+                            h.selected_play_type ||
+                            h.play_type ||
+                            "-"
+                        }
+                    </td>
+
+                    <td>
+                        Rs ${
+                            h.final_amount ||
+                            h.total ||
+                            0
+                        }
+                    </td>
+
+                    <td>
+                        ${
+                            h.paid
+                            ? "Paid"
+                            : "Unpaid"
+                        }
+                    </td>
+
+                </tr>
+            `;
+        });
+
+        if (count === 0) {
+
+            body.innerHTML = `
+                <tr>
+                    <td colspan="8">
+                        No player history found
+                    </td>
+                </tr>
+            `;
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "❌ Player History Error:",
+            error
+        );
+
+        body.innerHTML = `
+            <tr>
+                <td colspan="8">
+                    Error Loading Data
+                </td>
+            </tr>
+        `;
+    }
+}
+
+
+// ==========================================
+// PLAYER HISTORY BUTTONS
+// ==========================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const playerBtn =
+            document.getElementById("playerHistoryBtn");
+
+        const closeBtn =
+            document.getElementById(
+                "closePlayerHistoryBtn"
+            );
+
+        const searchBtn =
+            document.getElementById(
+                "searchPlayerBtn"
+            );
+
+        console.log(
+            "PLAYER BUTTON FOUND:",
+            playerBtn
+        );
+
+
+        // OPEN
+        if (playerBtn) {
+
+            playerBtn.addEventListener(
+                "click",
+                function (event) {
+
+                    event.preventDefault();
+
+                    window.openPlayerHistory();
+
+                }
+            );
+
+        }
+
+
+        // CLOSE
+        if (closeBtn) {
+
+            closeBtn.addEventListener(
+                "click",
+                function () {
+
+                    const popup =
+                        document.getElementById(
+                            "playerHistoryPopup"
+                        );
+
+                    if (popup) {
+                        popup.classList.add("hidden");
+                    }
+
+                }
+            );
+
+        }
+
+
+        // SEARCH
+        if (searchBtn) {
+
+            searchBtn.addEventListener(
+                "click",
+                function () {
+
+                    loadPlayerHistory();
+
+                }
+            );
+
+        }
+
+    }
+);
