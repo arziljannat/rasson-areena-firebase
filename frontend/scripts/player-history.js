@@ -6,7 +6,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ==========================================
-// PLAYER HISTORY - CURRENT DAY
+// PLAYER HISTORY - CURRENT DAY ONLY
 // ==========================================
 
 function getBranch() {
@@ -70,24 +70,10 @@ function escapeHtml(value) {
         .replaceAll("'", "&#039;");
 }
 
-function formatDate(value) {
-    if (!value) return "-";
-
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "-";
-
-    return date.toLocaleDateString("en-PK", {
-        timeZone: "Asia/Karachi",
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-    });
-}
-
 function formatTime(value) {
     if (!value) return "-";
 
-    const date = new Date(value);
+    const date = value?.toDate ? value.toDate() : new Date(value);
     if (Number.isNaN(date.getTime())) return "-";
 
     return date.toLocaleTimeString("en-PK", {
@@ -99,11 +85,10 @@ function formatTime(value) {
 }
 
 function formatDuration(seconds) {
-    let total = Math.max(0, Number(seconds || 0));
-
+    let total = Number(seconds || 0);
     if (!Number.isFinite(total)) total = 0;
 
-    total = Math.floor(total);
+    total = Math.max(0, Math.floor(total));
 
     const h = Math.floor(total / 3600);
     const m = Math.floor((total % 3600) / 60);
@@ -154,31 +139,10 @@ function getDiscount(session) {
     return Number(session?.discount || 0);
 }
 
-function getShift(session) {
-    const shift = Number(session?.shift_number);
-    return shift === 2 ? 2 : 1;
-}
-
-function isBooking(session) {
-    return Boolean(
-        session?.booking_id ||
-        session?.bookingId ||
-        session?.is_booking === true ||
-        session?.isBooking === true ||
-        session?.booking === true ||
-        session?.source === "booking" ||
-        session?.source === "online_booking"
-    );
-}
-
 // --------------------------------------------------
 // CURRENT DAY ID
 // --------------------------------------------------
 async function getCurrentDayId() {
-    if (window.currentDayId !== undefined && window.currentDayId !== null) {
-        return window.currentDayId;
-    }
-
     if (!window.db) {
         throw new Error("Firebase database is not ready yet.");
     }
@@ -196,26 +160,28 @@ async function getCurrentDayId() {
     }
 
     let latest = null;
+    let latestTime = -Infinity;
 
     snap.forEach(docSnap => {
         const data = docSnap.data();
+        const created = data?.created_at;
+        const createdTime = created?.toDate
+            ? created.toDate().getTime()
+            : new Date(created || 0).getTime();
 
-        if (!latest) {
+        if (!latest || createdTime > latestTime) {
             latest = data;
-            return;
+            latestTime = createdTime;
         }
-
-        const a = new Date(latest.created_at || 0).getTime();
-        const b = new Date(data.created_at || 0).getTime();
-
-        if (b > a) latest = data;
     });
 
     if (latest?.day_id === undefined || latest?.day_id === null) {
         throw new Error("Current day ID is missing.");
     }
 
+    // Keep the global value in sync with the current-day record.
     window.currentDayId = latest.day_id;
+
     return latest.day_id;
 }
 
@@ -240,7 +206,7 @@ async function fetchPlayerHistory() {
     snap.forEach(docSnap => {
         const session = docSnap.data();
 
-        // PLAYER HISTORY = CURRENT DAY ONLY
+        // IMPORTANT: Player History is CURRENT DAY only.
         if (String(session?.day_id) !== String(currentDayId)) return;
         if (session?.is_deleted === true) return;
         if (!session?.end_time) return;
@@ -256,8 +222,17 @@ async function fetchPlayerHistory() {
     });
 
     records.sort((a, b) => {
-        const ta = new Date(a.session?.end_time || a.session?.start_time || 0).getTime();
-        const tb = new Date(b.session?.end_time || b.session?.start_time || 0).getTime();
+        const aDate = a.session?.end_time;
+        const bDate = b.session?.end_time;
+
+        const ta = aDate?.toDate
+            ? aDate.toDate().getTime()
+            : new Date(aDate || a.session?.start_time || 0).getTime();
+
+        const tb = bDate?.toDate
+            ? bDate.toDate().getTime()
+            : new Date(bDate || b.session?.start_time || 0).getTime();
+
         return tb - ta;
     });
 
@@ -268,7 +243,7 @@ async function fetchPlayerHistory() {
 }
 
 // --------------------------------------------------
-// MAKE PLAYER HISTORY LOOK LIKE TABLE HISTORY
+// PLAYER HISTORY LAYOUT
 // --------------------------------------------------
 function ensurePlayerHistoryLayout() {
     const popup = getPopup();
@@ -277,79 +252,10 @@ function ensurePlayerHistoryLayout() {
     const box = popup.querySelector(".popup-box");
     if (!box) return null;
 
-    // Create the same summary-card area used by Table History.
-    let summary = document.getElementById("playerHistorySummary");
+    // Remove the old dynamically-created summary cards.
+    const oldSummary = box.querySelector("#playerHistorySummary");
+    if (oldSummary) oldSummary.remove();
 
-    if (!summary) {
-        summary = document.createElement("div");
-        summary.id = "playerHistorySummary";
-        summary.className = "history-summary-counters";
-
-        summary.innerHTML = `
-            <div class="history-summary-box green">
-                <div class="history-card-title">🎮 TOTAL GAME</div>
-                <div class="history-card-head"><span>Shift 1</span><span>Shift 2</span></div>
-                <div class="history-card-values">
-                    <strong id="playerHistoryS1Game">0</strong>
-                    <strong id="playerHistoryS2Game">0</strong>
-                </div>
-            </div>
-
-            <div class="history-summary-box green">
-                <div class="history-card-title">👤 GUEST PLAY</div>
-                <div class="history-card-head"><span>Shift 1</span><span>Shift 2</span></div>
-                <div class="history-card-values">
-                    <strong id="playerHistoryS1Guest">0</strong>
-                    <strong id="playerHistoryS2Guest">0</strong>
-                </div>
-            </div>
-
-            <div class="history-summary-box gold">
-                <div class="history-card-title">📅 BOOKING PLAY</div>
-                <div class="history-card-head"><span>Shift 1</span><span>Shift 2</span></div>
-                <div class="history-card-values">
-                    <strong id="playerHistoryS1Booking">0</strong>
-                    <strong id="playerHistoryS2Booking">0</strong>
-                </div>
-            </div>
-
-            <div class="history-summary-box green">
-                <div class="history-card-title">💰 PAID</div>
-                <div class="history-card-head"><span>Shift 1</span><span>Shift 2</span></div>
-                <div class="history-card-values">
-                    <strong id="playerHistoryS1Paid">0</strong>
-                    <strong id="playerHistoryS2Paid">0</strong>
-                </div>
-                <div class="history-card-amount">
-                    <span id="playerHistoryS1PaidAmount">Rs. 0</span>
-                    <span id="playerHistoryS2PaidAmount">Rs. 0</span>
-                </div>
-            </div>
-
-            <div class="history-summary-box red">
-                <div class="history-card-title">⚠️ UNPAID</div>
-                <div class="history-card-head"><span>Shift 1</span><span>Shift 2</span></div>
-                <div class="history-card-values">
-                    <strong id="playerHistoryS1Unpaid">0</strong>
-                    <strong id="playerHistoryS2Unpaid">0</strong>
-                </div>
-                <div class="history-card-amount">
-                    <span id="playerHistoryS1UnpaidAmount">Rs. 0</span>
-                    <span id="playerHistoryS2UnpaidAmount">Rs. 0</span>
-                </div>
-            </div>
-        `;
-
-        const tableWrapper = box.querySelector(".table-mobile-wrapper");
-        if (tableWrapper) {
-            box.insertBefore(summary, tableWrapper);
-        } else {
-            box.appendChild(summary);
-        }
-    }
-
-    // Replace the simple Player History columns with the same detailed
-    // information shown in Table History.
     const table = box.querySelector("table.history-table");
     const thead = table?.querySelector("thead");
 
@@ -371,67 +277,48 @@ function ensurePlayerHistoryLayout() {
         `;
     }
 
-    return summary;
+    return table;
 }
 
-function updatePlayerSummary(records) {
-    ensurePlayerHistoryLayout();
+function makeStatusBadge(paid) {
+    if (paid === true) {
+        return `
+            <span style="
+                display:inline-block;
+                padding:5px 12px;
+                border-radius:6px;
+                background:#00ff88;
+                color:#001a0d;
+                font-weight:800;
+                box-shadow:0 0 10px rgba(0,255,136,.65);
+            ">PAID</span>
+        `;
+    }
 
-    const stats = {
-        1: { game: 0, guest: 0, booking: 0, paid: 0, paidAmount: 0, unpaid: 0, unpaidAmount: 0 },
-        2: { game: 0, guest: 0, booking: 0, paid: 0, paidAmount: 0, unpaid: 0, unpaidAmount: 0 }
-    };
-
-    records.forEach(item => {
-        const s = item.session;
-        const shift = getShift(s);
-        const st = stats[shift];
-        const total = getTotalAmount(s);
-
-        st.game += 1;
-
-        if (isBooking(s)) st.booking += 1;
-        else st.guest += 1;
-
-        if (s.paid === true) {
-            st.paid += 1;
-            st.paidAmount += total;
-        } else {
-            st.unpaid += 1;
-            st.unpaidAmount += total;
-        }
-    });
-
-    const setText = (id, value) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = value;
-    };
-
-    setText("playerHistoryS1Game", stats[1].game);
-    setText("playerHistoryS2Game", stats[2].game);
-
-    setText("playerHistoryS1Guest", stats[1].guest);
-    setText("playerHistoryS2Guest", stats[2].guest);
-
-    setText("playerHistoryS1Booking", stats[1].booking);
-    setText("playerHistoryS2Booking", stats[2].booking);
-
-    setText("playerHistoryS1Paid", stats[1].paid);
-    setText("playerHistoryS2Paid", stats[2].paid);
-    setText("playerHistoryS1PaidAmount", `Rs. ${stats[1].paidAmount}`);
-    setText("playerHistoryS2PaidAmount", `Rs. ${stats[2].paidAmount}`);
-
-    setText("playerHistoryS1Unpaid", stats[1].unpaid);
-    setText("playerHistoryS2Unpaid", stats[2].unpaid);
-    setText("playerHistoryS1UnpaidAmount", `Rs. ${stats[1].unpaidAmount}`);
-    setText("playerHistoryS2UnpaidAmount", `Rs. ${stats[2].unpaidAmount}`);
+    return `
+        <span style="
+            display:inline-block;
+            padding:5px 12px;
+            border-radius:6px;
+            background:#ff3b3b;
+            color:#fff;
+            font-weight:800;
+            box-shadow:0 0 10px rgba(255,59,59,.65);
+        ">UNPAID</span>
+    `;
 }
 
+// --------------------------------------------------
+// SEARCH CURRENT-DAY PLAYER HISTORY
+// --------------------------------------------------
 async function searchPlayerHistory() {
     const body = document.getElementById("playerHistoryBody");
     const input = document.getElementById("playerSearchInput");
 
-    if (!body || !input) return;
+    if (!body || !input) {
+        console.error("PLAYER HISTORY: search elements not found.");
+        return;
+    }
 
     ensurePlayerHistoryLayout();
 
@@ -448,8 +335,8 @@ async function searchPlayerHistory() {
 
         const filtered = search
             ? records.filter(item => {
-                const p1 = item.player1.toLowerCase();
-                const p2 = item.player2.toLowerCase();
+                const p1 = String(item.player1 || "").toLowerCase();
+                const p2 = String(item.player2 || "").toLowerCase();
                 const checkout = String(item.session?.checkout_player || "").toLowerCase();
 
                 return (
@@ -459,9 +346,6 @@ async function searchPlayerHistory() {
                 );
             })
             : records;
-
-        // Summary always follows the currently searched player.
-        updatePlayerSummary(filtered);
 
         if (!filtered.length) {
             body.innerHTML = `
@@ -478,29 +362,27 @@ async function searchPlayerHistory() {
             const discount = getDiscount(s);
             const canteen = getCanteenAmount(s);
             const total = getTotalAmount(s);
-            const status = s.paid === true ? "PAID" : "UNPAID";
+            const paid = s?.paid === true;
 
             return `
                 <tr>
                     <td>${index + 1}</td>
                     <td>${escapeHtml(`${item.player1 || "-"} VS ${item.player2 || "-"}`)}</td>
-                    <td>${escapeHtml(formatTime(s.start_time))}</td>
-                    <td>${escapeHtml(formatTime(s.end_time))}</td>
-                    <td>${escapeHtml(formatDuration(s.final_seconds))}</td>
+                    <td>${escapeHtml(formatTime(s?.start_time))}</td>
+                    <td>${escapeHtml(formatTime(s?.end_time))}</td>
+                    <td>${escapeHtml(formatDuration(s?.final_seconds))}</td>
                     <td>${escapeHtml(getRate(s))}</td>
                     <td>Rs ${gameAmount}</td>
                     <td>Rs ${discount}</td>
                     <td>Rs ${canteen}</td>
                     <td>Rs ${total}</td>
-                    <td>${escapeHtml(status)}</td>
+                    <td>${makeStatusBadge(paid)}</td>
                 </tr>
             `;
         }).join("");
 
     } catch (error) {
         console.error("PLAYER HISTORY ERROR:", error);
-
-        updatePlayerSummary([]);
 
         body.innerHTML = `
             <tr>
@@ -510,15 +392,18 @@ async function searchPlayerHistory() {
     }
 }
 
+// --------------------------------------------------
+// OPEN / CLOSE
+// --------------------------------------------------
 function openPlayerHistory() {
     const popup = getPopup();
+
     if (!popup) {
-        console.error("playerHistoryPopup not found");
+        console.error("PLAYER HISTORY: playerHistoryPopup not found.");
         return;
     }
 
     ensurePlayerHistoryLayout();
-
     popup.classList.remove("hidden");
 
     const input = document.getElementById("playerSearchInput");
@@ -529,7 +414,10 @@ function openPlayerHistory() {
 
 function closePlayerHistory() {
     const popup = getPopup();
-    if (popup) popup.classList.add("hidden");
+
+    if (popup) {
+        popup.classList.add("hidden");
+    }
 }
 
 // --------------------------------------------------
@@ -548,21 +436,24 @@ function bindPlayerHistoryButtons() {
     const input = document.getElementById("playerSearchInput");
 
     if (searchBtn) {
-        searchBtn.onclick = event => {
+        searchBtn.onclick = function (event) {
             event.preventDefault();
+            event.stopPropagation();
             searchPlayerHistory();
         };
     }
 
     if (closeBtn) {
-        closeBtn.onclick = event => {
+        closeBtn.onclick = function (event) {
             event.preventDefault();
+            event.stopPropagation();
             closePlayerHistory();
         };
     }
 
-    if (input) {
-        input.addEventListener("keydown", event => {
+    if (input && !input.dataset.playerHistoryBound) {
+        input.dataset.playerHistoryBound = "1";
+        input.addEventListener("keydown", function (event) {
             if (event.key === "Enter") {
                 event.preventDefault();
                 searchPlayerHistory();
@@ -577,4 +468,4 @@ if (document.readyState === "loading") {
     bindPlayerHistoryButtons();
 }
 
-console.log("PLAYER HISTORY MODULE LOADED - TABLE HISTORY STYLE");
+console.log("PLAYER HISTORY MODULE LOADED - CURRENT DAY TABLE STYLE");
