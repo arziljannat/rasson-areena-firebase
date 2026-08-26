@@ -7781,28 +7781,4 @@ document
 
 });
 
-
-document.addEventListener("DOMContentLoaded",()=>{
-
-    const btn = document.getElementById("playerHistoryBtn");
-
-    console.log("PLAYER BUTTON:", btn);
-
-
-    if(btn){
-
-        btn.onclick = ()=>{
-
-            console.log("PLAYER HISTORY CLICKED");
-
-            document
-            .getElementById("playerHistoryPopup")
-            .classList.remove("hidden");
-
-        };
-
-    }
-
-
-});
 //fix deployment issues
