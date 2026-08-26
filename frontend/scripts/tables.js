@@ -7559,15 +7559,16 @@ function unlockAudio() {
 //fix deployment issues
 
 // ==========================================
-// 👤 PLAYER HISTORY - FINAL VERSION
+// 👤 PLAYER HISTORY - FINAL CLEAN VERSION
 // ==========================================
 
 window.openPlayerHistory = async function () {
 
-    const popup = document.getElementById("playerHistoryPopup");
+    const popup =
+        document.getElementById("playerHistoryPopup");
 
     if (!popup) {
-        console.error("❌ playerHistoryPopup not found");
+        console.error("❌ PLAYER HISTORY POPUP NOT FOUND");
         return;
     }
 
@@ -7580,78 +7581,147 @@ window.openPlayerHistory = async function () {
 
 
 // ==========================================
-// LOAD PLAYER HISTORY
+// 🔥 LOAD PLAYER HISTORY
 // ==========================================
 
 async function loadPlayerHistory() {
 
-    const body = document.getElementById("playerHistoryBody");
-    const input = document.getElementById("playerSearchInput");
+    const body =
+        document.getElementById("playerHistoryBody");
+
+    const input =
+        document.getElementById("playerSearchInput");
 
     if (!body || !input) {
-        console.error("❌ Player History elements missing");
+        console.error("❌ PLAYER HISTORY ELEMENTS NOT FOUND");
         return;
     }
 
-    const search = input.value.trim().toLowerCase();
+    const search =
+        input.value
+            .trim()
+            .toLowerCase();
+
 
     body.innerHTML = `
         <tr>
-            <td colspan="8">Loading...</td>
+            <td colspan="8">
+                Loading...
+            </td>
         </tr>
     `;
 
+
     try {
 
-        // 🔥 USE CURRENT SESSIONS COLLECTION
         const q = query(
             collection(window.db, "sessions"),
             where("branch", "==", BRANCH)
         );
 
-        const snap = await getDocs(q);
+
+        const snap =
+            await getDocs(q);
+
 
         let html = "";
         let count = 0;
 
+
         snap.forEach(docSnap => {
 
-            const h = docSnap.data();
+            const h =
+                docSnap.data();
 
-            // Deleted sessions ignore
+
+            // Deleted sessions skip
             if (h.is_deleted === true) {
                 return;
             }
 
-            // Player names - both possible formats
+
+            // ======================================
+            // PLAYER NAMES
+            // ======================================
+
             const player1 =
                 h.player1_name ||
                 h.player1Name ||
+                h.player1 ||
                 "";
 
             const player2 =
                 h.player2_name ||
                 h.player2Name ||
+                h.player2 ||
                 "";
 
-            const p1 = String(player1).toLowerCase();
-            const p2 = String(player2).toLowerCase();
 
-            // 🔥 SEARCH
+            const checkoutPlayer =
+                h.checkout_player ||
+                h.game_off_player ||
+                "";
+
+
+            // ======================================
+            // SEARCH
+            // ======================================
+
+            const p1 =
+                String(player1)
+                    .toLowerCase();
+
+            const p2 =
+                String(player2)
+                    .toLowerCase();
+
+            const cp =
+                String(checkoutPlayer)
+                    .toLowerCase();
+
+
             if (
                 search &&
                 !p1.includes(search) &&
-                !p2.includes(search)
+                !p2.includes(search) &&
+                !cp.includes(search)
             ) {
                 return;
             }
 
+
             count++;
 
-            const date =
-                h.start_time
-                    ? new Date(h.start_time).toLocaleDateString()
-                    : "-";
+
+            // ======================================
+            // DATE
+            // ======================================
+
+            let date = "-";
+
+
+            if (h.start_time) {
+
+                const d =
+                    new Date(h.start_time);
+
+                if (!isNaN(d.getTime())) {
+
+                    date =
+                        d.toLocaleDateString(
+                            "en-PK",
+                            {
+                                timeZone:
+                                    "Asia/Karachi"
+                            }
+                        );
+                }
+            }
+
+
+            // ======================================
+            // PLAY TYPE
+            // ======================================
 
             const play =
                 h.selected_play_type ||
@@ -7659,6 +7729,11 @@ async function loadPlayerHistory() {
                 h.play_type ||
                 h.playType ||
                 "-";
+
+
+            // ======================================
+            // AMOUNT
+            // ======================================
 
             const amount =
                 Number(
@@ -7668,10 +7743,20 @@ async function loadPlayerHistory() {
                     0
                 );
 
+
+            // ======================================
+            // STATUS
+            // ======================================
+
             const status =
                 h.paid === true
                     ? "Paid"
                     : "Unpaid";
+
+
+            // ======================================
+            // ROW
+            // ======================================
 
             html += `
                 <tr>
@@ -7680,9 +7765,13 @@ async function loadPlayerHistory() {
 
                     <td>${date}</td>
 
-                    <td>${player1 || "-"}</td>
+                    <td>
+                        ${player1 || "-"}
+                    </td>
 
-                    <td>${player2 || "-"}</td>
+                    <td>
+                        ${player2 || "-"}
+                    </td>
 
                     <td>
                         ${h.table_id || "-"}
@@ -7705,6 +7794,10 @@ async function loadPlayerHistory() {
         });
 
 
+        // ======================================
+        // NOTHING FOUND
+        // ======================================
+
         if (count === 0) {
 
             html = `
@@ -7714,15 +7807,18 @@ async function loadPlayerHistory() {
                     </td>
                 </tr>
             `;
-
         }
 
-        body.innerHTML = html;
+
+        body.innerHTML =
+            html;
+
 
         console.log(
             "✅ PLAYER HISTORY RESULTS:",
             count
         );
+
 
     } catch (error) {
 
@@ -7730,6 +7826,7 @@ async function loadPlayerHistory() {
             "❌ PLAYER HISTORY ERROR:",
             error
         );
+
 
         body.innerHTML = `
             <tr>
@@ -7743,81 +7840,107 @@ async function loadPlayerHistory() {
 
 
 // ==========================================
-// PLAYER HISTORY BUTTONS
-// 🔥 EVENT DELEGATION - NO DOM TIMING ISSUE
+// 👤 PLAYER HISTORY EVENTS
 // ==========================================
 
-document.addEventListener("click", function (event) {
+document.addEventListener(
+    "click",
+    function (event) {
 
-    const target = event.target;
-
-    // OPEN
-    if (
-        target &&
-        target.closest &&
-        target.closest("#playerHistoryBtn")
-    ) {
-
-        event.preventDefault();
-
-        window.openPlayerHistory();
-
-        return;
-    }
+        const target =
+            event.target;
 
 
-    // SEARCH
-    if (
-        target &&
-        target.closest &&
-        target.closest("#searchPlayerBtn")
-    ) {
+        // ======================================
+        // OPEN
+        // ======================================
 
-        event.preventDefault();
+        if (
+            target &&
+            target.closest &&
+            target.closest("#playerHistoryBtn")
+        ) {
 
-        loadPlayerHistory();
+            event.preventDefault();
 
-        return;
-    }
+            window.openPlayerHistory();
 
-
-    // CLOSE
-    if (
-        target &&
-        target.closest &&
-        target.closest("#closePlayerHistoryBtn")
-    ) {
-
-        event.preventDefault();
-
-        const popup =
-            document.getElementById("playerHistoryPopup");
-
-        if (popup) {
-
-            popup.classList.add("hidden");
-
-            console.log("✅ PLAYER HISTORY CLOSED");
+            return;
         }
 
-        return;
+
+        // ======================================
+        // SEARCH
+        // ======================================
+
+        if (
+            target &&
+            target.closest &&
+            target.closest("#searchPlayerBtn")
+        ) {
+
+            event.preventDefault();
+
+            loadPlayerHistory();
+
+            return;
+        }
+
+
+        // ======================================
+        // CLOSE
+        // ======================================
+
+        if (
+            target &&
+            target.closest &&
+            target.closest("#closePlayerHistoryBtn")
+        ) {
+
+            event.preventDefault();
+
+
+            const popup =
+                document.getElementById(
+                    "playerHistoryPopup"
+                );
+
+
+            if (popup) {
+
+                popup.classList.add("hidden");
+
+                console.log(
+                    "✅ PLAYER HISTORY CLOSED"
+                );
+            }
+
+            return;
+        }
+
     }
+);
 
-});
 
+// ==========================================
+// 🔥 ENTER = SEARCH
+// ==========================================
 
-// ENTER KEY = SEARCH
-document.addEventListener("keydown", function (event) {
+document.addEventListener(
+    "keydown",
+    function (event) {
 
-    if (
-        event.key === "Enter" &&
-        document.activeElement &&
-        document.activeElement.id === "playerSearchInput"
-    ) {
+        if (
+            event.key === "Enter" &&
+            document.activeElement &&
+            document.activeElement.id ===
+                "playerSearchInput"
+        ) {
 
-        event.preventDefault();
+            event.preventDefault();
 
-        loadPlayerHistory();
+            loadPlayerHistory();
+        }
+
     }
-
-});
+);
