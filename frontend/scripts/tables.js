@@ -7634,12 +7634,10 @@ async function loadPlayerHistory() {
             }
 
             const p1 =
-                (h.player1_name || "")
-                    .toLowerCase();
+                (h.player1_name || "").toLowerCase();
 
             const p2 =
-                (h.player2_name || "")
-                    .toLowerCase();
+                (h.player2_name || "").toLowerCase();
 
             if (
                 search &&
@@ -7653,7 +7651,6 @@ async function loadPlayerHistory() {
 
             body.innerHTML += `
                 <tr>
-
                     <td>${count}</td>
 
                     <td>
@@ -7665,17 +7662,11 @@ async function loadPlayerHistory() {
                         }
                     </td>
 
-                    <td>
-                        ${h.player1_name || "-"}
-                    </td>
+                    <td>${h.player1_name || "-"}</td>
 
-                    <td>
-                        ${h.player2_name || "-"}
-                    </td>
+                    <td>${h.player2_name || "-"}</td>
 
-                    <td>
-                        ${h.table_id || "-"}
-                    </td>
+                    <td>${h.table_id || "-"}</td>
 
                     <td>
                         ${
@@ -7694,13 +7685,8 @@ async function loadPlayerHistory() {
                     </td>
 
                     <td>
-                        ${
-                            h.paid
-                            ? "Paid"
-                            : "Unpaid"
-                        }
+                        ${h.paid ? "Paid" : "Unpaid"}
                     </td>
-
                 </tr>
             `;
         });
@@ -7732,88 +7718,43 @@ async function loadPlayerHistory() {
             </tr>
         `;
     }
-}
+};
 
 
 // ==========================================
-// PLAYER HISTORY BUTTONS
+// PLAYER HISTORY CLOSE + SEARCH
 // ==========================================
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+document.addEventListener("DOMContentLoaded", function () {
 
-        const playerBtn =
-            document.getElementById("playerHistoryBtn");
+    const closeBtn =
+        document.getElementById("closePlayerHistoryBtn");
 
-        const closeBtn =
-            document.getElementById(
-                "closePlayerHistoryBtn"
-            );
-
-        const searchBtn =
-            document.getElementById(
-                "searchPlayerBtn"
-            );
-
-        console.log(
-            "PLAYER BUTTON FOUND:",
-            playerBtn
-        );
+    const searchBtn =
+        document.getElementById("searchPlayerBtn");
 
 
-        // OPEN
-        if (playerBtn) {
+    if (closeBtn) {
 
-            playerBtn.addEventListener(
-                "click",
-                function (event) {
+        closeBtn.addEventListener("click", function () {
 
-                    event.preventDefault();
+            document
+                .getElementById("playerHistoryPopup")
+                .classList.add("hidden");
 
-                    window.openPlayerHistory();
-
-                }
-            );
-
-        }
-
-
-        // CLOSE
-        if (closeBtn) {
-
-            closeBtn.addEventListener(
-                "click",
-                function () {
-
-                    const popup =
-                        document.getElementById(
-                            "playerHistoryPopup"
-                        );
-
-                    if (popup) {
-                        popup.classList.add("hidden");
-                    }
-
-                }
-            );
-
-        }
-
-
-        // SEARCH
-        if (searchBtn) {
-
-            searchBtn.addEventListener(
-                "click",
-                function () {
-
-                    loadPlayerHistory();
-
-                }
-            );
-
-        }
+        });
 
     }
-);
+
+
+    if (searchBtn) {
+
+        searchBtn.addEventListener("click", function () {
+
+            loadPlayerHistory();
+
+        });
+
+    }
+
+});
