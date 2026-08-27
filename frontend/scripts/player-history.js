@@ -213,12 +213,19 @@ async function fetchPlayerHistory() {
 
         const players = getPlayers(session);
 
-        records.push({
-            id: docSnap.id,
-            session,
-            player1: players.player1,
-            player2: players.player2
-        });
+records.push({
+    id: docSnap.id,
+    session,
+    player1: players.player1,
+    player2: players.player2,
+
+    // 🔥 ACTUAL TABLE NAME
+    tableName:
+        session?.table_id ||
+        session?.table_name ||
+        session?.tableName ||
+        "-"
+});
     });
 
     records.sort((a, b) => {
@@ -264,6 +271,7 @@ function ensurePlayerHistoryLayout() {
             <tr>
                 <th>#</th>
                 <th>PLAYERS</th>
+                <th>TABLE</th>
                 <th>Check-in</th>
                 <th>Checkout</th>
                 <th>Play</th>
@@ -326,7 +334,7 @@ async function searchPlayerHistory() {
 
     body.innerHTML = `
         <tr>
-            <td colspan="11">Loading...</td>
+            <td colspan="12">Loading...</td>
         </tr>
     `;
 
@@ -350,7 +358,7 @@ async function searchPlayerHistory() {
         if (!filtered.length) {
             body.innerHTML = `
                 <tr>
-                    <td colspan="11">No player history found</td>
+                    <td colspan="12">No player history found</td>
                 </tr>
             `;
             return;
@@ -364,11 +372,21 @@ async function searchPlayerHistory() {
             const total = getTotalAmount(s);
             const paid = s?.paid === true;
 
-            return `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${escapeHtml(`${item.player1 || "-"} VS ${item.player2 || "-"}`)}</td>
-                    <td>${escapeHtml(formatTime(s?.start_time))}</td>
+return `
+    <tr>
+        <td>${index + 1}</td>
+
+        <td>
+            ${escapeHtml(`${item.player1 || "-"} VS ${item.player2 || "-"}`)}
+        </td>
+
+        <td>
+            ${escapeHtml(item.tableName || "-")}
+        </td>
+
+        <td>
+            ${escapeHtml(formatTime(s?.start_time))}
+        </td>
                     <td>${escapeHtml(formatTime(s?.end_time))}</td>
                     <td>${escapeHtml(formatDuration(s?.final_seconds))}</td>
                     <td>${escapeHtml(getRate(s))}</td>
@@ -386,7 +404,7 @@ async function searchPlayerHistory() {
 
         body.innerHTML = `
             <tr>
-                <td colspan="11">Error loading player history</td>
+                <td colspan="12">Error loading player history</td>
             </tr>
         `;
     }
