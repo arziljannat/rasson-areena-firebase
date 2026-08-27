@@ -322,12 +322,26 @@ history: []
 canteenTotal: old?.canteenTotal || 0,
 canteenItems: old?.canteenItems || {},
 
-// 🔥 PLAYERS PRESERVE
-player1Name: old?.player1Name || "",
-player2Name: old?.player2Name || "",
-checkoutPlayer: old?.checkoutPlayer || "",
+// 🔥 PLAYERS PRESERVE - FIREBASE VALUE MUST WIN
+player1Name:
+    nt.player1Name ||
+    old?.player1Name ||
+    "",
+
+player2Name:
+    nt.player2Name ||
+    old?.player2Name ||
+    "",
+
+checkoutPlayer:
+    nt.checkoutPlayer ||
+    old?.checkoutPlayer ||
+    "",
+
 checkoutPlayerNumber:
-    old?.checkoutPlayerNumber || null,
+    nt.checkoutPlayerNumber ??
+    old?.checkoutPlayerNumber ??
+    null,
 
 history: []
     };
