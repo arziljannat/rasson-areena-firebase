@@ -1269,182 +1269,283 @@ body * {
 }
 
 /* =========================================================
-   HISTORY SUMMARY CARDS
-   RASSON AREENA
+   🔥 HISTORY POPUP — FINAL LAYOUT
 ========================================================= */
 
-#historyPopup .history-summary-counters{
+#historyPopup .large-popup {
+    width: 1100px;
+    max-width: 94vw;
+    max-height: 88vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
 
-    display:grid;
+
+/* =========================================================
+   🔥 SUMMARY CARDS
+========================================================= */
+
+#historyPopup .history-summary-counters {
+
+    display: grid;
 
     grid-template-columns:
-    repeat(3, minmax(0, 1fr));
+        repeat(3, minmax(0, 1fr));
 
-    gap:18px;
+    gap: 16px;
 
-    width:100%;
+    width: 100%;
 
-    margin-bottom:22px;
+    margin: 0 0 22px 0;
 
+    box-sizing: border-box;
 }
 
 
-#historyPopup .history-summary-box{
+/* =========================================================
+   🔥 EACH CARD
+========================================================= */
 
-    min-height:145px;
+#historyPopup .history-summary-box {
 
-    padding:18px;
+    min-height: 145px;
 
-    box-sizing:border-box;
+    padding: 16px;
 
-    border-radius:16px;
+    box-sizing: border-box;
 
-    background:
-        rgba(0,0,0,.45);
+    border-radius: 16px;
 
-    display:flex;
+    background: rgba(0,0,0,.55);
 
-    flex-direction:column;
+    display: flex;
 
-    align-items:center;
+    flex-direction: column;
 
-    justify-content:flex-start;
+    align-items: center;
 
-    text-align:center;
+    justify-content: flex-start;
 
-    transition:.25s;
-
+    text-align: center;
 }
 
 
-#historyPopup .history-summary-box:hover{
+/* =========================================================
+   🔥 CARD TITLE
+========================================================= */
 
-    transform:translateY(-3px);
+#historyPopup .history-card-title {
 
+    width: 100%;
+
+    font-size: 17px;
+
+    font-weight: 900;
+
+    margin-bottom: 10px;
+
+    color: #00ffcc;
+
+    white-space: nowrap;
 }
 
 
-/* GREEN */
+/* =========================================================
+   🔥 SHIFT 1 / SHIFT 2 / TOTAL
+========================================================= */
 
-#historyPopup
-.history-summary-box.green{
+#historyPopup .history-card-head {
 
-    border:2px solid #00ff88;
+    width: 100%;
 
-    box-shadow:
-        0 0 18px rgba(0,255,136,.30);
+    display: grid;
 
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 5px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    color: #aaa;
+
+    margin-bottom: 5px;
 }
 
 
-/* GOLD */
+/* =========================================================
+   🔥 NUMBERS
+========================================================= */
 
-#historyPopup
-.history-summary-box.gold{
+#historyPopup .history-card-values {
 
-    border:2px solid #ffd700;
+    width: 100%;
 
-    box-shadow:
-        0 0 18px rgba(255,215,0,.30);
+    display: grid;
 
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 5px;
 }
 
 
-/* RED */
+#historyPopup .history-card-values strong {
 
-#historyPopup
-.history-summary-box.red{
+    font-size: 26px;
 
-    border:2px solid #ff4444;
+    font-weight: 900;
 
-    box-shadow:
-        0 0 18px rgba(255,60,60,.30);
+    color: #fff;
 
+    text-shadow:
+        0 0 10px rgba(255,255,255,.5);
 }
 
 
+/* =========================================================
+   🔥 AMOUNTS
+========================================================= */
 
+#historyPopup .history-card-amount {
 
-/* =========================================
-   🔥 HISTORY TOP CARDS — BIGGER TEXT
-========================================= */
+    width: 100%;
 
-.history-card-title {
-    font-size: 18px !important;
-    font-weight: 800 !important;
-}
+    display: grid;
 
-.history-card-head {
-    font-size: 15px !important;
-    font-weight: 600 !important;
-}
+    grid-template-columns:
+        repeat(3, 1fr);
 
-.history-card-values strong {
-    font-size: 25px !important;
-    font-weight: 900 !important;
-}
+    gap: 5px;
 
-.history-card-amount {
-    font-size: 15px !important;
-    font-weight: 700 !important;
-}
-
-.history-card-amount span {
-    font-size: 15px !important;
-    font-weight: 700 !important;
+    margin-top: 5px;
 }
 
 
-/* TABLE */
+#historyPopup .history-card-amount span {
 
-#historyPopup .table-mobile-wrapper{
+    font-size: 13px;
 
-    width:100%;
+    font-weight: 800;
 
-    overflow-x:auto;
-
-    overflow-y:auto;
-
-    flex:1;
-
+    color: #00ff99;
 }
 
 
-#historyPopup .history-table{
+/* =========================================================
+   🔥 CENTURY TIME
+========================================================= */
 
-    width:100%;
+#historyPopup .history-card-time {
 
-    min-width:1050px;
+    width: 100%;
 
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 5px;
+
+    margin-top: 4px;
 }
 
 
-/* MOBILE */
+#historyPopup .history-card-time span {
 
-@media(max-width:1200px){
+    font-size: 11px;
 
-    #historyPopup .history-summary-counters{
+    font-weight: 700;
+
+    color: #ffd700;
+}
+
+
+/* =========================================================
+   🔥 HISTORY TABLE — BIGGER
+========================================================= */
+
+#historyPopup .table-mobile-wrapper {
+
+    width: 100%;
+
+    max-height: 380px;
+
+    overflow-x: auto;
+
+    overflow-y: auto;
+
+    box-sizing: border-box;
+}
+
+
+#historyPopup .history-table {
+
+    width: 100%;
+
+    min-width: 850px;
+
+    border-collapse: collapse;
+
+    font-size: 16px;
+}
+
+
+#historyPopup .history-table th {
+
+    font-size: 16px;
+
+    padding: 12px 10px;
+
+    font-weight: 900;
+
+    white-space: nowrap;
+}
+
+
+#historyPopup .history-table td {
+
+    font-size: 15px;
+
+    padding: 11px 10px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   🔥 MOBILE
+========================================================= */
+
+@media (max-width: 850px) {
+
+    #historyPopup .history-summary-counters {
 
         grid-template-columns:
-        repeat(2, minmax(0,1fr));
+            repeat(2, minmax(0, 1fr));
 
     }
 
 }
 
 
-@media(max-width:700px){
+@media (max-width: 600px) {
 
-    #historyPopup .history-summary-counters{
+    #historyPopup .history-summary-counters {
 
-        grid-template-columns:1fr;
+        grid-template-columns: 1fr;
 
     }
 
-    #historyPopup .history-summary-box{
+    #historyPopup .large-popup {
 
-        min-height:110px;
+        width: 96vw;
 
+        max-width: 96vw;
     }
 
 }
