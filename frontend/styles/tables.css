@@ -748,10 +748,14 @@ body * {
     padding: 10px 22px !important;
 }
 
-#historyTableTitle{
+#historyTableTitle {
     text-align: center;
     width: 100%;
     display: block;
+
+    font-size: 26px !important;
+    font-weight: 800 !important;
+    margin-bottom: 20px !important;
 }
 
 /* =========================================
@@ -1359,94 +1363,35 @@ repeat(3, minmax(0, 1fr));
 }
 
 
-/* CARD TITLE */
 
-#historyPopup .history-card-title{
 
-    font-size:18px;
+/* =========================================
+   🔥 HISTORY TOP CARDS — BIGGER TEXT
+========================================= */
 
-    font-weight:800;
-
-    margin-bottom:12px;
-
-    color:#00ffcc;
-
+.history-card-title {
+    font-size: 18px !important;
+    font-weight: 800 !important;
 }
 
-
-/* SHIFT HEADERS */
-
-#historyPopup .history-card-head{
-
-    width:100%;
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:10px;
-
-    font-size:12px;
-
-    color:#aaa;
-
-    margin-bottom:5px;
-
+.history-card-head {
+    font-size: 15px !important;
+    font-weight: 600 !important;
 }
 
-
-/* NUMBERS */
-
-#historyPopup .history-card-values{
-
-    width:100%;
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:10px;
-
+.history-card-values strong {
+    font-size: 25px !important;
+    font-weight: 900 !important;
 }
 
-
-#historyPopup .history-card-values strong{
-
-    font-size:28px;
-
-    color:#fff;
-
-    text-shadow:
-        0 0 10px rgba(255,255,255,.5);
-
+.history-card-amount {
+    font-size: 15px !important;
+    font-weight: 700 !important;
 }
 
-
-/* AMOUNTS */
-
-#historyPopup .history-card-amount{
-
-    width:100%;
-
-    display:grid;
-
-    grid-template-columns:1fr 1fr;
-
-    gap:10px;
-
-    margin-top:5px;
-
-}
-
-
-#historyPopup .history-card-amount span{
-
-    font-size:12px;
-
-    color:#00ff99;
-
-    font-weight:bold;
-
+.history-card-amount span {
+    font-size: 15px !important;
+    font-weight: 700 !important;
 }
 
 
@@ -3868,4 +3813,15 @@ repeat(3, minmax(0, 1fr));
 
     font-weight:bold;
 
+}
+
+/* 🔥 HISTORY TABLE TEXT */
+#historyPopup table th {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+}
+
+#historyPopup table td {
+    font-size: 15px !important;
+    font-weight: 600 !important;
 }
