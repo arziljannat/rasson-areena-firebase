@@ -3840,3 +3840,32 @@ repeat(3, minmax(0, 1fr));
     text-shadow:
         0 0 5px #00ffff !important;
 }
+
+/* =====================================================
+   ⏱️ CENTURY TIME
+===================================================== */
+
+#historyPopup .history-card-time{
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:10px;
+
+    margin-top:5px;
+
+}
+
+
+#historyPopup .history-card-time span{
+
+    font-size:12px;
+
+    color:#ffd700;
+
+    font-weight:bold;
+
+}
