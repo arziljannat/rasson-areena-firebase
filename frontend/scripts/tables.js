@@ -2958,6 +2958,92 @@ function openHistory(id) {
     const shift2Game =
         shift2History.length;
 
+  // =====================================================
+// 🎱 FRAME / CENTURY SUMMARY
+// =====================================================
+
+const getPlayType = (h) =>
+    String(
+        h.selectedPlayType ||
+        h.playType ||
+        h.play_type ||
+        "frame"
+    ).toLowerCase();
+
+const getAmount = (h) =>
+    Number(
+        h.originalAmount ??
+        h.amount ??
+        h.final_game_amount ??
+        h.final_amount ??
+        0
+    );
+
+const getSeconds = (h) =>
+    Number(
+        h.playSeconds ??
+        h.finalSeconds ??
+        h.play_seconds ??
+        h.final_seconds ??
+        0
+    );
+
+const shift1Frames =
+    shift1History.filter(
+        h => getPlayType(h) === "frame"
+    );
+
+const shift2Frames =
+    shift2History.filter(
+        h => getPlayType(h) === "frame"
+    );
+
+const shift1Century =
+    shift1History.filter(
+        h => getPlayType(h) === "century"
+    );
+
+const shift2Century =
+    shift2History.filter(
+        h => getPlayType(h) === "century"
+    );
+
+const shift1FrameAmount =
+    shift1Frames.reduce(
+        (sum, h) => sum + getAmount(h),
+        0
+    );
+
+const shift2FrameAmount =
+    shift2Frames.reduce(
+        (sum, h) => sum + getAmount(h),
+        0
+    );
+
+const shift1CenturyAmount =
+    shift1Century.reduce(
+        (sum, h) => sum + getAmount(h),
+        0
+    );
+
+const shift2CenturyAmount =
+    shift2Century.reduce(
+        (sum, h) => sum + getAmount(h),
+        0
+    );
+
+const shift1CenturySeconds =
+    shift1Century.reduce(
+        (sum, h) => sum + getSeconds(h),
+        0
+    );
+
+const shift2CenturySeconds =
+    shift2Century.reduce(
+        (sum, h) => sum + getSeconds(h),
+        0
+    );
+
     const shift1Guest =
         shift1History.filter(
             h => !h.fromBooking
