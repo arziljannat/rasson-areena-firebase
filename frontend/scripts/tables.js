@@ -1495,19 +1495,45 @@ async function openPlayers(id) {
                     PLAYER 1
                 </label>
 
-                <input
-                    id="player1Input"
-                    type="text"
-                    placeholder="Player 1 name"
-                    style="
-                        width:100%;
-                        box-sizing:border-box;
-                        padding:12px;
-                        margin-bottom:18px;
-                        border-radius:8px;
-                        border:1px solid #555;
-                    "
-                >
+<div style="
+    display:flex;
+    gap:8px;
+    margin-bottom:18px;
+">
+
+    <input
+        id="player1Input"
+        type="text"
+        placeholder="Player 1 name"
+        style="
+            flex:1;
+            min-width:0;
+            box-sizing:border-box;
+            padding:12px;
+            border-radius:8px;
+            border:1px solid #555;
+        "
+    >
+
+    <button
+        type="button"
+        id="player1VoiceBtn"
+        title="Speak Player 1 name"
+        style="
+            width:52px;
+            border:0;
+            border-radius:8px;
+            background:#00ffcc;
+            color:#000;
+            font-size:22px;
+            cursor:pointer;
+            font-weight:bold;
+        "
+    >
+        🎤
+    </button>
+
+</div>
 
                 <label style="
                     display:block;
@@ -1517,19 +1543,45 @@ async function openPlayers(id) {
                     PLAYER 2
                 </label>
 
-                <input
-                    id="player2Input"
-                    type="text"
-                    placeholder="Player 2 name"
-                    style="
-                        width:100%;
-                        box-sizing:border-box;
-                        padding:12px;
-                        margin-bottom:20px;
-                        border-radius:8px;
-                        border:1px solid #555;
-                    "
-                >
+<div style="
+    display:flex;
+    gap:8px;
+    margin-bottom:20px;
+">
+
+    <input
+        id="player2Input"
+        type="text"
+        placeholder="Player 2 name"
+        style="
+            flex:1;
+            min-width:0;
+            box-sizing:border-box;
+            padding:12px;
+            border-radius:8px;
+            border:1px solid #555;
+        "
+    >
+
+    <button
+        type="button"
+        id="player2VoiceBtn"
+        title="Speak Player 2 name"
+        style="
+            width:52px;
+            border:0;
+            border-radius:8px;
+            background:#00ffcc;
+            color:#000;
+            font-size:22px;
+            cursor:pointer;
+            font-weight:bold;
+        "
+    >
+        🎤
+    </button>
+
+</div>
 
                 <div style="
                     display:flex;
@@ -1658,6 +1710,188 @@ async function openPlayers(id) {
         }
     };
 }
+
+
+// ==========================================
+// 🎤 PLAYER NAME VOICE INPUT
+// Typing + Voice dono supported
+// ==========================================
+
+function setupPlayerVoiceInput(inputId, buttonId) {
+
+    const input =
+        document.getElementById(inputId);
+
+    const button =
+        document.getElementById(buttonId);
+
+    if (!input || !button) {
+        console.warn(
+            "🎤 Voice elements not found:",
+            inputId,
+            buttonId
+        );
+        return;
+    }
+
+    // Browser support check
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+
+        button.onclick = () => {
+
+            alert(
+                "Voice input is not supported in this browser. Please use Google Chrome."
+            );
+
+        };
+
+        return;
+    }
+
+    const recognition =
+        new SpeechRecognition();
+
+    // English + Urdu support
+    recognition.lang = "en-PK";
+
+    recognition.interimResults = false;
+    recognition.continuous = false;
+    recognition.maxAlternatives = 1;
+
+    let listening = false;
+
+    button.onclick = () => {
+
+        if (listening) {
+            recognition.stop();
+            return;
+        }
+
+        try {
+
+            // Input ko focus karo
+            input.focus();
+
+            // Naya naam purane naam ko replace karega
+            input.select();
+
+            recognition.start();
+
+        } catch (error) {
+
+            console.log(
+                "🎤 Voice start error:",
+                error
+            );
+
+        }
+    };
+
+    recognition.onstart = () => {
+
+        listening = true;
+
+        button.innerText = "🔴";
+
+        button.style.background =
+            "#ff4444";
+
+        button.style.color =
+            "#fff";
+
+        input.placeholder =
+            "Listening... speak player name";
+    };
+
+    recognition.onresult = (event) => {
+
+        const result =
+            event.results[0][0].transcript;
+
+        if (result) {
+
+            input.value =
+                result.trim();
+
+            // Cursor end par
+            input.focus();
+
+            input.setSelectionRange(
+                input.value.length,
+                input.value.length
+            );
+        }
+    };
+
+    recognition.onerror = (event) => {
+
+        console.log(
+            "🎤 Voice recognition error:",
+            event.error
+        );
+
+        if (
+            event.error === "not-allowed"
+        ) {
+
+            alert(
+                "Microphone permission denied. Please allow microphone access."
+            );
+
+        } else if (
+            event.error === "no-speech"
+        ) {
+
+            console.log(
+                "🎤 No speech detected"
+            );
+
+        } else {
+
+            console.log(
+                "🎤 Voice error:",
+                event.error
+            );
+        }
+    };
+
+    recognition.onend = () => {
+
+        listening = false;
+
+        button.innerText = "🎤";
+
+        button.style.background =
+            "#00ffcc";
+
+        button.style.color =
+            "#000";
+
+        input.placeholder =
+            inputId === "player1Input"
+                ? "Player 1 name"
+                : "Player 2 name";
+    };
+}
+
+
+// ==========================================
+// 🎤 ACTIVATE BOTH PLAYER MIC BUTTONS
+// ==========================================
+
+setupPlayerVoiceInput(
+    "player1Input",
+    "player1VoiceBtn"
+);
+
+setupPlayerVoiceInput(
+    "player2Input",
+    "player2VoiceBtn"
+);
 
 
 /******************************************************
