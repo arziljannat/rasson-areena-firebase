@@ -4724,3 +4724,463 @@ body * {
         padding: 7px 4px !important;
     }
 }
+
+/* =========================================================
+   🔥 RASSON HISTORY POPUP — FINAL PREMIUM CARD FIX
+========================================================= */
+
+/* POPUP */
+#historyPopup .large-popup {
+    width: 1400px !important;
+    max-width: 96vw !important;
+
+    height: 88vh !important;
+    max-height: 88vh !important;
+
+    padding: 30px !important;
+
+    box-sizing: border-box !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    border-radius: 20px !important;
+}
+
+
+/* TITLE */
+#historyPopup #historyTableTitle {
+    font-size: 32px !important;
+    font-weight: 900 !important;
+
+    margin: 0 0 25px 0 !important;
+
+    text-align: center !important;
+
+    color: #dffff8 !important;
+
+    text-shadow:
+        0 0 8px #00ffcc,
+        0 0 20px #00ffcc !important;
+}
+
+
+/* =========================================================
+   🔥 SIX CARDS — 3 TOP + 3 BOTTOM
+========================================================= */
+
+#historyPopup .history-summary-counters {
+
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr)) !important;
+
+    gap: 20px !important;
+
+    margin: 0 0 28px 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   🔥 ACTUAL CARD BOX
+========================================================= */
+
+#historyPopup .history-summary-box {
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    min-height: 180px !important;
+
+    padding: 20px !important;
+
+    box-sizing: border-box !important;
+
+    border-radius: 18px !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(5,20,17,.96),
+            rgba(0,0,0,.92)
+        ) !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: center !important;
+
+    justify-content: flex-start !important;
+
+    text-align: center !important;
+
+    position: relative !important;
+}
+
+
+/* =========================================================
+   🔥 CARD BORDERS
+========================================================= */
+
+#historyPopup .history-summary-box.green {
+
+    border: 2px solid #00ff88 !important;
+
+    box-shadow:
+        0 0 12px rgba(0,255,136,.35),
+        inset 0 0 18px rgba(0,255,136,.08) !important;
+}
+
+
+#historyPopup .history-summary-box.gold {
+
+    border: 2px solid #ffd700 !important;
+
+    box-shadow:
+        0 0 12px rgba(255,215,0,.35),
+        inset 0 0 18px rgba(255,215,0,.08) !important;
+}
+
+
+#historyPopup .history-summary-box.red {
+
+    border: 2px solid #ff4444 !important;
+
+    box-shadow:
+        0 0 12px rgba(255,60,60,.35),
+        inset 0 0 18px rgba(255,60,60,.08) !important;
+}
+
+
+/* =========================================================
+   🔥 CARD TITLE
+========================================================= */
+
+#historyPopup .history-card-title {
+
+    width: 100% !important;
+
+    font-size: 21px !important;
+
+    font-weight: 900 !important;
+
+    line-height: 1.2 !important;
+
+    margin: 0 0 16px 0 !important;
+
+    color: #00ffcc !important;
+
+    text-align: center !important;
+
+    white-space: nowrap !important;
+
+    text-shadow:
+        0 0 8px rgba(0,255,204,.5) !important;
+}
+
+
+/* =========================================================
+   🔥 SHIFT 1 / SHIFT 2 / TOTAL
+========================================================= */
+
+#historyPopup .history-card-head {
+
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, 1fr) !important;
+
+    gap: 8px !important;
+
+    margin: 0 0 6px 0 !important;
+
+    font-size: 15px !important;
+
+    font-weight: 900 !important;
+
+    color: #d0d0d0 !important;
+
+    text-align: center !important;
+}
+
+
+#historyPopup .history-card-head span {
+
+    font-size: 15px !important;
+
+    font-weight: 900 !important;
+
+    color: #d8d8d8 !important;
+}
+
+
+/* =========================================================
+   🔥 NUMBERS
+========================================================= */
+
+#historyPopup .history-card-values {
+
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, 1fr) !important;
+
+    gap: 8px !important;
+
+    text-align: center !important;
+}
+
+
+#historyPopup .history-card-values strong {
+
+    font-size: 30px !important;
+
+    line-height: 1.15 !important;
+
+    font-weight: 900 !important;
+
+    color: #ffffff !important;
+
+    text-shadow:
+        0 0 8px rgba(255,255,255,.5) !important;
+}
+
+
+/* =========================================================
+   🔥 AMOUNTS
+========================================================= */
+
+#historyPopup .history-card-amount {
+
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, 1fr) !important;
+
+    gap: 8px !important;
+
+    margin-top: 7px !important;
+
+    text-align: center !important;
+}
+
+
+#historyPopup .history-card-amount span {
+
+    font-size: 15px !important;
+
+    line-height: 1.2 !important;
+
+    font-weight: 900 !important;
+
+    color: #00ff99 !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================================================
+   🔥 CENTURY TIME
+========================================================= */
+
+#historyPopup .history-card-time {
+
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, 1fr) !important;
+
+    gap: 8px !important;
+
+    margin-top: 5px !important;
+
+    text-align: center !important;
+}
+
+
+#historyPopup .history-card-time span {
+
+    font-size: 14px !important;
+
+    line-height: 1.2 !important;
+
+    font-weight: 900 !important;
+
+    color: #ffd700 !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================================================
+   🔥 HISTORY TABLE
+========================================================= */
+
+#historyPopup .table-mobile-wrapper {
+
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    max-height: 420px !important;
+
+    overflow-x: hidden !important;
+
+    overflow-y: auto !important;
+
+    box-sizing: border-box !important;
+}
+
+
+#historyPopup .history-table {
+
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    table-layout: fixed !important;
+
+    border-collapse: collapse !important;
+}
+
+
+#historyPopup .history-table th {
+
+    font-size: 16px !important;
+
+    font-weight: 900 !important;
+
+    padding: 12px 7px !important;
+
+    white-space: nowrap !important;
+
+    color: #00ffcc !important;
+}
+
+
+#historyPopup .history-table td {
+
+    font-size: 15px !important;
+
+    font-weight: 700 !important;
+
+    padding: 11px 7px !important;
+
+    white-space: nowrap !important;
+
+    height: 44px !important;
+}
+
+
+/* PLAYER COLUMN */
+#historyPopup .history-table th:nth-child(2),
+#historyPopup .history-table td:nth-child(2) {
+
+    width: 17% !important;
+}
+
+
+/* =========================================================
+   🔥 BUTTONS
+========================================================= */
+
+#historyPopup .popup-buttons {
+
+    width: 100% !important;
+
+    display: flex !important;
+
+    justify-content: center !important;
+
+    align-items: center !important;
+
+    gap: 20px !important;
+
+    margin-top: 18px !important;
+}
+
+
+#historyPopup .popup-buttons button {
+
+    min-width: 170px !important;
+
+    min-height: 48px !important;
+
+    padding: 10px 20px !important;
+
+    font-size: 17px !important;
+
+    font-weight: 900 !important;
+}
+
+
+/* =========================================================
+   🔥 RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    #historyPopup .large-popup {
+        width: 96vw !important;
+        max-width: 96vw !important;
+    }
+
+    #historyPopup .history-summary-counters {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    #historyPopup .large-popup {
+        width: 97vw !important;
+        max-width: 97vw !important;
+
+        height: 92vh !important;
+        max-height: 92vh !important;
+
+        padding: 16px !important;
+    }
+
+    #historyPopup .history-summary-counters {
+        grid-template-columns: 1fr !important;
+    }
+
+    #historyPopup .history-card-title {
+        font-size: 19px !important;
+    }
+
+    #historyPopup .history-card-values strong {
+        font-size: 27px !important;
+    }
+
+    #historyPopup .history-card-head span {
+        font-size: 13px !important;
+    }
+
+    #historyPopup .history-card-amount span {
+        font-size: 13px !important;
+    }
+
+    #historyPopup .history-card-time span {
+        font-size: 12px !important;
+    }
+
+}
