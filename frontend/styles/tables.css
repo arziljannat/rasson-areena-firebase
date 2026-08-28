@@ -4281,3 +4281,446 @@ body * {
     }
 
 }
+
+/* =========================================================
+   🔥 FINAL TABLE HISTORY POPUP — WIDE + NO HORIZONTAL SCROLL
+========================================================= */
+
+#historyPopup {
+    padding: 15px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+
+/* =========================
+   POPUP BOX
+========================= */
+
+#historyPopup .popup-box {
+    width: 1500px !important;
+    max-width: 96vw !important;
+    height: 88vh !important;
+    max-height: 88vh !important;
+
+    padding: 28px !important;
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+
+    border-radius: 20px !important;
+}
+
+
+/* =========================
+   TITLE
+========================= */
+
+#historyPopup #historyTableTitle {
+    flex: 0 0 auto !important;
+
+    margin: 0 0 22px 0 !important;
+
+    text-align: center !important;
+
+    font-size: 30px !important;
+    font-weight: 900 !important;
+
+    color: #dffff8 !important;
+
+    text-shadow:
+        0 0 8px #00ffcc,
+        0 0 18px #00ffcc !important;
+}
+
+
+/* =========================================================
+   🔥 SIX SUMMARY CARDS
+========================================================= */
+
+#historyPopup .history-summary-counters {
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr)) !important;
+
+    gap: 16px !important;
+
+    margin: 0 0 22px 0 !important;
+
+    flex: 0 0 auto !important;
+}
+
+
+/* =========================
+   CARD
+========================= */
+
+#historyPopup .history-summary-box {
+    min-width: 0 !important;
+
+    min-height: 145px !important;
+
+    padding: 16px !important;
+
+    box-sizing: border-box !important;
+
+    border-radius: 16px !important;
+
+    background: rgba(0,0,0,0.65) !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: center !important;
+
+    justify-content: flex-start !important;
+
+    text-align: center !important;
+}
+
+
+/* =========================
+   CARD TITLE
+========================= */
+
+#historyPopup .history-card-title {
+    font-size: 18px !important;
+    font-weight: 900 !important;
+
+    margin-bottom: 10px !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================
+   SHIFT / TOTAL HEAD
+========================= */
+
+#historyPopup .history-card-head {
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, 1fr) !important;
+
+    gap: 6px !important;
+
+    font-size: 13px !important;
+
+    font-weight: 800 !important;
+
+    color: #cfcfcf !important;
+
+    margin-bottom: 4px !important;
+}
+
+
+/* =========================
+   NUMBERS
+========================= */
+
+#historyPopup .history-card-values {
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, 1fr) !important;
+
+    gap: 6px !important;
+}
+
+
+#historyPopup .history-card-values strong {
+    font-size: 26px !important;
+
+    font-weight: 900 !important;
+
+    color: #ffffff !important;
+
+    text-shadow:
+        0 0 8px rgba(255,255,255,0.5) !important;
+}
+
+
+/* =========================
+   AMOUNTS
+========================= */
+
+#historyPopup .history-card-amount {
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, 1fr) !important;
+
+    gap: 6px !important;
+
+    margin-top: 5px !important;
+}
+
+
+#historyPopup .history-card-amount span {
+    font-size: 13px !important;
+
+    font-weight: 800 !important;
+
+    color: #00ff99 !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================
+   CENTURY TIME
+========================= */
+
+#historyPopup .history-card-time {
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, 1fr) !important;
+
+    gap: 6px !important;
+
+    margin-top: 3px !important;
+}
+
+
+#historyPopup .history-card-time span {
+    font-size: 12px !important;
+
+    font-weight: 800 !important;
+
+    color: #ffd700 !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================================================
+   🔥 HISTORY TABLE
+========================================================= */
+
+#historyPopup .table-mobile-wrapper {
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    flex: 1 1 auto !important;
+
+    min-height: 0 !important;
+
+    overflow-x: hidden !important;
+
+    overflow-y: auto !important;
+}
+
+
+/* =========================
+   TABLE — FIT FULL WIDTH
+========================= */
+
+#historyPopup .history-table {
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    max-width: 100% !important;
+
+    table-layout: fixed !important;
+
+    border-collapse: collapse !important;
+}
+
+
+/* =========================
+   TABLE CELLS
+========================= */
+
+#historyPopup .history-table th,
+#historyPopup .history-table td {
+    padding: 10px 7px !important;
+
+    font-size: 14px !important;
+
+    font-weight: 700 !important;
+
+    text-align: center !important;
+
+    vertical-align: middle !important;
+
+    box-sizing: border-box !important;
+
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+}
+
+
+/* =========================
+   TABLE HEADER
+========================= */
+
+#historyPopup .history-table th {
+    font-size: 15px !important;
+
+    font-weight: 900 !important;
+
+    color: #00ffcc !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================
+   PLAYERS COLUMN
+========================= */
+
+#historyPopup .history-table th:nth-child(2),
+#historyPopup .history-table td:nth-child(2) {
+    width: 17% !important;
+}
+
+
+/* =========================
+   SMALL COLUMNS
+========================= */
+
+#historyPopup .history-table th:nth-child(1),
+#historyPopup .history-table td:nth-child(1) {
+    width: 4% !important;
+}
+
+#historyPopup .history-table th:nth-child(3),
+#historyPopup .history-table td:nth-child(3),
+#historyPopup .history-table th:nth-child(4),
+#historyPopup .history-table td:nth-child(4) {
+    width: 8% !important;
+}
+
+#historyPopup .history-table th:nth-child(5),
+#historyPopup .history-table td:nth-child(5) {
+    width: 7% !important;
+}
+
+#historyPopup .history-table th:nth-child(6),
+#historyPopup .history-table td:nth-child(6) {
+    width: 6% !important;
+}
+
+#historyPopup .history-table th:nth-child(7),
+#historyPopup .history-table td:nth-child(7),
+#historyPopup .history-table th:nth-child(8),
+#historyPopup .history-table td:nth-child(8),
+#historyPopup .history-table th:nth-child(9),
+#historyPopup .history-table td:nth-child(9),
+#historyPopup .history-table th:nth-child(10),
+#historyPopup .history-table td:nth-child(10) {
+    width: 7% !important;
+}
+
+#historyPopup .history-table th:nth-child(11),
+#historyPopup .history-table td:nth-child(11) {
+    width: 6% !important;
+}
+
+#historyPopup .history-table th:nth-child(12),
+#historyPopup .history-table td:nth-child(12) {
+    width: 5% !important;
+}
+
+
+/* =========================================================
+   🔥 PLAYER NAMES — KEEP VISIBLE
+========================================================= */
+
+#historyPopup .history-table td:nth-child(2) > div {
+    min-width: 0 !important;
+    width: 100% !important;
+}
+
+
+#historyPopup .history-table td:nth-child(2) div {
+    max-width: 100% !important;
+
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+}
+
+
+/* =========================================================
+   🔥 BOTTOM BUTTONS
+========================================================= */
+
+#historyPopup .popup-buttons {
+    flex: 0 0 auto !important;
+
+    width: 100% !important;
+
+    display: flex !important;
+
+    justify-content: center !important;
+
+    align-items: center !important;
+
+    gap: 20px !important;
+
+    margin-top: 15px !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    #historyPopup .popup-box {
+        width: 96vw !important;
+        max-width: 96vw !important;
+    }
+
+    #historyPopup .history-summary-counters {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    #historyPopup .popup-box {
+        width: 97vw !important;
+        max-width: 97vw !important;
+
+        height: 92vh !important;
+        max-height: 92vh !important;
+
+        padding: 15px !important;
+    }
+
+    #historyPopup .history-summary-counters {
+        grid-template-columns: 1fr !important;
+    }
+
+    #historyPopup .history-table th,
+    #historyPopup .history-table td {
+        font-size: 12px !important;
+        padding: 7px 4px !important;
+    }
+}
