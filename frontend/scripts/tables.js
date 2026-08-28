@@ -3121,314 +3121,538 @@ const shift2CenturySeconds =
             );
 
 // =====================================================
-// 🔥 UPDATE TOP CARDS
-// FRAME / CENTURY + PAID / UNPAID
+// 🔥 PAID / UNPAID FRAME + CENTURY SUMMARY
 // =====================================================
+
+const isPaid = (h) =>
+    h.paid === true ||
+    h.paid === "true";
+
+
+// ---------- FRAME ----------
+
+const shift1PaidFrames =
+    shift1Frames.filter(isPaid);
+
+const shift2PaidFrames =
+    shift2Frames.filter(isPaid);
+
+const shift1UnpaidFrames =
+    shift1Frames.filter(h => !isPaid(h));
+
+const shift2UnpaidFrames =
+    shift2Frames.filter(h => !isPaid(h));
+
+
+// ---------- CENTURY ----------
+
+const shift1PaidCentury =
+    shift1Century.filter(isPaid);
+
+const shift2PaidCentury =
+    shift2Century.filter(isPaid);
+
+const shift1UnpaidCentury =
+    shift1Century.filter(h => !isPaid(h));
+
+const shift2UnpaidCentury =
+    shift2Century.filter(h => !isPaid(h));
 
 
 // =====================================================
-// 🎱 TOTAL FRAMES
+// 🔥 HELPER
 // =====================================================
 
-document.getElementById(
-    "historyShift1Frame"
-).textContent =
+const amountOf = (list) =>
+    list.reduce(
+        (sum, h) => sum + getAmount(h),
+        0
+    );
+
+const secondsOf = (list) =>
+    list.reduce(
+        (sum, h) => sum + getSeconds(h),
+        0
+    );
+
+
+// =====================================================
+// 🎱 FRAME COUNTS
+// =====================================================
+
+const s1FrameCount =
     shift1Frames.length;
 
-document.getElementById(
-    "historyShift2Frame"
-).textContent =
+const s2FrameCount =
     shift2Frames.length;
 
-document.getElementById(
-    "historyShift1FrameAmount"
-).textContent =
-    `Rs. ${shift1FrameAmount.toLocaleString()}`;
-
-document.getElementById(
-    "historyShift2FrameAmount"
-).textContent =
-    `Rs. ${shift2FrameAmount.toLocaleString()}`;
+const totalFrameCount =
+    s1FrameCount + s2FrameCount;
 
 
 // =====================================================
-// 👑 TOTAL CENTURY
+// 💰 FRAME AMOUNTS
 // =====================================================
 
-document.getElementById(
-    "historyShift1Century"
-).textContent =
+const s1FrameAmount =
+    amountOf(shift1Frames);
+
+const s2FrameAmount =
+    amountOf(shift2Frames);
+
+const totalFrameAmount =
+    s1FrameAmount + s2FrameAmount;
+
+
+// =====================================================
+// 👑 CENTURY COUNTS
+// =====================================================
+
+const s1CenturyCount =
     shift1Century.length;
 
-document.getElementById(
-    "historyShift2Century"
-).textContent =
+const s2CenturyCount =
     shift2Century.length;
 
-document.getElementById(
-    "historyShift1CenturyAmount"
-).textContent =
-    `Rs. ${shift1CenturyAmount.toLocaleString()}`;
+const totalCenturyCount =
+    s1CenturyCount + s2CenturyCount;
 
-document.getElementById(
-    "historyShift2CenturyAmount"
-).textContent =
-    `Rs. ${shift2CenturyAmount.toLocaleString()}`;
 
-document.getElementById(
-    "historyShift1CenturyTime"
-).textContent =
-    formatSeconds(shift1CenturySeconds);
+// =====================================================
+// 👑 CENTURY AMOUNTS
+// =====================================================
 
-document.getElementById(
-    "historyShift2CenturyTime"
-).textContent =
-    formatSeconds(shift2CenturySeconds);
+const s1CenturyAmount =
+    amountOf(shift1Century);
+
+const s2CenturyAmount =
+    amountOf(shift2Century);
+
+const totalCenturyAmount =
+    s1CenturyAmount + s2CenturyAmount;
+
+
+// =====================================================
+// ⏱️ CENTURY TIME
+// =====================================================
+
+const s1CenturySeconds =
+    secondsOf(shift1Century);
+
+const s2CenturySeconds =
+    secondsOf(shift2Century);
+
+const totalCenturySeconds =
+    s1CenturySeconds + s2CenturySeconds;
 
 
 // =====================================================
 // 💰 PAID FRAMES
 // =====================================================
 
-const shift1PaidFrames =
-    shift1Frames.filter(
-        h => h.paid === true
-    );
-
-const shift2PaidFrames =
-    shift2Frames.filter(
-        h => h.paid === true
-    );
-
-const shift1PaidFrameAmount =
-    shift1PaidFrames.reduce(
-        (sum, h) =>
-            sum + getAmount(h),
-        0
-    );
-
-const shift2PaidFrameAmount =
-    shift2PaidFrames.reduce(
-        (sum, h) =>
-            sum + getAmount(h),
-        0
-    );
-
-document.getElementById(
-    "historyShift1PaidFrame"
-).textContent =
+const s1PaidFrameCount =
     shift1PaidFrames.length;
 
-document.getElementById(
-    "historyShift2PaidFrame"
-).textContent =
+const s2PaidFrameCount =
     shift2PaidFrames.length;
 
-document.getElementById(
-    "historyShift1PaidFrameAmount"
-).textContent =
-    `Rs. ${shift1PaidFrameAmount.toLocaleString()}`;
+const totalPaidFrameCount =
+    s1PaidFrameCount + s2PaidFrameCount;
 
-document.getElementById(
-    "historyShift2PaidFrameAmount"
-).textContent =
-    `Rs. ${shift2PaidFrameAmount.toLocaleString()}`;
+const s1PaidFrameAmount =
+    amountOf(shift1PaidFrames);
+
+const s2PaidFrameAmount =
+    amountOf(shift2PaidFrames);
+
+const totalPaidFrameAmount =
+    s1PaidFrameAmount + s2PaidFrameAmount;
 
 
 // =====================================================
 // 👑 PAID CENTURIES
 // =====================================================
 
-const shift1PaidCenturies =
-    shift1Century.filter(
-        h => h.paid === true
-    );
+const s1PaidCenturyCount =
+    shift1PaidCentury.length;
 
-const shift2PaidCenturies =
-    shift2Century.filter(
-        h => h.paid === true
-    );
+const s2PaidCenturyCount =
+    shift2PaidCentury.length;
 
-const shift1PaidCenturyAmount =
-    shift1PaidCenturies.reduce(
-        (sum, h) =>
-            sum + getAmount(h),
-        0
-    );
+const totalPaidCenturyCount =
+    s1PaidCenturyCount + s2PaidCenturyCount;
 
-const shift2PaidCenturyAmount =
-    shift2PaidCenturies.reduce(
-        (sum, h) =>
-            sum + getAmount(h),
-        0
-    );
+const s1PaidCenturyAmount =
+    amountOf(shift1PaidCentury);
 
-const shift1PaidCenturySeconds =
-    shift1PaidCenturies.reduce(
-        (sum, h) =>
-            sum + getSeconds(h),
-        0
-    );
+const s2PaidCenturyAmount =
+    amountOf(shift2PaidCentury);
 
-const shift2PaidCenturySeconds =
-    shift2PaidCenturies.reduce(
-        (sum, h) =>
-            sum + getSeconds(h),
-        0
-    );
+const totalPaidCenturyAmount =
+    s1PaidCenturyAmount + s2PaidCenturyAmount;
 
-document.getElementById(
-    "historyShift1PaidCentury"
-).textContent =
-    shift1PaidCenturies.length;
+const s1PaidCenturySeconds =
+    secondsOf(shift1PaidCentury);
 
-document.getElementById(
-    "historyShift2PaidCentury"
-).textContent =
-    shift2PaidCenturies.length;
+const s2PaidCenturySeconds =
+    secondsOf(shift2PaidCentury);
 
-document.getElementById(
-    "historyShift1PaidCenturyAmount"
-).textContent =
-    `Rs. ${shift1PaidCenturyAmount.toLocaleString()}`;
-
-document.getElementById(
-    "historyShift2PaidCenturyAmount"
-).textContent =
-    `Rs. ${shift2PaidCenturyAmount.toLocaleString()}`;
-
-document.getElementById(
-    "historyShift1PaidCenturyTime"
-).textContent =
-    formatSeconds(shift1PaidCenturySeconds);
-
-document.getElementById(
-    "historyShift2PaidCenturyTime"
-).textContent =
-    formatSeconds(shift2PaidCenturySeconds);
+const totalPaidCenturySeconds =
+    s1PaidCenturySeconds + s2PaidCenturySeconds;
 
 
 // =====================================================
 // 🔴 UNPAID FRAMES
 // =====================================================
 
-const shift1UnpaidFrames =
-    shift1Frames.filter(
-        h => h.paid !== true
-    );
-
-const shift2UnpaidFrames =
-    shift2Frames.filter(
-        h => h.paid !== true
-    );
-
-const shift1UnpaidFrameAmount =
-    shift1UnpaidFrames.reduce(
-        (sum, h) =>
-            sum + getAmount(h),
-        0
-    );
-
-const shift2UnpaidFrameAmount =
-    shift2UnpaidFrames.reduce(
-        (sum, h) =>
-            sum + getAmount(h),
-        0
-    );
-
-document.getElementById(
-    "historyShift1UnpaidFrame"
-).textContent =
+const s1UnpaidFrameCount =
     shift1UnpaidFrames.length;
 
-document.getElementById(
-    "historyShift2UnpaidFrame"
-).textContent =
+const s2UnpaidFrameCount =
     shift2UnpaidFrames.length;
 
-document.getElementById(
-    "historyShift1UnpaidFrameAmount"
-).textContent =
-    `Rs. ${shift1UnpaidFrameAmount.toLocaleString()}`;
+const totalUnpaidFrameCount =
+    s1UnpaidFrameCount + s2UnpaidFrameCount;
 
-document.getElementById(
-    "historyShift2UnpaidFrameAmount"
-).textContent =
-    `Rs. ${shift2UnpaidFrameAmount.toLocaleString()}`;
+const s1UnpaidFrameAmount =
+    amountOf(shift1UnpaidFrames);
+
+const s2UnpaidFrameAmount =
+    amountOf(shift2UnpaidFrames);
+
+const totalUnpaidFrameAmount =
+    s1UnpaidFrameAmount + s2UnpaidFrameAmount;
 
 
 // =====================================================
 // 🔴 UNPAID CENTURIES
 // =====================================================
 
-const shift1UnpaidCenturies =
-    shift1Century.filter(
-        h => h.paid !== true
+const s1UnpaidCenturyCount =
+    shift1UnpaidCentury.length;
+
+const s2UnpaidCenturyCount =
+    shift2UnpaidCentury.length;
+
+const totalUnpaidCenturyCount =
+    s1UnpaidCenturyCount + s2UnpaidCenturyCount;
+
+const s1UnpaidCenturyAmount =
+    amountOf(shift1UnpaidCentury);
+
+const s2UnpaidCenturyAmount =
+    amountOf(shift2UnpaidCentury);
+
+const totalUnpaidCenturyAmount =
+    s1UnpaidCenturyAmount + s2UnpaidCenturyAmount;
+
+const s1UnpaidCenturySeconds =
+    secondsOf(shift1UnpaidCentury);
+
+const s2UnpaidCenturySeconds =
+    secondsOf(shift2UnpaidCentury);
+
+const totalUnpaidCenturySeconds =
+    s1UnpaidCenturySeconds +
+    s2UnpaidCenturySeconds;
+
+
+// =====================================================
+// 🔥 TIME FORMAT
+// =====================================================
+
+const formatSummaryTime = (seconds) => {
+
+    seconds = Math.max(
+        0,
+        Math.floor(Number(seconds) || 0)
     );
 
-const shift2UnpaidCenturies =
-    shift2Century.filter(
-        h => h.paid !== true
-    );
+    const hours =
+        Math.floor(seconds / 3600);
 
-const shift1UnpaidCenturyAmount =
-    shift1UnpaidCenturies.reduce(
-        (sum, h) =>
-            sum + getAmount(h),
-        0
-    );
+    const minutes =
+        Math.floor((seconds % 3600) / 60);
 
-const shift2UnpaidCenturyAmount =
-    shift2UnpaidCenturies.reduce(
-        (sum, h) =>
-            sum + getAmount(h),
-        0
-    );
+    const secs =
+        seconds % 60;
 
-const shift1UnpaidCenturySeconds =
-    shift1UnpaidCenturies.reduce(
-        (sum, h) =>
-            sum + getSeconds(h),
-        0
-    );
+    return [
+        String(hours).padStart(2, "0"),
+        String(minutes).padStart(2, "0"),
+        String(secs).padStart(2, "0")
+    ].join(":");
+};
 
-const shift2UnpaidCenturySeconds =
-    shift2UnpaidCenturies.reduce(
-        (sum, h) =>
-            sum + getSeconds(h),
-        0
-    );
 
-document.getElementById(
-    "historyShift1UnpaidCentury"
-).textContent =
-    shift1UnpaidCenturies.length;
+// =====================================================
+// 🔥 SAFE DOM UPDATE
+// =====================================================
 
-document.getElementById(
-    "historyShift2UnpaidCentury"
-).textContent =
-    shift2UnpaidCenturies.length;
+const setText = (id, value) => {
 
-document.getElementById(
-    "historyShift1UnpaidCenturyAmount"
-).textContent =
-    `Rs. ${shift1UnpaidCenturyAmount.toLocaleString()}`;
+    const el =
+        document.getElementById(id);
 
-document.getElementById(
-    "historyShift2UnpaidCenturyAmount"
-).textContent =
-    `Rs. ${shift2UnpaidCenturyAmount.toLocaleString()}`;
+    if (el) {
+        el.textContent = value;
+    }
+};
 
-document.getElementById(
-    "historyShift1UnpaidCenturyTime"
-).textContent =
-    formatSeconds(shift1UnpaidCenturySeconds);
 
-document.getElementById(
-    "historyShift2UnpaidCenturyTime"
-).textContent =
-    formatSeconds(shift2UnpaidCenturySeconds);
+// =====================================================
+// 🎱 TOTAL FRAMES
+// =====================================================
 
+setText(
+    "historyShift1Frame",
+    s1FrameCount
+);
+
+setText(
+    "historyShift2Frame",
+    s2FrameCount
+);
+
+setText(
+    "historyTotalFrame",
+    totalFrameCount
+);
+
+setText(
+    "historyShift1FrameAmount",
+    `Rs. ${s1FrameAmount.toLocaleString()}`
+);
+
+setText(
+    "historyShift2FrameAmount",
+    `Rs. ${s2FrameAmount.toLocaleString()}`
+);
+
+setText(
+    "historyTotalFrameAmount",
+    `Rs. ${totalFrameAmount.toLocaleString()}`
+);
+
+
+// =====================================================
+// 👑 TOTAL CENTURY
+// =====================================================
+
+setText(
+    "historyShift1Century",
+    s1CenturyCount
+);
+
+setText(
+    "historyShift2Century",
+    s2CenturyCount
+);
+
+setText(
+    "historyTotalCentury",
+    totalCenturyCount
+);
+
+setText(
+    "historyShift1CenturyAmount",
+    `Rs. ${s1CenturyAmount.toLocaleString()}`
+);
+
+setText(
+    "historyShift2CenturyAmount",
+    `Rs. ${s2CenturyAmount.toLocaleString()}`
+);
+
+setText(
+    "historyTotalCenturyAmount",
+    `Rs. ${totalCenturyAmount.toLocaleString()}`
+);
+
+setText(
+    "historyShift1CenturyTime",
+    formatSummaryTime(s1CenturySeconds)
+);
+
+setText(
+    "historyShift2CenturyTime",
+    formatSummaryTime(s2CenturySeconds)
+);
+
+setText(
+    "historyTotalCenturyTime",
+    formatSummaryTime(totalCenturySeconds)
+);
+
+
+// =====================================================
+// 💰 PAID FRAMES
+// =====================================================
+
+setText(
+    "historyShift1PaidFrame",
+    s1PaidFrameCount
+);
+
+setText(
+    "historyShift2PaidFrame",
+    s2PaidFrameCount
+);
+
+setText(
+    "historyTotalPaidFrame",
+    totalPaidFrameCount
+);
+
+setText(
+    "historyShift1PaidFrameAmount",
+    `Rs. ${s1PaidFrameAmount.toLocaleString()}`
+);
+
+setText(
+    "historyShift2PaidFrameAmount",
+    `Rs. ${s2PaidFrameAmount.toLocaleString()}`
+);
+
+setText(
+    "historyTotalPaidFrameAmount",
+    `Rs. ${totalPaidFrameAmount.toLocaleString()}`
+);
+
+
+// =====================================================
+// 💰 PAID CENTURIES
+// =====================================================
+
+setText(
+    "historyShift1PaidCentury",
+    s1PaidCenturyCount
+);
+
+setText(
+    "historyShift2PaidCentury",
+    s2PaidCenturyCount
+);
+
+setText(
+    "historyTotalPaidCentury",
+    totalPaidCenturyCount
+);
+
+setText(
+    "historyShift1PaidCenturyAmount",
+    `Rs. ${s1PaidCenturyAmount.toLocaleString()}`
+);
+
+setText(
+    "historyShift2PaidCenturyAmount",
+    `Rs. ${s2PaidCenturyAmount.toLocaleString()}`
+);
+
+setText(
+    "historyTotalPaidCenturyAmount",
+    `Rs. ${totalPaidCenturyAmount.toLocaleString()}`
+);
+
+setText(
+    "historyShift1PaidCenturyTime",
+    formatSummaryTime(s1PaidCenturySeconds)
+);
+
+setText(
+    "historyShift2PaidCenturyTime",
+    formatSummaryTime(s2PaidCenturySeconds)
+);
+
+setText(
+    "historyTotalPaidCenturyTime",
+    formatSummaryTime(totalPaidCenturySeconds)
+);
+
+
+// =====================================================
+// 🔴 UNPAID FRAMES
+// =====================================================
+
+setText(
+    "historyShift1UnpaidFrame",
+    s1UnpaidFrameCount
+);
+
+setText(
+    "historyShift2UnpaidFrame",
+    s2UnpaidFrameCount
+);
+
+setText(
+    "historyTotalUnpaidFrame",
+    totalUnpaidFrameCount
+);
+
+setText(
+    "historyShift1UnpaidFrameAmount",
+    `Rs. ${s1UnpaidFrameAmount.toLocaleString()}`
+);
+
+setText(
+    "historyShift2UnpaidFrameAmount",
+    `Rs. ${s2UnpaidFrameAmount.toLocaleString()}`
+);
+
+setText(
+    "historyTotalUnpaidFrameAmount",
+    `Rs. ${totalUnpaidFrameAmount.toLocaleString()}`
+);
+
+
+// =====================================================
+// 🔴 UNPAID CENTURIES
+// =====================================================
+
+setText(
+    "historyShift1UnpaidCentury",
+    s1UnpaidCenturyCount
+);
+
+setText(
+    "historyShift2UnpaidCentury",
+    s2UnpaidCenturyCount
+);
+
+setText(
+    "historyTotalUnpaidCentury",
+    totalUnpaidCenturyCount
+);
+
+setText(
+    "historyShift1UnpaidCenturyAmount",
+    `Rs. ${s1UnpaidCenturyAmount.toLocaleString()}`
+);
+
+setText(
+    "historyShift2UnpaidCenturyAmount",
+    `Rs. ${s2UnpaidCenturyAmount.toLocaleString()}`
+);
+
+setText(
+    "historyTotalUnpaidCenturyAmount",
+    `Rs. ${totalUnpaidCenturyAmount.toLocaleString()}`
+);
+
+setText(
+    "historyShift1UnpaidCenturyTime",
+    formatSummaryTime(s1UnpaidCenturySeconds)
+);
+
+setText(
+    "historyShift2UnpaidCenturyTime",
+    formatSummaryTime(s2UnpaidCenturySeconds)
+);
+
+setText(
+    "historyTotalUnpaidCenturyTime",
+    formatSummaryTime(totalUnpaidCenturySeconds)
+);
     // =====================================================
     // 🔥 TABLE
     // =====================================================
