@@ -3121,40 +3121,68 @@ const shift2CenturySeconds =
             );
 
 // =====================================================
-// 🔥 UPDATE TOP CARDS — FRAME / CENTURY
+// 🔥 UPDATE TOP CARDS
+// FRAME / CENTURY + PAID / UNPAID
 // =====================================================
 
+
+// =====================================================
 // 🎱 TOTAL FRAMES
-document.getElementById("historyShift1Frame").textContent =
+// =====================================================
+
+document.getElementById(
+    "historyShift1Frame"
+).textContent =
     shift1Frames.length;
 
-document.getElementById("historyShift2Frame").textContent =
+document.getElementById(
+    "historyShift2Frame"
+).textContent =
     shift2Frames.length;
 
-document.getElementById("historyShift1FrameAmount").textContent =
+document.getElementById(
+    "historyShift1FrameAmount"
+).textContent =
     `Rs. ${shift1FrameAmount.toLocaleString()}`;
 
-document.getElementById("historyShift2FrameAmount").textContent =
+document.getElementById(
+    "historyShift2FrameAmount"
+).textContent =
     `Rs. ${shift2FrameAmount.toLocaleString()}`;
 
 
+// =====================================================
 // 👑 TOTAL CENTURY
-document.getElementById("historyShift1Century").textContent =
+// =====================================================
+
+document.getElementById(
+    "historyShift1Century"
+).textContent =
     shift1Century.length;
 
-document.getElementById("historyShift2Century").textContent =
+document.getElementById(
+    "historyShift2Century"
+).textContent =
     shift2Century.length;
 
-document.getElementById("historyShift1CenturyAmount").textContent =
+document.getElementById(
+    "historyShift1CenturyAmount"
+).textContent =
     `Rs. ${shift1CenturyAmount.toLocaleString()}`;
 
-document.getElementById("historyShift2CenturyAmount").textContent =
+document.getElementById(
+    "historyShift2CenturyAmount"
+).textContent =
     `Rs. ${shift2CenturyAmount.toLocaleString()}`;
 
-document.getElementById("historyShift1CenturyTime").textContent =
+document.getElementById(
+    "historyShift1CenturyTime"
+).textContent =
     formatSeconds(shift1CenturySeconds);
 
-document.getElementById("historyShift2CenturyTime").textContent =
+document.getElementById(
+    "historyShift2CenturyTime"
+).textContent =
     formatSeconds(shift2CenturySeconds);
 
 
@@ -3163,86 +3191,120 @@ document.getElementById("historyShift2CenturyTime").textContent =
 // =====================================================
 
 const shift1PaidFrames =
-    shift1Frames.filter(h => h.paid === true);
+    shift1Frames.filter(
+        h => h.paid === true
+    );
 
 const shift2PaidFrames =
-    shift2Frames.filter(h => h.paid === true);
+    shift2Frames.filter(
+        h => h.paid === true
+    );
 
 const shift1PaidFrameAmount =
     shift1PaidFrames.reduce(
-        (sum, h) => sum + getAmount(h),
+        (sum, h) =>
+            sum + getAmount(h),
         0
     );
 
 const shift2PaidFrameAmount =
     shift2PaidFrames.reduce(
-        (sum, h) => sum + getAmount(h),
+        (sum, h) =>
+            sum + getAmount(h),
         0
     );
 
-document.getElementById("historyShift1PaidFrame").textContent =
+document.getElementById(
+    "historyShift1PaidFrame"
+).textContent =
     shift1PaidFrames.length;
 
-document.getElementById("historyShift2PaidFrame").textContent =
+document.getElementById(
+    "historyShift2PaidFrame"
+).textContent =
     shift2PaidFrames.length;
 
-document.getElementById("historyShift1PaidFrameAmount").textContent =
+document.getElementById(
+    "historyShift1PaidFrameAmount"
+).textContent =
     `Rs. ${shift1PaidFrameAmount.toLocaleString()}`;
 
-document.getElementById("historyShift2PaidFrameAmount").textContent =
+document.getElementById(
+    "historyShift2PaidFrameAmount"
+).textContent =
     `Rs. ${shift2PaidFrameAmount.toLocaleString()}`;
 
 
 // =====================================================
-// 💰 PAID CENTURIES
+// 👑 PAID CENTURIES
 // =====================================================
 
 const shift1PaidCenturies =
-    shift1Century.filter(h => h.paid === true);
+    shift1Century.filter(
+        h => h.paid === true
+    );
 
 const shift2PaidCenturies =
-    shift2Century.filter(h => h.paid === true);
+    shift2Century.filter(
+        h => h.paid === true
+    );
 
 const shift1PaidCenturyAmount =
     shift1PaidCenturies.reduce(
-        (sum, h) => sum + getAmount(h),
+        (sum, h) =>
+            sum + getAmount(h),
         0
     );
 
 const shift2PaidCenturyAmount =
     shift2PaidCenturies.reduce(
-        (sum, h) => sum + getAmount(h),
+        (sum, h) =>
+            sum + getAmount(h),
         0
     );
 
 const shift1PaidCenturySeconds =
     shift1PaidCenturies.reduce(
-        (sum, h) => sum + getSeconds(h),
+        (sum, h) =>
+            sum + getSeconds(h),
         0
     );
 
 const shift2PaidCenturySeconds =
     shift2PaidCenturies.reduce(
-        (sum, h) => sum + getSeconds(h),
+        (sum, h) =>
+            sum + getSeconds(h),
         0
     );
 
-document.getElementById("historyShift1PaidCentury").textContent =
+document.getElementById(
+    "historyShift1PaidCentury"
+).textContent =
     shift1PaidCenturies.length;
 
-document.getElementById("historyShift2PaidCentury").textContent =
+document.getElementById(
+    "historyShift2PaidCentury"
+).textContent =
     shift2PaidCenturies.length;
 
-document.getElementById("historyShift1PaidCenturyAmount").textContent =
+document.getElementById(
+    "historyShift1PaidCenturyAmount"
+).textContent =
     `Rs. ${shift1PaidCenturyAmount.toLocaleString()}`;
 
-document.getElementById("historyShift2PaidCenturyAmount").textContent =
+document.getElementById(
+    "historyShift2PaidCenturyAmount"
+).textContent =
     `Rs. ${shift2PaidCenturyAmount.toLocaleString()}`;
 
-document.getElementById("historyShift1PaidCenturyTime").textContent =
+document.getElementById(
+    "historyShift1PaidCenturyTime"
+).textContent =
     formatSeconds(shift1PaidCenturySeconds);
 
-document.getElementById("historyShift2PaidCenturyTime").textContent =
+document.getElementById(
+    "historyShift2PaidCenturyTime"
+).textContent =
     formatSeconds(shift2PaidCenturySeconds);
 
 
@@ -3251,33 +3313,47 @@ document.getElementById("historyShift2PaidCenturyTime").textContent =
 // =====================================================
 
 const shift1UnpaidFrames =
-    shift1Frames.filter(h => h.paid !== true);
+    shift1Frames.filter(
+        h => h.paid !== true
+    );
 
 const shift2UnpaidFrames =
-    shift2Frames.filter(h => h.paid !== true);
+    shift2Frames.filter(
+        h => h.paid !== true
+    );
 
 const shift1UnpaidFrameAmount =
     shift1UnpaidFrames.reduce(
-        (sum, h) => sum + getAmount(h),
+        (sum, h) =>
+            sum + getAmount(h),
         0
     );
 
 const shift2UnpaidFrameAmount =
     shift2UnpaidFrames.reduce(
-        (sum, h) => sum + getAmount(h),
+        (sum, h) =>
+            sum + getAmount(h),
         0
     );
 
-document.getElementById("historyShift1UnpaidFrame").textContent =
+document.getElementById(
+    "historyShift1UnpaidFrame"
+).textContent =
     shift1UnpaidFrames.length;
 
-document.getElementById("historyShift2UnpaidFrame").textContent =
+document.getElementById(
+    "historyShift2UnpaidFrame"
+).textContent =
     shift2UnpaidFrames.length;
 
-document.getElementById("historyShift1UnpaidFrameAmount").textContent =
+document.getElementById(
+    "historyShift1UnpaidFrameAmount"
+).textContent =
     `Rs. ${shift1UnpaidFrameAmount.toLocaleString()}`;
 
-document.getElementById("historyShift2UnpaidFrameAmount").textContent =
+document.getElementById(
+    "historyShift2UnpaidFrameAmount"
+).textContent =
     `Rs. ${shift2UnpaidFrameAmount.toLocaleString()}`;
 
 
@@ -3286,51 +3362,71 @@ document.getElementById("historyShift2UnpaidFrameAmount").textContent =
 // =====================================================
 
 const shift1UnpaidCenturies =
-    shift1Century.filter(h => h.paid !== true);
+    shift1Century.filter(
+        h => h.paid !== true
+    );
 
 const shift2UnpaidCenturies =
-    shift2Century.filter(h => h.paid !== true);
+    shift2Century.filter(
+        h => h.paid !== true
+    );
 
 const shift1UnpaidCenturyAmount =
     shift1UnpaidCenturies.reduce(
-        (sum, h) => sum + getAmount(h),
+        (sum, h) =>
+            sum + getAmount(h),
         0
     );
 
 const shift2UnpaidCenturyAmount =
     shift2UnpaidCenturies.reduce(
-        (sum, h) => sum + getAmount(h),
+        (sum, h) =>
+            sum + getAmount(h),
         0
     );
 
 const shift1UnpaidCenturySeconds =
     shift1UnpaidCenturies.reduce(
-        (sum, h) => sum + getSeconds(h),
+        (sum, h) =>
+            sum + getSeconds(h),
         0
     );
 
 const shift2UnpaidCenturySeconds =
     shift2UnpaidCenturies.reduce(
-        (sum, h) => sum + getSeconds(h),
+        (sum, h) =>
+            sum + getSeconds(h),
         0
     );
 
-document.getElementById("historyShift1UnpaidCentury").textContent =
+document.getElementById(
+    "historyShift1UnpaidCentury"
+).textContent =
     shift1UnpaidCenturies.length;
 
-document.getElementById("historyShift2UnpaidCentury").textContent =
+document.getElementById(
+    "historyShift2UnpaidCentury"
+).textContent =
     shift2UnpaidCenturies.length;
 
-document.getElementById("historyShift1UnpaidCenturyAmount").textContent =
+document.getElementById(
+    "historyShift1UnpaidCenturyAmount"
+).textContent =
     `Rs. ${shift1UnpaidCenturyAmount.toLocaleString()}`;
 
-document.getElementById("historyShift2UnpaidCenturyAmount").textContent =
+document.getElementById(
+    "historyShift2UnpaidCenturyAmount"
+).textContent =
     `Rs. ${shift2UnpaidCenturyAmount.toLocaleString()}`;
 
-document.getElementById("historyShift1UnpaidCenturyTime").textContent =
+document.getElementById(
+    "historyShift1UnpaidCenturyTime"
+).textContent =
     formatSeconds(shift1UnpaidCenturySeconds);
 
-document.getElementById("historyShift2UnpaidCenturyTime").textContent =
+document.getElementById(
+    "historyShift2UnpaidCenturyTime"
+).textContent =
     formatSeconds(shift2UnpaidCenturySeconds);
 
     // =====================================================
