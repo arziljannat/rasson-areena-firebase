@@ -3825,3 +3825,94 @@ body * {
     font-size: 15px !important;
     font-weight: 600 !important;
 }
+
+/* =========================================================
+   🔥 HISTORY POPUP — BIGGER HISTORY TABLE
+========================================================= */
+
+#historyPopup .table-mobile-wrapper {
+    width: 100% !important;
+    max-height: 430px !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+}
+
+
+/* HISTORY TABLE */
+
+#historyPopup .history-table {
+    width: 100% !important;
+    min-width: 850px !important;
+    border-collapse: collapse !important;
+}
+
+
+/* HEADER */
+
+#historyPopup .history-table th {
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    padding: 10px 12px !important;
+    white-space: nowrap !important;
+}
+
+
+/* ROW */
+
+#historyPopup .history-table td {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    padding: 9px 12px !important;
+    height: 40px !important;
+    white-space: nowrap !important;
+}
+
+
+/* PLAYER */
+
+#historyPopup .history-table td:nth-child(2) {
+    font-size: 15px !important;
+    min-width: 180px !important;
+}
+
+
+/* NUMBER */
+
+#historyPopup .history-table td:first-child {
+    font-size: 15px !important;
+    font-weight: 900 !important;
+}
+
+
+/* SUMMARY CARD TEXT */
+
+#historyPopup .history-card-title {
+    font-size: 15px !important;
+    font-weight: 900 !important;
+}
+
+
+#historyPopup .history-card-head span {
+    font-size: 12px !important;
+    font-weight: 800 !important;
+}
+
+
+#historyPopup .history-card-values strong {
+    font-size: 20px !important;
+    font-weight: 900 !important;
+}
+
+
+#historyPopup .history-card-amount span {
+    font-size: 12px !important;
+    font-weight: 900 !important;
+}
+
+
+/* CENTURY TIME */
+
+#historyPopup .history-card-time span {
+    font-size: 11px !important;
+    font-weight: 900 !important;
+}
