@@ -1622,6 +1622,17 @@ async function openPlayers(id) {
         `;
 
         document.body.appendChild(popup);
+
+      // 🎤 ACTIVATE VOICE AFTER PLAYER POPUP IS CREATED
+setupPlayerVoiceInput(
+    "player1Input",
+    "player1VoiceBtn"
+);
+
+setupPlayerVoiceInput(
+    "player2Input",
+    "player2VoiceBtn"
+);
     }
 
     // 🔥 LOAD CURRENT NAMES
@@ -1883,15 +1894,7 @@ function setupPlayerVoiceInput(inputId, buttonId) {
 // 🎤 ACTIVATE BOTH PLAYER MIC BUTTONS
 // ==========================================
 
-setupPlayerVoiceInput(
-    "player1Input",
-    "player1VoiceBtn"
-);
 
-setupPlayerVoiceInput(
-    "player2Input",
-    "player2VoiceBtn"
-);
 
 
 /******************************************************
