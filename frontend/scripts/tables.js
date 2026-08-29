@@ -6199,111 +6199,6 @@ unpaidBills.forEach(bill => {
     return;
 }
 
-console.log(
-    "✅ SHIFT 2 CLOSE — No unpaid completed bills"
-);
-
-
-    let now = Date.now();
-
-    // Shift1 snapshot required
-    let s1 = shift1 || {};
-
-    let startMs = shift1?.endMs;
-
-// 🔥 HARD FIX (NO FAIL SYSTEM)
-if (!startMs) {
-
-    console.log("⚠️ shift1 missing → forcing reload");
-
-    // ✅ STEP 1: reload shifts
-    loadShiftsFromFirebase();
-
-    startMs = shift1?.endMs;
-
-    // ✅ STEP 2: STILL MISSING → WAIT + FETCH
-    if (!startMs) {
-
-        await new Promise(res => setTimeout(res, 800)); // 🔥 WAIT
-
-        const q = query(
-            collection(window.db, "shifts"),
-            where("branch", "==", BRANCH),
-            where("shift_number", "==", 1),
-            where("day_id", "==", window.currentDayId)
-        );
-
-        const snap = await getDocs(q);
-
-        snap.forEach(doc => {
-            const d = doc.data();
-            startMs = d.end_ms;
-        });
-    }
-
-    if (!startMs) {
-    console.log("🔥 FALLBACK ACTIVATED");
-
-    // 🔥 NEVER FAIL SYSTEM
-    startMs = Date.now() - (60 * 60 * 1000); // 1 hour back
-}
-}
-    let endMs = now;
-
-    
-    let shiftData = calculateShiftSnapshot(startMs, endMs);
-
-    shift2 = {
-        shift: 2,
-        openTime: new Date(startMs).toLocaleString('en-PK', { timeZone: 'Asia/Karachi' }),
-        closeTime: new Date(endMs).toLocaleString('en-PK', { timeZone: 'Asia/Karachi' }),
-        startMs: startMs,
-        endMs: endMs,
-        ...shiftData
-    };
-
-    
-
-    document.getElementById("shiftCloseBtn").innerText = "Day Close";
-    hidePopup("shiftSummaryPopup");
-
-// ✅ BACKEND SAVE
-
-// 🔥 FIREBASE SAVE SHIFT 2
-await addDoc(collection(window.db, "shifts"), {
-    tables: tables.map(t => ({
-        table_id: t.name,
-        total: t.history.reduce((sum, h) => sum + (h.total || 0), 0)
-    })),
-    shift_number: 2,
-    branch: BRANCH,
-
-    day_id: window.currentDayId,
-
-    open_time: shift2.openTime,
-    close_time: shift2.closeTime,
-    start_ms: shift2.startMs,
-    end_ms: shift2.endMs,
-
-    game_total: shiftData.gameTotal,
-canteen_total: shiftData.canteenTotal,
-
-game_collection: shiftData.gameCollection,
-canteen_collection: shiftData.canteenCollection,
-
-expenses: shiftData.expenses,
-easypaisa: shiftData.easypaisa,
-
-discount: shiftData.discount || 0,
-
-closing_cash: shiftData.closingCash,
-
-    created_at: new Date().toISOString()
-});
-
-alert("Shift 2 closed successfully ✅");
-  loadShiftsFromFirebase();
-}
 
 
 
@@ -6312,12 +6207,17 @@ alert("Shift 2 closed successfully ✅");
  ******************************************************/
 async function closeDay() {
 
-   const today = new Date().toLocaleDateString("en-CA"); // ✅ FIX
-    let s1 = shift1;
-    let s2 = shift2;
+    const today =
+        new Date().toLocaleDateString("en-CA");
 
-    if (!s1 || !s2) {
-        alert("Please close Shift 1 and Shift 2 before Day Close.");
+    let s1 = shift1;
+
+    if (!s1) {
+
+        alert(
+            "Please close Shift before Day Close."
+        );
+
         return;
     }
 
