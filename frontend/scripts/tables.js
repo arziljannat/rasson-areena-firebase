@@ -7299,14 +7299,13 @@ tables.sort((a, b) => {
                     </div>
 
 
-                    <div class="snapshot-grid">
-
+                    <div class="snapshot-grid room-total-grid">
+                    
                         <div class="snapshot-item">
-
+                    
                             <span>
                                 Total Amount
                             </span>
-
                             <strong>
                                 Rs ${formatMoney(
                                     totalAmount
