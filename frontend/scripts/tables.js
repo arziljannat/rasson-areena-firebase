@@ -4902,331 +4902,773 @@ function hidePopup(id) {
 }
 
 /******************************************************
- * 🔥 HABIB STYLE LIVE SHIFT SNAPSHOT
+ * 🔥 NEW RASSON DAY / SHIFT SNAPSHOT
  ******************************************************/
-async function openShiftSummary() {
 
-    const btn =
-        document.getElementById("shiftCloseBtn");
-
-    const summaryBody =
-        document.getElementById("shiftSummaryBody");
-
-    const title =
-        document.getElementById("shiftSummaryTitle");
-
-    // ==========================================
-    // TITLE
-    // ==========================================
-
-    if (btn.innerText.includes("Day")) {
-
-        title.innerText = "DAY SNAPSHOT";
-
-        document.getElementById(
-            "confirmShiftCloseBtn"
-        ).innerText = "Close Day";
-
-    } else {
-
-        title.innerText = "SHIFT SNAPSHOT";
-
-        document.getElementById(
-            "confirmShiftCloseBtn"
-        ).innerText = "Close Shift";
-    }
+function snapshotMoney(value) {
+    return "Rs. " + Number(value || 0).toLocaleString("en-PK");
+}
 
 
-    // ==========================================
-    // 🔥 ALWAYS REBUILD CURRENT HISTORY FIRST
-    // ==========================================
+function snapshotTime(seconds) {
 
-    await rebuildHistoryFromSessions();
+    seconds = Number(seconds || 0);
 
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
 
-    // ==========================================
-    // 🔥 CURRENT TIME
-    // ==========================================
-
-    const now = Date.now();
-
-
-    // ==========================================
-    // 🔥 GET SHIFT DATA
-    // ==========================================
-
-    let s1 = shift1
-        ? { ...shift1 }
-        : null;
-
-    let s2 = shift2
-        ? { ...shift2 }
-        : null;
+    return (
+        String(h).padStart(2, "0") + ":" +
+        String(m).padStart(2, "0") + ":" +
+        String(s).padStart(2, "0")
+    );
+}
 
 
-// ==========================================
-// 🔥 LIVE SHIFT 1
-// Shift 1 is running when no closed Shift 1
-// exists for current operational day.
-// ==========================================
+/* =====================================================
+   TABLE DATA
+===================================================== */
 
-if (!s1) {
+function getSnapshotTableData(
+    table,
+    startMs,
+    endMs,
+    shiftNumber = null
+) {
 
-    // 🔥 SHIFT 1 START = CURRENT OPERATIONAL DAY START
-    let startMs =
-        Number(window.currentDayId) || 0;
+    let frames = 0;
+    let frameAmount = 0;
+    let frameTime = 0;
 
-    // Safety fallback
-    if (!startMs || startMs < 1000000000000) {
-        startMs = now;
-    }
+    let centuries = 0;
+    let centuryAmount = 0;
+    let centuryTime = 0;
 
-    const liveData =
-        calculateShiftSnapshot(
-            startMs,
-            now,
-            1
+
+    (table.history || []).forEach(h => {
+
+        const checkout =
+            Number(h.checkout || 0);
+
+        if (
+            checkout < startMs ||
+            checkout > endMs
+        ) {
+            return;
+        }
+
+
+        /*
+         * Shift filtering
+         */
+
+        if (
+            shiftNumber !== null &&
+            Number(h.shiftNumber || 1) !==
+            Number(shiftNumber)
+        ) {
+            return;
+        }
+
+
+        const amount =
+            Number(
+                h.amount ??
+                h.finalAmount ??
+                0
+            );
+
+
+        const seconds =
+            Number(
+                h.playSeconds ??
+                h.finalSeconds ??
+                0
+            );
+
+
+        const type =
+            String(
+                h.playType || "frame"
+            ).toLowerCase();
+
+
+        if (type === "century") {
+
+            centuries++;
+            centuryAmount += amount;
+            centuryTime += seconds;
+
+        } else {
+
+            frames++;
+            frameAmount += amount;
+            frameTime += seconds;
+
+        }
+
+    });
+
+
+    return {
+        frames,
+        frameAmount,
+        frameTime,
+
+        centuries,
+        centuryAmount,
+        centuryTime
+    };
+}
+
+
+/* =====================================================
+   ROOM DATA
+===================================================== */
+
+function getSnapshotRoomAmount(
+    room,
+    startMs,
+    endMs,
+    shiftNumber = null
+) {
+
+    let total = 0;
+
+
+    (room.history || []).forEach(h => {
+
+        const checkout =
+            Number(h.checkout || 0);
+
+
+        if (
+            checkout < startMs ||
+            checkout > endMs
+        ) {
+            return;
+        }
+
+
+        if (
+            shiftNumber !== null &&
+            Number(h.shiftNumber || 1) !==
+            Number(shiftNumber)
+        ) {
+            return;
+        }
+
+
+        total += Number(
+            h.amount ??
+            h.finalAmount ??
+            0
         );
 
-    s1 = {
+    });
 
-        shift: 1,
 
-        startMs: startMs,
+    return total;
+}
 
-        // 🔥 IMPORTANT:
-        // running shift ka end time nahi hota
-        endMs: null,
 
-        openTime:
-            new Date(startMs)
+/* =====================================================
+   BUILD SNAPSHOT
+===================================================== */
+
+function buildRassonSnapshot(
+    startMs,
+    endMs,
+    shiftNumber = null
+) {
+
+    let html = "";
+
+
+    let totalFrames = 0;
+    let totalFrameAmount = 0;
+    let totalFrameTime = 0;
+
+    let totalCenturies = 0;
+    let totalCenturyAmount = 0;
+    let totalCenturyTime = 0;
+
+
+    /* =================================================
+       TABLES
+    ================================================= */
+
+    const normalTables =
+        tables
+            .filter(t =>
+                String(
+                    t.tableType || "table"
+                ).toLowerCase() !== "room"
+            )
+            .sort((a, b) => {
+
+                const aNum =
+                    parseInt(
+                        String(a.name)
+                            .replace(/\D/g, "")
+                    ) || 999;
+
+                const bNum =
+                    parseInt(
+                        String(b.name)
+                            .replace(/\D/g, "")
+                    ) || 999;
+
+                return aNum - bNum;
+
+            });
+
+
+    normalTables.forEach(t => {
+
+        const data =
+            getSnapshotTableData(
+                t,
+                startMs,
+                endMs,
+                shiftNumber
+            );
+
+
+        totalFrames += data.frames;
+        totalFrameAmount += data.frameAmount;
+        totalFrameTime += data.frameTime;
+
+        totalCenturies += data.centuries;
+        totalCenturyAmount += data.centuryAmount;
+        totalCenturyTime += data.centuryTime;
+
+
+        html += `
+
+        <div class="snapshot-table-card">
+
+            <div class="snapshot-table-title">
+                ${t.name}
+            </div>
+
+
+            <div class="snapshot-game-row frame-row">
+
+                <div class="snapshot-game-type">
+                    🎱 FRAMES
+                </div>
+
+                <div class="snapshot-stat">
+                    <span>Total Frames</span>
+                    <strong>
+                        ${data.frames}
+                    </strong>
+                </div>
+
+                <div class="snapshot-stat">
+                    <span>Amount</span>
+                    <strong>
+                        ${snapshotMoney(
+                            data.frameAmount
+                        )}
+                    </strong>
+                </div>
+
+                <div class="snapshot-stat">
+                    <span>Total Time</span>
+                    <strong>
+                        ${snapshotTime(
+                            data.frameTime
+                        )}
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="snapshot-game-row century-row">
+
+                <div class="snapshot-game-type">
+                    👑 CENTURIES
+                </div>
+
+                <div class="snapshot-stat">
+                    <span>Total Centuries</span>
+                    <strong>
+                        ${data.centuries}
+                    </strong>
+                </div>
+
+                <div class="snapshot-stat">
+                    <span>Amount</span>
+                    <strong>
+                        ${snapshotMoney(
+                            data.centuryAmount
+                        )}
+                    </strong>
+                </div>
+
+                <div class="snapshot-stat">
+                    <span>Total Time</span>
+                    <strong>
+                        ${snapshotTime(
+                            data.centuryTime
+                        )}
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+
+    /* =================================================
+       ROOMS
+    ================================================= */
+
+    const rooms =
+        tables
+            .filter(t =>
+                String(
+                    t.tableType || ""
+                ).toLowerCase() === "room"
+            )
+            .sort((a, b) => {
+
+                const aNum =
+                    parseInt(
+                        String(a.name)
+                            .replace(/\D/g, "")
+                    ) || 999;
+
+                const bNum =
+                    parseInt(
+                        String(b.name)
+                            .replace(/\D/g, "")
+                    ) || 999;
+
+                return aNum - bNum;
+
+            });
+
+
+    if (rooms.length) {
+
+        html += `
+
+        <div class="snapshot-section-title">
+            🏠 ROOMS
+        </div>
+
+        <div class="snapshot-rooms">
+
+        `;
+
+
+        rooms.forEach(room => {
+
+            const amount =
+                getSnapshotRoomAmount(
+                    room,
+                    startMs,
+                    endMs,
+                    shiftNumber
+                );
+
+
+            html += `
+
+            <div class="snapshot-room-card">
+
+                <div class="snapshot-room-name">
+                    ${room.name}
+                </div>
+
+                <div class="snapshot-room-amount">
+                    ${snapshotMoney(amount)}
+                </div>
+
+            </div>
+
+            `;
+
+        });
+
+
+        html += `</div>`;
+
+    }
+
+
+    /* =================================================
+       DISCOUNT
+    ================================================= */
+
+    let discount = 0;
+
+
+    tables.forEach(t => {
+
+        (t.history || []).forEach(h => {
+
+            const checkout =
+                Number(h.checkout || 0);
+
+
+            if (
+                checkout < startMs ||
+                checkout > endMs
+            ) {
+                return;
+            }
+
+
+            if (
+                shiftNumber !== null &&
+                Number(h.shiftNumber || 1) !==
+                Number(shiftNumber)
+            ) {
+                return;
+            }
+
+
+            discount +=
+                Number(h.discount || 0);
+
+        });
+
+    });
+
+
+    /* =================================================
+       EXISTING ACCOUNTING
+       DON'T CHANGE FORMULA
+    ================================================= */
+
+    const accounting =
+        calculateShiftSnapshot(
+            startMs,
+            endMs,
+            shiftNumber
+        );
+
+
+    const easypaisa =
+        Number(
+            accounting.easypaisa || 0
+        );
+
+
+    const closingCash =
+        Number(
+            accounting.closingCash || 0
+        );
+
+
+    /* =================================================
+       OVERALL
+    ================================================= */
+
+    html += `
+
+    <div class="snapshot-section-title">
+        📊 OVERALL SUMMARY
+    </div>
+
+
+    <div class="snapshot-overall">
+
+        <div class="snapshot-overall-card">
+
+            <div class="snapshot-overall-title">
+                🎱 TOTAL FRAMES
+            </div>
+
+            <strong>
+                ${totalFrames}
+            </strong>
+
+            <span>
+                ${snapshotMoney(
+                    totalFrameAmount
+                )}
+            </span>
+
+            <small>
+                ${snapshotTime(
+                    totalFrameTime
+                )}
+            </small>
+
+        </div>
+
+
+        <div class="snapshot-overall-card century-total">
+
+            <div class="snapshot-overall-title">
+                👑 TOTAL CENTURIES
+            </div>
+
+            <strong>
+                ${totalCenturies}
+            </strong>
+
+            <span>
+                ${snapshotMoney(
+                    totalCenturyAmount
+                )}
+            </span>
+
+            <small>
+                ${snapshotTime(
+                    totalCenturyTime
+                )}
+            </small>
+
+        </div>
+
+
+        <div class="snapshot-overall-card discount-total">
+
+            <div class="snapshot-overall-title">
+                🎁 DISCOUNT
+            </div>
+
+            <strong>
+                ${snapshotMoney(
+                    discount
+                )}
+            </strong>
+
+        </div>
+
+
+        <div class="snapshot-overall-card easypaisa-total">
+
+            <div class="snapshot-overall-title">
+                📲 EASYPAISA
+            </div>
+
+            <strong>
+                ${snapshotMoney(
+                    easypaisa
+                )}
+            </strong>
+
+        </div>
+
+
+        <div class="snapshot-overall-card cash-total">
+
+            <div class="snapshot-overall-title">
+                💵 CLOSING CASH
+            </div>
+
+            <strong>
+                ${snapshotMoney(
+                    closingCash
+                )}
+            </strong>
+
+        </div>
+
+    </div>
+
+    `;
+
+
+    /* =================================================
+       OPEN / CLOSE TIME
+    ================================================= */
+
+    const openText =
+        startMs
+            ? new Date(startMs)
                 .toLocaleString(
                     "en-PK",
                     {
                         timeZone:
                             "Asia/Karachi"
                     }
-                ),
-
-        // 🔥 RUNNING
-        closeTime: "RUNNING",
-
-        ...liveData
-    };
-
-}
+                )
+            : "—";
 
 
-    // ==========================================
-    // 🔥 COMBINED
-    // ==========================================
-
-    let combined = null;
-
-    if (s1 && s2) {
-
-        combined = {
-
-            gameTotal:
-                Number(s1.gameTotal || 0) +
-                Number(s2.gameTotal || 0),
-
-            canteenTotal:
-                Number(s1.canteenTotal || 0) +
-                Number(s2.canteenTotal || 0),
-
-            gameCollection:
-                Number(s1.gameCollection || 0) +
-                Number(s2.gameCollection || 0),
-
-            canteenCollection:
-                Number(s1.canteenCollection || 0) +
-                Number(s2.canteenCollection || 0),
-
-            gameBalance:
-                Number(s1.gameBalance || 0) +
-                Number(s2.gameBalance || 0),
-
-            canteenBalance:
-                Number(s1.canteenBalance || 0) +
-                Number(s2.canteenBalance || 0),
-
-            discount:
-                Number(s1.discount || 0) +
-                Number(s2.discount || 0),
-
-            expenses:
-                Number(s1.expenses || 0) +
-                Number(s2.expenses || 0),
-
-            easypaisa:
-                Number(s1.easypaisa || 0) +
-                Number(s2.easypaisa || 0)
-        };
+    const closeText =
+        endMs
+            ? new Date(endMs)
+                .toLocaleString(
+                    "en-PK",
+                    {
+                        timeZone:
+                            "Asia/Karachi"
+                    }
+                )
+            : "RUNNING";
 
 
-        combined.closingCash =
+    html += `
 
-            Number(
-                combined.gameCollection || 0
-            ) +
+    <div class="snapshot-time-card">
 
-            Number(
-                combined.canteenCollection || 0
-            ) -
+        <div>
+            <span>OPEN TIME</span>
+            <strong>
+                ${openText}
+            </strong>
+        </div>
 
-            Number(
-                combined.expenses || 0
-            ) -
+        <div>
+            <span>CLOSE TIME</span>
+            <strong>
+                ${closeText}
+            </strong>
+        </div>
 
-            Number(
-                combined.easypaisa || 0
-            );
-
-    }
-
-
-    // ==========================================
-    // 🔥 HABIB STYLE ROW
-    // ==========================================
-
-    const value = v =>
-        Number(v || 0)
-            .toLocaleString();
-
-
-    const makeRow = (
-        shiftName,
-        data,
-        combinedRow = false
-    ) => {
-
-        if (!data) {
-
-            return `
-                <tr>
-                    <td>
-                        ${shiftName}
-                    </td>
-
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
-            `;
-        }
-
-
-        return `
-            <tr class="
-                ${combinedRow
-                    ? "combined-row"
-                    : ""}
-            ">
-
-                <td>
-                    ${shiftName}
-                </td>
-
-                <td>
-                    ${value(data.gameTotal)}
-                </td>
-
-                <td>
-                    ${value(data.canteenTotal)}
-                </td>
-
-                <td>
-                    ${value(data.gameCollection)}
-                </td>
-
-                <td>
-                    ${value(data.canteenCollection)}
-                </td>
-
-                <td>
-                    ${value(data.gameBalance)}
-                </td>
-
-                <td>
-                    ${value(data.canteenBalance)}
-                </td>
-
-                <td>
-                    ${value(data.discount)}
-                </td>
-
-                <td>
-                    ${value(data.expenses)}
-                </td>
-
-                <td>
-                    ${value(data.easypaisa)}
-                </td>
-
-                <td>
-                    ${value(data.closingCash)}
-                </td>
-
-                <td>
-                    ${data.openTime || "-"}
-                </td>
-
-                <td>
-                    ${data.closeTime || "-"}
-                </td>
-
-            </tr>
-        `;
-    };
-
-
-    // ==========================================
-    // 🔥 HABIB STYLE TABLE
-    // ==========================================
-
-    summaryBody.innerHTML = `
-
-        ${makeRow(
-            "Shift 1",
-            s1
-        )}
-
-        ${makeRow(
-            "Shift 2",
-            s2
-        )}
-
-        ${
-            combined
-            ?
-            makeRow(
-                "Combined",
-                combined,
-                true
-            )
-            :
-            ""
-        }
+    </div>
 
     `;
 
 
-    // ==========================================
-    // 🔥 SHOW POPUP
-    // ==========================================
+    return html;
+}
 
-    showPopup("shiftSummaryPopup");
 
+/******************************************************
+ * 🔥 OPEN SHIFT / DAY SNAPSHOT
+ ******************************************************/
+
+async function openShiftSummary() {
+
+    const btn =
+        document.getElementById(
+            "shiftCloseBtn"
+        );
+
+    const body =
+        document.getElementById(
+            "shiftSummaryBody"
+        );
+
+    const title =
+        document.getElementById(
+            "shiftSummaryTitle"
+        );
+
+    await rebuildHistoryFromSessions();
+
+
+    const now = Date.now();
+
+
+    let startMs = 0;
+    let endMs = now;
+    let shiftNumber = null;
+
+
+    /* =================================================
+       DAY CLOSE
+    ================================================= */
+
+    if (
+        btn.innerText.includes("Day")
+    ) {
+
+        title.innerText =
+            "DAY SNAPSHOT";
+
+        document.getElementById(
+            "confirmShiftCloseBtn"
+        ).innerText =
+            "Close Day";
+
+
+        startMs =
+            Number(
+                window.currentDayId
+            ) || now;
+
+        shiftNumber = null;
+
+    }
+
+
+    /* =================================================
+       SHIFT 1
+    ================================================= */
+
+    else if (
+        btn.innerText.includes("1")
+    ) {
+
+        title.innerText =
+            "SHIFT 1 SNAPSHOT";
+
+        document.getElementById(
+            "confirmShiftCloseBtn"
+        ).innerText =
+            "Close Shift";
+
+
+        startMs =
+            shift1?.startMs ||
+            Number(
+                window.currentDayId
+            ) ||
+            now;
+
+
+        shiftNumber = 1;
+
+    }
+
+
+    /* =================================================
+       SHIFT 2
+    ================================================= */
+
+    else {
+
+        title.innerText =
+            "SHIFT 2 SNAPSHOT";
+
+        document.getElementById(
+            "confirmShiftCloseBtn"
+        ).innerText =
+            "Close Shift";
+
+
+        startMs =
+            shift2?.startMs ||
+            shift1?.endMs ||
+            Number(
+                window.currentDayId
+            ) ||
+            now;
+
+
+        shiftNumber = 2;
+
+    }
+
+
+    body.innerHTML =
+        buildRassonSnapshot(
+            startMs,
+            endMs,
+            shiftNumber
+        );
+
+
+    showPopup(
+        "shiftSummaryPopup"
+    );
 }
 
 /******************************************************
