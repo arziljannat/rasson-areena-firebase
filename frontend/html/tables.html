@@ -496,42 +496,46 @@
 
 <!-- DAY HISTORY POPUP -->
 <div id="dayHistoryPopup" class="popup hidden">
-    <div class="popup-box large-popup">
-        <h2>Day History</h2>
 
-        <label>Select Day Range:</label>
+    <div class="popup-box large-popup">
+
+        <h2>DAY HISTORY</h2>
+
+        <label>Select Day:</label>
+
         <select id="dayHistoryDateSelect"></select>
+
         <p id="dayHistoryBranch"></p>
 
-        <h3>Shift 1 Summary</h3>
-        
-        <div class="table-mobile-wrapper">
-            <table class="history-table neon-table">
-                <tbody id="dayShift1Body"></tbody>
-            </table>
-        </div>
 
-        <h3>Shift 2 Summary</h3>
-        
-        <div class="table-mobile-wrapper">
-            <table class="history-table neon-table">
-                <tbody id="dayShift2Body"></tbody>
-            </table>
-        </div>
+        <!-- 🔥 HISTORICAL DAY SNAPSHOT -->
 
-        <h3>Combined</h3>
-        
-        <div class="table-mobile-wrapper">
-            <table class="history-table neon-table">
-                <tbody id="dayCombinedBody"></tbody>
-            </table>
-        </div>
+        <div
+            id="dayHistorySnapshot"
+            class="day-history-snapshot"
+        ></div>
+
 
         <div class="popup-buttons">
-            <button id="printDayHistoryBtn" class="neon-btn">Print</button>
-            <button id="cancelDayHistoryBtn" class="neon-btn red">Cancel</button>
+
+            <button
+                id="printDayHistoryBtn"
+                class="neon-btn"
+            >
+                Print
+            </button>
+
+            <button
+                id="cancelDayHistoryBtn"
+                class="neon-btn red"
+            >
+                Close
+            </button>
+
         </div>
+
     </div>
+
 </div>
 
 
