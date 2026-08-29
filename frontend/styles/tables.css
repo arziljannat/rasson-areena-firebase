@@ -6669,3 +6669,18 @@ body * {
     font-weight: 900 !important;
 
 }
+/* ============================================================
+   TABLE HISTORY — SLIGHTLY LARGER POPUP
+============================================================ */
+
+#tableHistoryPopup .table-history-popup-box {
+
+    width: 1350px !important;
+
+    max-width: 97vw !important;
+
+    height: 92vh !important;
+
+    max-height: 92vh !important;
+
+}
