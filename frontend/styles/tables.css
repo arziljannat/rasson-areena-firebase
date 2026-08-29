@@ -75,22 +75,83 @@ body * {
    TABLE / ROOM SECTIONS
 ============================================================ */
 
-.resource-section {width: 100%;margin: 45px auto 70px;text-align: center;max-width: 1650px;}
+.resource-section {
+    width: 100%;
+    margin: 35px auto 45px;
+    text-align: center;
+}
 
-.resource-section-title {width: fit-content;margin: 0 auto 30px;font-size: 34px;font-weight: 900;letter-spacing: 6px;color: #00ffcc;text-shadow:
+.resource-section-title {
+    width: fit-content;
+    margin: 0 auto 28px;
+
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: 5px;
+
+    color: #00ffcc;
+
+    text-shadow:
         0 0 8px #00ff88,
         0 0 18px #00ff88,
-        0 0 35px #00ff88;border-bottom: 2px solid #00ff88;padding: 10px 45px 12px;border-radius: 12px;}
+        0 0 35px #00ff88;
 
-.rooms-section {margin-top: 80px;}
+    border-bottom: 2px solid #00ff88;
+
+    padding: 8px 35px 10px;
+
+    border-radius: 10px;
+}
+
+.rooms-section {
+    margin-top: 65px;
+}
+
+
+/* ============================================================
+   TABLE / ROOM CENTERED GRID
+   5 CARDS FIRST ROW
+   REMAINING CARDS CENTERED
+============================================================ */
+
+.tables-grid {
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, 300px);
+
+    gap: 25px;
+
+    justify-content: center;
+    justify-items: center;
+    align-items: start;
+}
 
 
 /* ============================================================
    TABLE CARD
 ============================================================ */
-.table-box {background: rgba(0, 0, 0, 0.25);border: 2px solid #00ff88;border-radius: 12px;padding: 15px;width: 100%;max-width: 300px;box-sizing: border-box;box-shadow:
+.table-box {
+    background: rgba(0, 0, 0, 0.25);
+
+    border: 2px solid #00ff88;
+    border-radius: 12px;
+
+    padding: 15px;
+
+    width: 100%;
+    max-width: 300px;
+
+    box-sizing: border-box;
+
+    box-shadow:
         0 0 15px #00ff88,
-        inset 0 0 15px #00ff88;position:relative !important;position:relative;overflow:visible;}
+        inset 0 0 15px #00ff88;
+}
 
 .table-title {
     text-align: center;
@@ -174,8 +235,16 @@ body * {
 /* ============================================================
    POPUPS
 ============================================================ */
-.popup {position: fixed;inset: 0;background: lab(0% 0 0 / 0.65);backdrop-filter: blur(4px);display: flex;justify-content: center;align-items: center;z-index: 900
-;top: 0;left: 0;width: 100%;height: 100%;display: flex !important;align-items: center !important;justify-content: center !important;}
+.popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(7px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+}
 
 .hidden {
     display: none !important;
@@ -257,11 +326,74 @@ body * {
 
 
 /* 🔥 SHIFT SUMMARY IMPROVE */
-#shiftSummaryPopup table {font-size: 16px;width: max-content !important;min-width: 1200px !important;border-collapse: collapse !important;}
+#shiftSummaryPopup table {
+    font-size: 16px;   /* text bada */
+}
 
-#shiftSummaryPopup th {font-size: 17px;padding: 10px;font-size: 18px !important;font-weight: 700 !important;padding: 14px !important;text-align: center;}
+#shiftSummaryPopup th {
+    font-size: 17px;
+    padding: 10px;
+}
 
-#shiftSummaryPopup td {font-size: 15px;padding: 8px;font-size: 20px !important;font-weight: 600 !important;padding: 12px !important;text-align: center;}
+#shiftSummaryPopup td {
+    font-size: 15px;
+    padding: 8px;
+}
+
+/* ============================================================
+   RESPONSIVE TABLE / ROOM GRID
+============================================================ */
+
+@media (max-width: 1450px) {
+
+    .tables-grid {
+        grid-template-columns:
+            repeat(4, minmax(230px, 1fr));
+    }
+
+}
+
+
+@media (max-width: 1150px) {
+
+    .tables-grid {
+        grid-template-columns:
+            repeat(3, minmax(230px, 1fr));
+    }
+
+}
+
+
+@media (max-width: 850px) {
+
+    .tables-grid {
+        grid-template-columns:
+            repeat(2, minmax(220px, 1fr));
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .tables-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .table-box {
+        width: 95%;
+        max-width: 360px;
+    }
+
+    .resource-section-title {
+        font-size: 24px;
+        padding: 7px 25px 9px;
+    }
+
+}
+
+
+
 
 #shiftTablePopup .popup-content {
     width: 380px;
@@ -280,7 +412,19 @@ body * {
 
 
 /* UNIVERSAL POPUP CENTER FIX */
-
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: lab(0% 0 0 / 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 900
+}
 
 .popup.hidden {
     display: none !important;
@@ -317,6 +461,8 @@ body * {
     font-weight: bold;
     cursor: pointer;
 }
+
+
 
 
 /* THERMAL BILL STYLE */
@@ -491,6 +637,11 @@ body * {
    🔥 POPUP Z-INDEX FIX
 ================================ */
 
+/* HISTORY POPUP */
+#historyPopup {
+    z-index: 1000 !important;
+}
+
 /* BILL POPUP (always top) */
 #billPopup {
     z-index: 2000 !important;
@@ -561,12 +712,26 @@ body * {
 }
 
 /* ❌ SCROLL FIX */
-
+#shiftSummaryPopup table {
+    width: max-content !important;
+    min-width: 1200px !important;
+    border-collapse: collapse !important;
+}
 /* HEADINGS */
-
+#shiftSummaryPopup th {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    padding: 14px !important;
+    text-align: center;
+}
 
 /* DATA */
-
+#shiftSummaryPopup td {
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    padding: 12px !important;
+    text-align: center;
+}
 
 /* 🔥 TITLE CENTER */
 #shiftSummaryPopup h2,
@@ -581,6 +746,16 @@ body * {
 #shiftSummaryPopup button {
     font-size: 16px !important;
     padding: 10px 22px !important;
+}
+
+#historyTableTitle {
+    text-align: center;
+    width: 100%;
+    display: block;
+
+    font-size: 26px !important;
+    font-weight: 800 !important;
+    margin-bottom: 20px !important;
 }
 
 /* =========================================
@@ -760,6 +935,13 @@ body * {
     margin-top: 6px;
 }
 
+
+
+.table-box{
+   position:relative !important;
+    position:relative;
+    overflow:visible;
+}
 
 /* WALL BREAK EFFECT */
 .table-box.crack::before{
@@ -951,12 +1133,56 @@ body * {
    5 TOP + 4 CENTERED BELOW
 ============================================================ */
 
+.resource-section {
+    width: 100%;
+    max-width: 1650px;
+    margin: 45px auto 70px;
+    text-align: center;
+}
+
+.resource-section-title {
+    width: fit-content;
+    margin: 0 auto 30px;
+
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: 6px;
+
+    color: #00ffcc;
+
+    text-shadow:
+        0 0 8px #00ff88,
+        0 0 18px #00ff88,
+        0 0 35px #00ff88;
+
+    border-bottom: 2px solid #00ff88;
+
+    padding: 10px 45px 12px;
+
+    border-radius: 12px;
+}
+
 
 /* ============================================================
    🔥 FLEX LAYOUT
    5 CARDS FIRST ROW
    4 CARDS SECOND ROW CENTER
 ============================================================ */
+
+.tables-grid {
+    width: 100%;
+    max-width: 1650px;
+
+    margin: 0 auto;
+
+    display: flex;
+    flex-wrap: wrap;
+
+    justify-content: center;
+    align-items: flex-start;
+
+    gap: 28px;
+}
 
 
 /* ============================================================
@@ -976,6 +1202,10 @@ body * {
 /* ============================================================
    🔥 ROOMS SECTION
 ============================================================ */
+
+.rooms-section {
+    margin-top: 80px;
+}
 
 
 /* ============================================================
@@ -1039,20 +1269,338 @@ body * {
 }
 
 /* =========================================================
+   🔥 HISTORY POPUP — FINAL LAYOUT
+========================================================= */
+
+#historyPopup .large-popup {
+    width: 1100px;
+    max-width: 94vw;
+    max-height: 88vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   🔥 SUMMARY CARDS
+========================================================= */
+
+#historyPopup .history-summary-counters {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 16px;
+
+    width: 100%;
+
+    margin: 0 0 22px 0;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   🔥 EACH CARD
+========================================================= */
+
+#historyPopup .history-summary-box {
+
+    min-height: 145px;
+
+    padding: 16px;
+
+    box-sizing: border-box;
+
+    border-radius: 16px;
+
+    background: rgba(0,0,0,.55);
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: flex-start;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   🔥 CARD TITLE
+========================================================= */
+
+#historyPopup .history-card-title {
+
+    width: 100%;
+
+    font-size: 17px;
+
+    font-weight: 900;
+
+    margin-bottom: 10px;
+
+    color: #00ffcc;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   🔥 SHIFT 1 / SHIFT 2 / TOTAL
+========================================================= */
+
+#historyPopup .history-card-head {
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 5px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    color: #aaa;
+
+    margin-bottom: 5px;
+}
+
+
+/* =========================================================
+   🔥 NUMBERS
+========================================================= */
+
+#historyPopup .history-card-values {
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 5px;
+}
+
+
+#historyPopup .history-card-values strong {
+
+    font-size: 26px;
+
+    font-weight: 900;
+
+    color: #fff;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,.5);
+}
+
+
+/* =========================================================
+   🔥 AMOUNTS
+========================================================= */
+
+#historyPopup .history-card-amount {
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 5px;
+
+    margin-top: 5px;
+}
+
+
+#historyPopup .history-card-amount span {
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    color: #00ff99;
+}
+
+
+/* =========================================================
+   🔥 CENTURY TIME
+========================================================= */
+
+#historyPopup .history-card-time {
+
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 5px;
+
+    margin-top: 4px;
+}
+
+
+#historyPopup .history-card-time span {
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    color: #ffd700;
+}
+
+
+/* =========================================================
+   🔥 HISTORY TABLE — BIGGER
+========================================================= */
+
+#historyPopup .table-mobile-wrapper {
+
+    width: 100%;
+
+    max-height: 380px;
+
+    overflow-x: auto;
+
+    overflow-y: auto;
+
+    box-sizing: border-box;
+}
+
+
+#historyPopup .history-table {
+
+    width: 100%;
+
+    min-width: 850px;
+
+    border-collapse: collapse;
+
+    font-size: 16px;
+}
+
+
+#historyPopup .history-table th {
+
+    font-size: 16px;
+
+    padding: 12px 10px;
+
+    font-weight: 900;
+
+    white-space: nowrap;
+}
+
+
+#historyPopup .history-table td {
+
+    font-size: 15px;
+
+    padding: 11px 10px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   🔥 MOBILE
+========================================================= */
+
+@media (max-width: 850px) {
+
+    #historyPopup .history-summary-counters {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    #historyPopup .history-summary-counters {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    #historyPopup .large-popup {
+
+        width: 96vw;
+
+        max-width: 96vw;
+    }
+
+}
+
+/* =========================================================
    🔥 HABIB STYLE SHIFT / DAY SNAPSHOT POPUP
    🔥 VERTICAL + HORIZONTAL SCROLL
 ========================================================= */
 
-#shiftSummaryPopup .popup-box {width: 98vw !important;max-width: 1600px !important;height: 50vh !important;max-height: 50vh !important;box-sizing: border-box !important;padding: 22px !important;overflow: hidden !important;display: flex !important;flex-direction: column !important;}
+#shiftSummaryPopup .popup-box {
+
+    width: min(1200px, 95vw) !important;
+
+    max-width: 1200px !important;
+
+    height: 90vh !important;
+
+    max-height: 90vh !important;
+
+    box-sizing: border-box !important;
+
+    padding: 25px !important;
+
+    overflow: hidden !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+}
 
 
 /* =========================================================
    🔥 POPUP TITLE
 ========================================================= */
 
-#shiftSummaryPopup #shiftSummaryTitle {flex: 0 0 auto !important;text-align: center !important;color: #00ffcc !important;font-size: 30px !important;font-weight: 900 !important;margin: 0 0 18px 0 !important;text-shadow:
+#shiftSummaryPopup #shiftSummaryTitle {
+
+    flex: 0 0 auto !important;
+
+    text-align: center;
+
+    color: #00ffcc;
+
+    font-size: 30px;
+
+    font-weight: 900;
+
+    margin: 0 0 20px 0;
+
+    text-shadow:
         0 0 10px #00ffcc,
-        0 0 25px #00ffcc !important;}
+        0 0 25px #00ffcc;
+
+}
 
 
 /* =========================================================
@@ -1060,14 +1608,38 @@ body * {
    UP/DOWN + LEFT/RIGHT
 ========================================================= */
 
-#shiftSummaryPopup .table-mobile-wrapper {flex: 1 1 auto !important;width: 100% !important;max-width: 100% !important;min-height: 0 !important;overflow-x: hidden !important;overflow-y: auto !important;-webkit-overflow-scrolling: touch !important;min-width: 0 !important;box-sizing: border-box !important;}
+#shiftSummaryPopup .table-mobile-wrapper {
+
+    flex: 1 1 auto !important;
+
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    min-height: 0 !important;
+
+    overflow-x: auto !important;
+
+    overflow-y: auto !important;
+
+    -webkit-overflow-scrolling: touch !important;
+
+}
 
 
 /* =========================================================
    🔥 REMOVE OLD TABLE RESTRICTIONS
 ========================================================= */
 
-#shiftSummaryPopup .neon-table {width: 100% !important;min-width: 0 !important;border: none !important;max-width: 100% !important;table-layout: fixed !important;border-collapse: collapse !important;margin: 10px 0 !important;}
+#shiftSummaryPopup .neon-table {
+
+    width: max-content !important;
+
+    min-width: 100% !important;
+
+    border: none !important;
+
+}
 
 
 /* =========================================================
@@ -1171,40 +1743,116 @@ body * {
    🔥 SNAPSHOT BUTTON AREA
 ========================================================= */
 
-#shiftSummaryPopup .popup-buttons {flex: 0 0 auto !important;width: 100% !important;display: flex !important;justify-content: center !important;align-items: center !important;gap: 25px !important;margin-top: 12px !important;padding-top: 10px !important;}
+#shiftSummaryPopup .popup-buttons {
+
+    flex: 0 0 auto !important;
+
+    width: 100% !important;
+
+    display: flex !important;
+
+    justify-content: center !important;
+
+    align-items: center !important;
+
+    gap: 20px !important;
+
+    margin-top: 15px !important;
+
+    padding-top: 10px !important;
+
+}
 
 
 /* =========================================================
    🔥 BUTTONS
 ========================================================= */
 
-#shiftSummaryPopup .popup-buttons button {min-width: 180px !important;height: 48px !important;padding: 8px 22px !important;font-size: 16px !important;font-weight: 900 !important;border-radius: 12px !important;}
+#shiftSummaryPopup .popup-buttons button {
+
+    min-width: 170px !important;
+
+    height: 50px !important;
+
+    padding: 10px 22px !important;
+
+    font-size: 17px !important;
+
+    font-weight: 900 !important;
+
+    border-radius: 12px !important;
+
+}
 
 
 /* =========================================================
    🔥 SCROLLBAR
 ========================================================= */
 
-#shiftSummaryPopup .table-mobile-wrapper::-webkit-scrollbar {width: 10px;height: 10px;width: 9px !important;}
+#shiftSummaryPopup .table-mobile-wrapper::-webkit-scrollbar {
+
+    width: 10px;
+
+    height: 10px;
+
+}
 
 
-#shiftSummaryPopup .table-mobile-wrapper::-webkit-scrollbar-thumb {background: #00ff99;border-radius: 10px;background: #00ff99 !important;border-radius: 10px !important;}
+#shiftSummaryPopup .table-mobile-wrapper::-webkit-scrollbar-thumb {
+
+    background: #00ff99;
+
+    border-radius: 10px;
+
+}
 
 
-#shiftSummaryPopup .table-mobile-wrapper::-webkit-scrollbar-track {background: rgba(0,0,0,0.5);background: rgba(0,0,0,0.5) !important;}
+#shiftSummaryPopup .table-mobile-wrapper::-webkit-scrollbar-track {
+
+    background: rgba(0,0,0,0.5);
+
+}
 
 
 /* TITLE */
+
+#shiftSummaryPopup #shiftSummaryTitle {
+
+    text-align: center;
+
+    color: #00ffcc;
+
+    font-size: 30px;
+
+    font-weight: 800;
+
+    margin-bottom: 25px;
+
+    text-shadow:
+        0 0 10px #00ffcc,
+        0 0 25px #00ffcc;
+
+}
 
 
 /* REMOVE TABLE LOOK */
 
 #shiftSummaryPopup
-.table-mobile-wrapper {overflow: visible !important;width: 100%;overflow-x: auto !important;overflow-y: auto !important;}
+.table-mobile-wrapper {
+
+    overflow: visible !important;
+
+}
 
 
 #shiftSummaryPopup
-.neon-table {width: 100% !important;border: none !important;min-width: 1100px;border-collapse: collapse;}
+.neon-table {
+
+    width: 100% !important;
+
+    border: none !important;
+
+}
 
 
 /* SNAPSHOT CONTAINER */
@@ -1499,20 +2147,78 @@ body * {
    🔥 HABIB STYLE SHIFT SNAPSHOT
 ===================================================== */
 
+#shiftSummaryPopup .popup-box {
+
+    width: min(1150px, 96vw) !important;
+
+    max-width: 1150px !important;
+
+    max-height: 90vh !important;
+
+    overflow: auto !important;
+
+    padding: 22px !important;
+
+    box-sizing: border-box;
+
+}
+
 
 /* ==========================================
    TITLE
 ========================================== */
+
+#shiftSummaryPopup #shiftSummaryTitle {
+
+    text-align: center;
+
+    color: #00ffcc;
+
+    font-size: 28px;
+
+    font-weight: 800;
+
+    margin-bottom: 22px;
+
+    text-shadow:
+        0 0 8px #00ffcc,
+        0 0 18px #00ffcc;
+
+}
 
 
 /* ==========================================
    TABLE WRAPPER
 ========================================== */
 
+#shiftSummaryPopup
+.table-mobile-wrapper {
+
+    width: 100%;
+
+    overflow-x: auto !important;
+
+    overflow-y: auto !important;
+
+}
+
 
 /* ==========================================
    HABIB STYLE TABLE
 ========================================== */
+
+#shiftSummaryPopup
+.neon-table {
+
+    width: 100% !important;
+
+    min-width: 1100px;
+
+    border-collapse: collapse;
+
+    border: none !important;
+
+}
 
 
 /* ==========================================
@@ -1662,20 +2368,90 @@ body * {
    🔥 HABIB STYLE — ALL 13 FIELDS FIT ON SCREEN
 ========================================================= */
 
+#shiftSummaryPopup .popup-box {
+
+    width: 98vw !important;
+    max-width: 1600px !important;
+
+    height: 50vh !important;
+    max-height: 50vh !important;
+
+    box-sizing: border-box !important;
+
+    padding: 22px !important;
+
+    overflow: hidden !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+}
+
 
 /* =========================================================
    TITLE
 ========================================================= */
+
+#shiftSummaryPopup #shiftSummaryTitle {
+
+    flex: 0 0 auto !important;
+
+    text-align: center !important;
+
+    color: #00ffcc !important;
+
+    font-size: 30px !important;
+
+    font-weight: 900 !important;
+
+    margin: 0 0 18px 0 !important;
+
+    text-shadow:
+        0 0 10px #00ffcc,
+        0 0 25px #00ffcc !important;
+
+}
 
 
 /* =========================================================
    TABLE AREA
 ========================================================= */
 
+#shiftSummaryPopup .table-mobile-wrapper {
+
+    flex: 1 1 auto !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    min-width: 0 !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    box-sizing: border-box !important;
+
+}
+
 
 /* =========================================================
    TABLE
 ========================================================= */
+
+#shiftSummaryPopup .neon-table {
+
+    width: 100% !important;
+
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    table-layout: fixed !important;
+
+    border-collapse: collapse !important;
+
+    margin: 10px 0 !important;
+
+}
 
 
 /* =========================================================
@@ -1883,10 +2659,67 @@ body * {
    BUTTONS
 ========================================================= */
 
+#shiftSummaryPopup .popup-buttons {
+
+    flex: 0 0 auto !important;
+
+    width: 100% !important;
+
+    display: flex !important;
+
+    justify-content: center !important;
+
+    align-items: center !important;
+
+    gap: 25px !important;
+
+    margin-top: 12px !important;
+
+}
+
+
+#shiftSummaryPopup .popup-buttons button {
+
+    min-width: 180px !important;
+
+    height: 48px !important;
+
+    padding: 8px 22px !important;
+
+    font-size: 16px !important;
+
+    font-weight: 900 !important;
+
+    border-radius: 12px !important;
+
+}
+
 
 /* =========================================================
    SCROLLBAR — ONLY UP/DOWN
 ========================================================= */
+
+#shiftSummaryPopup .table-mobile-wrapper::-webkit-scrollbar {
+
+    width: 9px !important;
+
+}
+
+
+#shiftSummaryPopup .table-mobile-wrapper::-webkit-scrollbar-thumb {
+
+    background: #00ff99 !important;
+
+    border-radius: 10px !important;
+
+}
+
+
+#shiftSummaryPopup .table-mobile-wrapper::-webkit-scrollbar-track {
+
+    background: rgba(0,0,0,0.5) !important;
+
+}
 
 
 /* =========================================================
@@ -2659,34 +3492,235 @@ body * {
    🔥 PLAYERS DISPLAY — TABLE CARD
    ===================================================== */
 
-.players-section {width: 100%;display: flex;flex-direction: column;align-items: center;gap: 5px;}
+.players-section {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 6px 0 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
 
-.players-display {width: 100%;display: flex;align-items: center;justify-content: center;gap: 8px;white-space: nowrap;overflow: hidden;box-sizing: border-box;}
+.players-display {
+    width: 100%;
+    box-sizing: border-box;
 
-.players-display span {display: inline-flex;align-items: center;justify-content: center;max-width: 45%;color: #00ffff;font-size: 13px;font-weight: 700;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;text-shadow:
-        0 0 5px #00ffff;}
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-.players-display b {flex: 0 0 auto;color: #ffd700;font-size: 12px;font-weight: 900;text-shadow:
-        0 0 5px #ffd700;}
+    gap: 6px;
 
-.player-btn {min-width: 75px;padding: 4px 10px;font-size: 11px;font-weight: 800;border-radius: 6px;}
+    padding: 4px 6px;
+
+    min-height: 24px;
+
+    overflow: hidden;
+}
+
+.players-display span {
+    display: block;
+
+    max-width: 45%;
+
+    color: #ffffff;
+
+    font-size: 18px;
+    font-weight: 600;
+
+    line-height: 18px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    text-align: center;
+
+    text-shadow:
+        0 0 4px #000,
+        0 0 7px #00ffd5;
+}
+
+.players-display b {
+    flex: 0 0 auto;
+
+    color: #d4af37;
+
+    font-size: 18px;
+    font-weight: 800;
+
+    line-height: 18px;
+
+    text-shadow:
+        0 0 5px #d4af37;
+}
+
+.player-btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: auto;
+    min-width: 75px;
+
+    height: 22px;
+
+    padding: 2px 8px;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    line-height: 1;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+}
 /* =========================================================
    🔥 PLAYERS — FINAL CARD STYLE
    ========================================================= */
 
+.players-section {
+    width: 100%;
+    margin: 5px 0 7px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    box-sizing: border-box;
+}
+
 
 /* ---------- PLAYER NAMES ---------- */
+
+.players-display {
+    width: 100%;
+    min-height: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 2px 4px;
+
+    box-sizing: border-box;
+}
 
 
 /* PLAYER NAME */
 
+.players-display span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    max-width: 43%;
+
+    padding: 3px 6px;
+
+    border-radius: 6px;
+
+    background: rgba(0, 20, 25, 0.80);
+
+    border: 1px solid rgba(0, 255, 210, 0.65);
+
+    color: #ffffff;
+
+    font-size: 18px;
+    font-weight: 700;
+
+    line-height: 17px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    text-align: center;
+
+    text-shadow:
+        0 0 4px #00ffe1,
+        0 0 8px rgba(0, 255, 225, 0.65);
+
+    box-shadow:
+        0 0 5px rgba(0, 255, 210, 0.25);
+
+    box-sizing: border-box;
+}
+
 
 /* VS */
+
+.players-display b {
+    flex: 0 0 auto;
+
+    color: #ffd84d;
+
+    font-size: 12px;
+    font-weight: 900;
+
+    line-height: 18px;
+
+    text-shadow:
+        0 0 5px #ffd84d,
+        0 0 10px rgba(255, 216, 77, 0.7);
+}
 
 
 /* =========================================================
    🔥 PLAYERS BUTTON
    ========================================================= */
+
+.player-btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 92px;
+    height: 27px;
+
+    padding: 3px 12px;
+
+    border-radius: 7px;
+
+    border: 1px solid #00ffe1;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0, 255, 225, 0.16),
+            rgba(0, 20, 25, 0.92)
+        );
+
+    color: #ffffff;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 0.4px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    text-shadow:
+        0 0 5px #00ffe1;
+
+    box-shadow:
+        0 0 5px rgba(0, 255, 225, 0.55),
+        inset 0 0 7px rgba(0, 255, 225, 0.12);
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        background 0.15s ease;
+}
 
 
 /* HOVER */
@@ -2719,6 +3753,64 @@ body * {
    👥 PLAYER LINE — SINGLE ROW
    ========================================= */
 
+.players-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.players-display {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.players-display span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    max-width: 45%;
+
+    color: #00ffff;
+    font-size: 13px;
+    font-weight: 700;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    text-shadow:
+        0 0 5px #00ffff;
+}
+
+.players-display b {
+    flex: 0 0 auto;
+
+    color: #ffd700;
+    font-size: 12px;
+    font-weight: 900;
+
+    text-shadow:
+        0 0 5px #ffd700;
+}
+
+.player-btn {
+    min-width: 75px;
+    padding: 4px 10px;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    border-radius: 6px;
+}
 
 /* ================================
    PLAYERS ONE-LINE DISPLAY
@@ -2752,238 +3844,873 @@ body * {
     flex-shrink: 0 !important;
 }
 
-/* ============================================================
-   RASSON AREENA — TABLE HISTORY POPUP
-   FINAL CLEAN VERSION
-   6 summary cards: 3 top + 3 bottom
-============================================================ */
+/* =========================================================
+   🔥 HISTORY — PLAYERS ALWAYS ONE ROW
+   ========================================================= */
 
-#historyPopup {
-    z-index: 1000 !important;
-    padding: 15px !important;
-    box-sizing: border-box !important;
-    overflow: hidden !important;
-}
-
-#historyPopup .popup-box,
-#historyPopup .large-popup {
-    width: min(1500px, 96vw) !important;
-    max-width: 96vw !important;
-    height: 88vh !important;
-    max-height: 88vh !important;
-    padding: 28px !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-    border-radius: 20px !important;
-}
-
-#historyPopup #historyTableTitle {
-    flex: 0 0 auto !important;
-    width: 100% !important;
-    margin: 0 0 24px !important;
-    text-align: center !important;
-    font-size: 32px !important;
-    font-weight: 900 !important;
-    color: #dffff8 !important;
-    text-shadow: 0 0 8px #00ffcc, 0 0 20px #00ffcc !important;
-}
-
-/* ===================== SUMMARY CARDS ===================== */
-
-#historyPopup .history-summary-counters {
-    width: 100% !important;
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 20px !important;
-    margin: 0 0 25px !important;
-    box-sizing: border-box !important;
-    flex: 0 0 auto !important;
-}
-
-#historyPopup .history-summary-box {
-    width: 100% !important;
-    min-width: 0 !important;
-    min-height: 180px !important;
-    padding: 20px !important;
-    box-sizing: border-box !important;
-    border-radius: 18px !important;
-    background: linear-gradient(145deg, rgba(5,20,17,.96), rgba(0,0,0,.92)) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    text-align: center !important;
-}
-
-#historyPopup .history-summary-box.green {
-    border: 2px solid #00ff88 !important;
-    box-shadow: 0 0 14px rgba(0,255,136,.35), inset 0 0 18px rgba(0,255,136,.08) !important;
-}
-
-#historyPopup .history-summary-box.gold {
-    border: 2px solid #ffd700 !important;
-    box-shadow: 0 0 14px rgba(255,215,0,.35), inset 0 0 18px rgba(255,215,0,.08) !important;
-}
-
-#historyPopup .history-summary-box.red {
-    border: 2px solid #ff4444 !important;
-    box-shadow: 0 0 14px rgba(255,68,68,.35), inset 0 0 18px rgba(255,68,68,.08) !important;
-}
-
-#historyPopup .history-card-title {
-    width: 100% !important;
-    margin: 0 0 14px !important;
-    font-size: 21px !important;
-    line-height: 1.2 !important;
-    font-weight: 900 !important;
-    color: #00ffcc !important;
-    text-align: center !important;
+.history-table td:nth-child(2),
+.history-table th:nth-child(2) {
     white-space: nowrap !important;
-    text-shadow: 0 0 8px rgba(0,255,204,.5) !important;
-}
-
-#historyPopup .history-card-head,
-#historyPopup .history-card-values,
-#historyPopup .history-card-amount {
-    width: 100% !important;
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 8px !important;
-    text-align: center !important;
-}
-
-#historyPopup .history-card-head,
-#historyPopup .history-card-head span {
-    font-size: 15px !important;
-    font-weight: 900 !important;
-    color: #d8d8d8 !important;
-}
-
-#historyPopup .history-card-head {
-    margin: 0 0 5px !important;
-}
-
-#historyPopup .history-card-values strong {
-    font-size: 30px !important;
-    line-height: 1.15 !important;
-    font-weight: 900 !important;
-    color: #fff !important;
-    text-shadow: 0 0 8px rgba(255,255,255,.5) !important;
-}
-
-#historyPopup .history-card-amount {
-    margin-top: 5px !important;
-}
-
-#historyPopup .history-card-amount span {
-    font-size: 15px !important;
-    font-weight: 900 !important;
-    color: #00ff99 !important;
-}
-
-#historyPopup .history-card-time {
-    width: 100% !important;
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 8px !important;
-    margin-top: 5px !important;
-}
-
-#historyPopup .history-card-time span {
-    font-size: 13px !important;
-    font-weight: 900 !important;
-    color: #ffd700 !important;
-}
-
-/* ===================== HISTORY TABLE ===================== */
-
-#historyPopup .table-mobile-wrapper {
-    width: 100% !important;
-    max-width: 100% !important;
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    box-sizing: border-box !important;
-}
-
-#historyPopup .history-table {
-    width: 100% !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    table-layout: fixed !important;
-    border-collapse: collapse !important;
-    margin: 8px 0 !important;
-}
-
-#historyPopup .history-table th {
-    padding: 12px 7px !important;
-    font-size: 15px !important;
-    font-weight: 900 !important;
-    color: #00ffcc !important;
-    white-space: nowrap !important;
-    text-align: center !important;
-}
-
-#historyPopup .history-table td {
-    padding: 12px 7px !important;
-    font-size: 15px !important;
-    font-weight: 700 !important;
-    color: #ccffee !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    text-align: center !important;
-}
-
-#historyPopup .history-table th:nth-child(2),
-#historyPopup .history-table td:nth-child(2) {
-    width: 150px !important;
     min-width: 150px !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    width: 150px !important;
+    text-align: center !important;
     vertical-align: middle !important;
 }
 
-#historyPopup .history-table td:nth-child(2) span,
-#historyPopup .history-table td:nth-child(2) strong,
-#historyPopup .history-table td:nth-child(2) div,
-#historyPopup .history-table td:nth-child(2) b {
+.history-table td:nth-child(2) {
+    overflow: hidden !important;
+}
+
+/* Player names inside History */
+.history-table td:nth-child(2) span,
+.history-table td:nth-child(2) strong,
+.history-table td:nth-child(2) div {
     display: inline !important;
     white-space: nowrap !important;
     vertical-align: middle !important;
 }
 
-#historyPopup .history-table td:nth-child(2) b {
+/* VS ko bhi same line mein rakho */
+.history-table td:nth-child(2) b {
+    display: inline !important;
+    white-space: nowrap !important;
     margin: 0 6px !important;
     color: #ffd700 !important;
 }
 
-/* ===================== RESPONSIVE ===================== */
+/* Player name text */
+.history-table td:nth-child(2) {
+    color: #00ffff !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    text-shadow:
+        0 0 5px #00ffff !important;
+}
+
+/* =====================================================
+   ⏱️ CENTURY TIME
+===================================================== */
+
+#historyPopup .history-card-time{
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:10px;
+
+    margin-top:5px;
+
+}
+
+
+#historyPopup .history-card-time span{
+
+    font-size:12px;
+
+    color:#ffd700;
+
+    font-weight:bold;
+
+}
+
+/* 🔥 HISTORY TABLE TEXT */
+#historyPopup table th {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+}
+
+#historyPopup table td {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+}
+
+/* =========================================================
+   🔥 HISTORY POPUP — BIGGER HISTORY TABLE
+========================================================= */
+
+#historyPopup .table-mobile-wrapper {
+    width: 100% !important;
+    max-height: 430px !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+}
+
+
+/* HISTORY TABLE */
+
+#historyPopup .history-table {
+    width: 100% !important;
+    min-width: 850px !important;
+    border-collapse: collapse !important;
+}
+
+
+/* HEADER */
+
+#historyPopup .history-table th {
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    padding: 10px 12px !important;
+    white-space: nowrap !important;
+}
+
+
+/* ROW */
+
+#historyPopup .history-table td {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    padding: 9px 12px !important;
+    height: 40px !important;
+    white-space: nowrap !important;
+}
+
+
+/* PLAYER */
+
+#historyPopup .history-table td:nth-child(2) {
+    font-size: 15px !important;
+    min-width: 180px !important;
+}
+
+
+/* NUMBER */
+
+#historyPopup .history-table td:first-child {
+    font-size: 15px !important;
+    font-weight: 900 !important;
+}
+
+
+/* SUMMARY CARD TEXT */
+
+#historyPopup .history-card-title {
+    font-size: 15px !important;
+    font-weight: 900 !important;
+}
+
+
+#historyPopup .history-card-head span {
+    font-size: 12px !important;
+    font-weight: 800 !important;
+}
+
+
+#historyPopup .history-card-values strong {
+    font-size: 20px !important;
+    font-weight: 900 !important;
+}
+
+
+#historyPopup .history-card-amount span {
+    font-size: 12px !important;
+    font-weight: 900 !important;
+}
+
+
+/* CENTURY TIME */
+
+#historyPopup .history-card-time span {
+    font-size: 11px !important;
+    font-weight: 900 !important;
+}
+
+
+/* =========================================================
+   🔥 HISTORY POPUP — FINAL FIX
+========================================================= */
+
+/* POPUP */
+#historyPopup .large-popup {
+    width: 1100px;
+    max-width: 94vw;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+
+/* =========================================================
+   🔥 TOP 6 CARDS
+   3 + 3
+========================================================= */
+
+#historyPopup .history-summary-counters {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 14px;
+
+    margin: 0 0 22px 0;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   🔥 CARD BOX
+========================================================= */
+
+#historyPopup .history-summary-box {
+    width: 100%;
+    min-width: 0;
+
+    min-height: 150px;
+
+    padding: 14px;
+
+    box-sizing: border-box;
+
+    border-radius: 16px;
+
+    background: rgba(0,0,0,.60);
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: flex-start;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   🔥 TITLE
+========================================================= */
+
+#historyPopup .history-card-title {
+    font-size: 17px !important;
+
+    font-weight: 900 !important;
+
+    margin-bottom: 10px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   🔥 SHIFT 1 / SHIFT 2 / TOTAL
+========================================================= */
+
+#historyPopup .history-card-head {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 4px;
+
+    font-size: 13px !important;
+
+    font-weight: 700;
+
+    color: #aaa;
+
+    margin-bottom: 4px;
+}
+
+
+/* =========================================================
+   🔥 NUMBERS
+========================================================= */
+
+#historyPopup .history-card-values {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 4px;
+}
+
+
+#historyPopup .history-card-values strong {
+    font-size: 25px !important;
+
+    font-weight: 900 !important;
+
+    color: #fff;
+}
+
+
+/* =========================================================
+   🔥 AMOUNT
+========================================================= */
+
+#historyPopup .history-card-amount {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 4px;
+
+    margin-top: 5px;
+}
+
+
+#historyPopup .history-card-amount span {
+    font-size: 13px !important;
+
+    font-weight: 800 !important;
+
+    color: #00ff99;
+}
+
+
+/* =========================================================
+   🔥 CENTURY TIME
+========================================================= */
+
+#historyPopup .history-card-time {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 4px;
+
+    margin-top: 4px;
+}
+
+
+#historyPopup .history-card-time span {
+    font-size: 11px;
+
+    font-weight: 700;
+
+    color: #ffd700;
+}
+
+
+/* =========================================================
+   🔥 HISTORY TABLE
+========================================================= */
+
+#historyPopup .table-mobile-wrapper {
+    width: 100%;
+
+    max-width: 100%;
+
+    overflow-x: hidden;
+
+    overflow-y: auto;
+
+    box-sizing: border-box;
+}
+
+
+/* NO HORIZONTAL SCROLL */
+#historyPopup .history-table {
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    table-layout: fixed;
+
+    border-collapse: collapse;
+}
+
+
+/* TABLE HEADER */
+#historyPopup .history-table th {
+    font-size: 15px;
+
+    padding: 10px 7px;
+
+    white-space: nowrap;
+}
+
+
+/* TABLE ROW */
+#historyPopup .history-table td {
+    font-size: 14px;
+
+    padding: 10px 7px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   🔥 MOBILE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    #historyPopup .history-summary-counters {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    #historyPopup .history-summary-counters {
+        grid-template-columns: 1fr;
+    }
+
+    #historyPopup .large-popup {
+        width: 96vw;
+
+        max-width: 96vw;
+    }
+
+}
+
+/* =========================================================
+   🔥 FINAL TABLE HISTORY POPUP — WIDE + NO HORIZONTAL SCROLL
+========================================================= */
+
+#historyPopup {
+    padding: 15px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+
+/* =========================
+   POPUP BOX
+========================= */
+
+#historyPopup .popup-box {
+    width: 1500px !important;
+    max-width: 96vw !important;
+    height: 88vh !important;
+    max-height: 88vh !important;
+
+    padding: 28px !important;
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+
+    border-radius: 20px !important;
+}
+
+
+/* =========================
+   TITLE
+========================= */
+
+#historyPopup #historyTableTitle {
+    flex: 0 0 auto !important;
+
+    margin: 0 0 22px 0 !important;
+
+    text-align: center !important;
+
+    font-size: 30px !important;
+    font-weight: 900 !important;
+
+    color: #dffff8 !important;
+
+    text-shadow:
+        0 0 8px #00ffcc,
+        0 0 18px #00ffcc !important;
+}
+
+
+/* =========================================================
+   🔥 SIX SUMMARY CARDS
+========================================================= */
+
+#historyPopup .history-summary-counters {
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr)) !important;
+
+    gap: 16px !important;
+
+    margin: 0 0 22px 0 !important;
+
+    flex: 0 0 auto !important;
+}
+
+
+/* =========================
+   CARD
+========================= */
+
+#historyPopup .history-summary-box {
+    min-width: 0 !important;
+
+    min-height: 145px !important;
+
+    padding: 16px !important;
+
+    box-sizing: border-box !important;
+
+    border-radius: 16px !important;
+
+    background: rgba(0,0,0,0.65) !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: center !important;
+
+    justify-content: flex-start !important;
+
+    text-align: center !important;
+}
+
+
+/* =========================
+   CARD TITLE
+========================= */
+
+#historyPopup .history-card-title {
+    font-size: 18px !important;
+    font-weight: 900 !important;
+
+    margin-bottom: 10px !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================
+   SHIFT / TOTAL HEAD
+========================= */
+
+#historyPopup .history-card-head {
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, 1fr) !important;
+
+    gap: 6px !important;
+
+    font-size: 13px !important;
+
+    font-weight: 800 !important;
+
+    color: #cfcfcf !important;
+
+    margin-bottom: 4px !important;
+}
+
+
+/* =========================
+   NUMBERS
+========================= */
+
+#historyPopup .history-card-values {
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, 1fr) !important;
+
+    gap: 6px !important;
+}
+
+
+#historyPopup .history-card-values strong {
+    font-size: 26px !important;
+
+    font-weight: 900 !important;
+
+    color: #ffffff !important;
+
+    text-shadow:
+        0 0 8px rgba(255,255,255,0.5) !important;
+}
+
+
+/* =========================
+   AMOUNTS
+========================= */
+
+#historyPopup .history-card-amount {
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, 1fr) !important;
+
+    gap: 6px !important;
+
+    margin-top: 5px !important;
+}
+
+
+#historyPopup .history-card-amount span {
+    font-size: 13px !important;
+
+    font-weight: 800 !important;
+
+    color: #00ff99 !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================
+   CENTURY TIME
+========================= */
+
+#historyPopup .history-card-time {
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, 1fr) !important;
+
+    gap: 6px !important;
+
+    margin-top: 3px !important;
+}
+
+
+#historyPopup .history-card-time span {
+    font-size: 12px !important;
+
+    font-weight: 800 !important;
+
+    color: #ffd700 !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================================================
+   🔥 HISTORY TABLE
+========================================================= */
+
+#historyPopup .table-mobile-wrapper {
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    flex: 1 1 auto !important;
+
+    min-height: 0 !important;
+
+    overflow-x: hidden !important;
+
+    overflow-y: auto !important;
+}
+
+
+/* =========================
+   TABLE — FIT FULL WIDTH
+========================= */
+
+#historyPopup .history-table {
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    max-width: 100% !important;
+
+    table-layout: fixed !important;
+
+    border-collapse: collapse !important;
+}
+
+
+/* =========================
+   TABLE CELLS
+========================= */
+
+#historyPopup .history-table th,
+#historyPopup .history-table td {
+    padding: 10px 7px !important;
+
+    font-size: 14px !important;
+
+    font-weight: 700 !important;
+
+    text-align: center !important;
+
+    vertical-align: middle !important;
+
+    box-sizing: border-box !important;
+
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+}
+
+
+/* =========================
+   TABLE HEADER
+========================= */
+
+#historyPopup .history-table th {
+    font-size: 15px !important;
+
+    font-weight: 900 !important;
+
+    color: #00ffcc !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================
+   PLAYERS COLUMN
+========================= */
+
+#historyPopup .history-table th:nth-child(2),
+#historyPopup .history-table td:nth-child(2) {
+    width: 17% !important;
+}
+
+
+/* =========================
+   SMALL COLUMNS
+========================= */
+
+#historyPopup .history-table th:nth-child(1),
+#historyPopup .history-table td:nth-child(1) {
+    width: 4% !important;
+}
+
+#historyPopup .history-table th:nth-child(3),
+#historyPopup .history-table td:nth-child(3),
+#historyPopup .history-table th:nth-child(4),
+#historyPopup .history-table td:nth-child(4) {
+    width: 8% !important;
+}
+
+#historyPopup .history-table th:nth-child(5),
+#historyPopup .history-table td:nth-child(5) {
+    width: 7% !important;
+}
+
+#historyPopup .history-table th:nth-child(6),
+#historyPopup .history-table td:nth-child(6) {
+    width: 6% !important;
+}
+
+#historyPopup .history-table th:nth-child(7),
+#historyPopup .history-table td:nth-child(7),
+#historyPopup .history-table th:nth-child(8),
+#historyPopup .history-table td:nth-child(8),
+#historyPopup .history-table th:nth-child(9),
+#historyPopup .history-table td:nth-child(9),
+#historyPopup .history-table th:nth-child(10),
+#historyPopup .history-table td:nth-child(10) {
+    width: 7% !important;
+}
+
+#historyPopup .history-table th:nth-child(11),
+#historyPopup .history-table td:nth-child(11) {
+    width: 6% !important;
+}
+
+#historyPopup .history-table th:nth-child(12),
+#historyPopup .history-table td:nth-child(12) {
+    width: 5% !important;
+}
+
+
+/* =========================================================
+   🔥 PLAYER NAMES — KEEP VISIBLE
+========================================================= */
+
+#historyPopup .history-table td:nth-child(2) > div {
+    min-width: 0 !important;
+    width: 100% !important;
+}
+
+
+#historyPopup .history-table td:nth-child(2) div {
+    max-width: 100% !important;
+
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+}
+
+
+/* =========================================================
+   🔥 BOTTOM BUTTONS
+========================================================= */
+
+#historyPopup .popup-buttons {
+    flex: 0 0 auto !important;
+
+    width: 100% !important;
+
+    display: flex !important;
+
+    justify-content: center !important;
+
+    align-items: center !important;
+
+    gap: 20px !important;
+
+    margin-top: 15px !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
 
 @media (max-width: 1100px) {
-    #historyPopup .popup-box,
-    #historyPopup .large-popup {
+
+    #historyPopup .popup-box {
         width: 96vw !important;
         max-width: 96vw !important;
     }
 
     #historyPopup .history-summary-counters {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
     }
+
 }
 
+
 @media (max-width: 700px) {
-    #historyPopup .popup-box,
-    #historyPopup .large-popup {
+
+    #historyPopup .popup-box {
         width: 97vw !important;
         max-width: 97vw !important;
+
         height: 92vh !important;
         max-height: 92vh !important;
+
         padding: 15px !important;
     }
 
@@ -2991,22 +4718,469 @@ body * {
         grid-template-columns: 1fr !important;
     }
 
-    #historyPopup .history-summary-box {
-        min-height: 150px !important;
-        padding: 15px !important;
-    }
-
-    #historyPopup .history-card-title {
-        font-size: 18px !important;
-    }
-
-    #historyPopup .history-card-values strong {
-        font-size: 25px !important;
-    }
-
     #historyPopup .history-table th,
     #historyPopup .history-table td {
         font-size: 12px !important;
-        padding: 8px 4px !important;
+        padding: 7px 4px !important;
     }
+}
+
+/* =========================================================
+   🔥 RASSON HISTORY POPUP — FINAL PREMIUM CARD FIX
+========================================================= */
+
+/* POPUP */
+#historyPopup .large-popup {
+    width: 1400px !important;
+    max-width: 96vw !important;
+
+    height: 88vh !important;
+    max-height: 88vh !important;
+
+    padding: 30px !important;
+
+    box-sizing: border-box !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    border-radius: 20px !important;
+}
+
+
+/* TITLE */
+#historyPopup #historyTableTitle {
+    font-size: 32px !important;
+    font-weight: 900 !important;
+
+    margin: 0 0 25px 0 !important;
+
+    text-align: center !important;
+
+    color: #dffff8 !important;
+
+    text-shadow:
+        0 0 8px #00ffcc,
+        0 0 20px #00ffcc !important;
+}
+
+
+/* =========================================================
+   🔥 SIX CARDS — 3 TOP + 3 BOTTOM
+========================================================= */
+
+#historyPopup .history-summary-counters {
+
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr)) !important;
+
+    gap: 20px !important;
+
+    margin: 0 0 28px 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   🔥 ACTUAL CARD BOX
+========================================================= */
+
+#historyPopup .history-summary-box {
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    min-height: 180px !important;
+
+    padding: 20px !important;
+
+    box-sizing: border-box !important;
+
+    border-radius: 18px !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(5,20,17,.96),
+            rgba(0,0,0,.92)
+        ) !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: center !important;
+
+    justify-content: flex-start !important;
+
+    text-align: center !important;
+
+    position: relative !important;
+}
+
+
+/* =========================================================
+   🔥 CARD BORDERS
+========================================================= */
+
+#historyPopup .history-summary-box.green {
+
+    border: 2px solid #00ff88 !important;
+
+    box-shadow:
+        0 0 12px rgba(0,255,136,.35),
+        inset 0 0 18px rgba(0,255,136,.08) !important;
+}
+
+
+#historyPopup .history-summary-box.gold {
+
+    border: 2px solid #ffd700 !important;
+
+    box-shadow:
+        0 0 12px rgba(255,215,0,.35),
+        inset 0 0 18px rgba(255,215,0,.08) !important;
+}
+
+
+#historyPopup .history-summary-box.red {
+
+    border: 2px solid #ff4444 !important;
+
+    box-shadow:
+        0 0 12px rgba(255,60,60,.35),
+        inset 0 0 18px rgba(255,60,60,.08) !important;
+}
+
+
+/* =========================================================
+   🔥 CARD TITLE
+========================================================= */
+
+#historyPopup .history-card-title {
+
+    width: 100% !important;
+
+    font-size: 21px !important;
+
+    font-weight: 900 !important;
+
+    line-height: 1.2 !important;
+
+    margin: 0 0 16px 0 !important;
+
+    color: #00ffcc !important;
+
+    text-align: center !important;
+
+    white-space: nowrap !important;
+
+    text-shadow:
+        0 0 8px rgba(0,255,204,.5) !important;
+}
+
+
+/* =========================================================
+   🔥 SHIFT 1 / SHIFT 2 / TOTAL
+========================================================= */
+
+#historyPopup .history-card-head {
+
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, 1fr) !important;
+
+    gap: 8px !important;
+
+    margin: 0 0 6px 0 !important;
+
+    font-size: 15px !important;
+
+    font-weight: 900 !important;
+
+    color: #d0d0d0 !important;
+
+    text-align: center !important;
+}
+
+
+#historyPopup .history-card-head span {
+
+    font-size: 15px !important;
+
+    font-weight: 900 !important;
+
+    color: #d8d8d8 !important;
+}
+
+
+/* =========================================================
+   🔥 NUMBERS
+========================================================= */
+
+#historyPopup .history-card-values {
+
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, 1fr) !important;
+
+    gap: 8px !important;
+
+    text-align: center !important;
+}
+
+
+#historyPopup .history-card-values strong {
+
+    font-size: 30px !important;
+
+    line-height: 1.15 !important;
+
+    font-weight: 900 !important;
+
+    color: #ffffff !important;
+
+    text-shadow:
+        0 0 8px rgba(255,255,255,.5) !important;
+}
+
+
+/* =========================================================
+   🔥 AMOUNTS
+========================================================= */
+
+#historyPopup .history-card-amount {
+
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, 1fr) !important;
+
+    gap: 8px !important;
+
+    margin-top: 7px !important;
+
+    text-align: center !important;
+}
+
+
+#historyPopup .history-card-amount span {
+
+    font-size: 15px !important;
+
+    line-height: 1.2 !important;
+
+    font-weight: 900 !important;
+
+    color: #00ff99 !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================================================
+   🔥 CENTURY TIME
+========================================================= */
+
+#historyPopup .history-card-time {
+
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, 1fr) !important;
+
+    gap: 8px !important;
+
+    margin-top: 5px !important;
+
+    text-align: center !important;
+}
+
+
+#historyPopup .history-card-time span {
+
+    font-size: 14px !important;
+
+    line-height: 1.2 !important;
+
+    font-weight: 900 !important;
+
+    color: #ffd700 !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================================================
+   🔥 HISTORY TABLE
+========================================================= */
+
+#historyPopup .table-mobile-wrapper {
+
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    max-height: 420px !important;
+
+    overflow-x: hidden !important;
+
+    overflow-y: auto !important;
+
+    box-sizing: border-box !important;
+}
+
+
+#historyPopup .history-table {
+
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    table-layout: fixed !important;
+
+    border-collapse: collapse !important;
+}
+
+
+#historyPopup .history-table th {
+
+    font-size: 16px !important;
+
+    font-weight: 900 !important;
+
+    padding: 12px 7px !important;
+
+    white-space: nowrap !important;
+
+    color: #00ffcc !important;
+}
+
+
+#historyPopup .history-table td {
+
+    font-size: 15px !important;
+
+    font-weight: 700 !important;
+
+    padding: 11px 7px !important;
+
+    white-space: nowrap !important;
+
+    height: 44px !important;
+}
+
+
+/* PLAYER COLUMN */
+#historyPopup .history-table th:nth-child(2),
+#historyPopup .history-table td:nth-child(2) {
+
+    width: 17% !important;
+}
+
+
+/* =========================================================
+   🔥 BUTTONS
+========================================================= */
+
+#historyPopup .popup-buttons {
+
+    width: 100% !important;
+
+    display: flex !important;
+
+    justify-content: center !important;
+
+    align-items: center !important;
+
+    gap: 20px !important;
+
+    margin-top: 18px !important;
+}
+
+
+#historyPopup .popup-buttons button {
+
+    min-width: 170px !important;
+
+    min-height: 48px !important;
+
+    padding: 10px 20px !important;
+
+    font-size: 17px !important;
+
+    font-weight: 900 !important;
+}
+
+
+/* =========================================================
+   🔥 RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    #historyPopup .large-popup {
+        width: 96vw !important;
+        max-width: 96vw !important;
+    }
+
+    #historyPopup .history-summary-counters {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    #historyPopup .large-popup {
+        width: 97vw !important;
+        max-width: 97vw !important;
+
+        height: 92vh !important;
+        max-height: 92vh !important;
+
+        padding: 16px !important;
+    }
+
+    #historyPopup .history-summary-counters {
+        grid-template-columns: 1fr !important;
+    }
+
+    #historyPopup .history-card-title {
+        font-size: 19px !important;
+    }
+
+    #historyPopup .history-card-values strong {
+        font-size: 27px !important;
+    }
+
+    #historyPopup .history-card-head span {
+        font-size: 13px !important;
+    }
+
+    #historyPopup .history-card-amount span {
+        font-size: 13px !important;
+    }
+
+    #historyPopup .history-card-time span {
+        font-size: 12px !important;
+    }
+
 }
