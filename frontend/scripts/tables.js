@@ -8519,15 +8519,17 @@ function renderHistoryPage() {
     if (!t || !Array.isArray(t.history) || t.history.length === 0) {
 
         body.innerHTML =
-            "<tr><td colspan='11'>No history found.</td></tr>";
+            "<tr><td colspan='12'>No history found.</td></tr>";
 
         return;
     }
 
-    let history =
-        [...t.history];
+    let history = [...t.history];
 
+    // ==========================================
     // SHIFT FILTER
+    // ==========================================
+
     const shiftSelect =
         document.getElementById("tableHistoryShiftSelect");
 
@@ -8549,12 +8551,19 @@ function renderHistoryPage() {
             );
     }
 
+    // ==========================================
     // LATEST FIRST
+    // ==========================================
+
     history.sort(
         (a, b) =>
-            Number(b.checkout || 0) -
-            Number(a.checkout || 0)
+            Number(b.checkin || 0) -
+            Number(a.checkin || 0)
     );
+
+    // ==========================================
+    // PAGINATION
+    // ==========================================
 
     const start =
         (historyPage - 1) * historyPerPage;
@@ -8565,85 +8574,163 @@ function renderHistoryPage() {
     const pageRows =
         history.slice(start, end);
 
+    // ==========================================
+    // BUILD ROWS
+    // ==========================================
+
     pageRows.forEach((h, index) => {
 
-        /*
-         * IMPORTANT:
-         * Firebase sessionId is the REAL ID.
-         * Never pass array index to openBillFromHistory().
-         */
+        // -------------------------------
+        // PLAYER NAMES
+        // -------------------------------
 
-        const sessionId =
-            String(h.sessionId || "");
+        const player1 =
+            h.player1Name ||
+            h.player1_name ||
+            "Player 1";
 
-        const rowNumber =
-            start + index + 1;
+        const player2 =
+            h.player2Name ||
+            h.player2_name ||
+            "Player 2";
+
+        // -------------------------------
+        // CHECKOUT PLAYER
+        // -------------------------------
+
+        const checkoutNumber =
+            Number(
+                h.checkoutPlayerNumber ||
+                h.checkout_player_number ||
+                0
+            );
+
+        const checkoutName =
+            h.checkoutPlayer ||
+            h.checkout_player ||
+            "";
+
+        // -------------------------------
+        // PLAYER 1 HTML
+        // -------------------------------
+
+        let player1HTML = "";
+
+        if (checkoutNumber === 1) {
+
+            player1HTML = `
+                <span class="history-player checkout-player">
+                    ⭐ ${player1}
+                </span>
+            `;
+
+        } else {
+
+            player1HTML = `
+                <span class="history-player">
+                    ${player1}
+                </span>
+            `;
+        }
+
+        // -------------------------------
+        // PLAYER 2 HTML
+        // -------------------------------
+
+        let player2HTML = "";
+
+        if (checkoutNumber === 2) {
+
+            player2HTML = `
+                <span class="history-player checkout-player">
+                    ⭐ ${player2}
+                </span>
+            `;
+
+        } else {
+
+            player2HTML = `
+                <span class="history-player">
+                    ${player2}
+                </span>
+            `;
+        }
+
+        // -------------------------------
+        // PLAYERS ROW
+        // -------------------------------
+
+        const playersHTML = `
+            <div class="history-players">
+                ${player1HTML}
+                <b>VS</b>
+                ${player2HTML}
+            </div>
+        `;
+
+        // -------------------------------
+        // PAID / UNPAID
+        // -------------------------------
+
+        const paidHTML =
+            h.paid
+
+            ? `<button
+                    class="paid-btn"
+                    disabled
+               >
+                    PAID
+               </button>`
+
+            : `<button
+                    class="unpaid-btn"
+                    onclick="openBillFromHistory(
+                        '${tableId}',
+                        ${start + index}
+                    )"
+               >
+                    UNPAID
+               </button>`;
+
+        // -------------------------------
+        // ROW
+        // -------------------------------
 
         body.innerHTML += `
             <tr>
 
-                <td>${rowNumber}</td>
-
                 <td>
-    <div style="
-        display:flex;
-        flex-direction:column;
-        gap:4px;
-    ">
+                    ${start + index + 1}
+                </td>
 
-        <div style="
-            font-weight:bold;
-            ${
-                Number(h.checkoutPlayerNumber) === 1
-                ? "background:#d4af37;color:#000;padding:4px 7px;border-radius:5px;"
-                : ""
-            }
-        ">
-            ${
-                Number(h.checkoutPlayerNumber) === 1
-                ? "⭐ "
-                : ""
-            }
-            ${h.player1Name || "Player 1"}
-        </div>
-
-        <div style="
-            text-align:center;
-            font-size:10px;
-            opacity:.6;
-        ">
-            VS
-        </div>
-
-        <div style="
-            font-weight:bold;
-            ${
-                Number(h.checkoutPlayerNumber) === 2
-                ? "background:#d4af37;color:#000;padding:4px 7px;border-radius:5px;"
-                : ""
-            }
-        ">
-            ${
-                Number(h.checkoutPlayerNumber) === 2
-                ? "⭐ "
-                : ""
-            }
-            ${h.player2Name || "Player 2"}
-        </div>
-
-    </div>
-</td>
-
-                <td>
-                    ${formatTime(h.checkin)}
+                <td class="history-player-cell">
+                    ${playersHTML}
                 </td>
 
                 <td>
-                    ${formatTime(h.checkout)}
+                    ${
+                        h.checkin
+                            ? new Date(
+                                h.checkin
+                              ).toLocaleTimeString()
+                            : "-"
+                    }
                 </td>
 
                 <td>
-                    ${formatSeconds(h.playSeconds || 0)}
+                    ${
+                        h.checkout
+                            ? new Date(
+                                h.checkout
+                              ).toLocaleTimeString()
+                            : "-"
+                    }
+                </td>
+
+                <td>
+                    ${formatSeconds(
+                        h.playSeconds || 0
+                    )}
                 </td>
 
                 <td>
@@ -8651,47 +8738,52 @@ function renderHistoryPage() {
                 </td>
 
                 <td>
-                    ${h.amount || 0}
+                    ${formatMoney(
+                        h.amount || 0
+                    )}
                 </td>
 
                 <td>
-                    ${h.canteenAmount || 0}
+                    ${formatMoney(
+                        h.discount || 0
+                    )}
                 </td>
 
                 <td>
-                    ${h.total || 0}
+                    ${formatMoney(
+                        h.canteenAmount || 0
+                    )}
                 </td>
 
                 <td>
+                    ${formatMoney(
+                        h.total || 0
+                    )}
+                </td>
 
-                    ${
-                        h.paid
-                        ?
-                        `
-                        <button
-                            class="paid-btn"
-                            disabled>
-                            PAID
-                        </button>
-                        `
-                        :
-                        `
-                        <button
-                            class="unpaid-btn"
-                            onclick="window.openBillFromHistory(
-                                '${tableId}',
-                                '${sessionId}'
-                            )">
-                            UNPAID
-                        </button>
-                        `
-                    }
+                <td>
+                    ${paidHTML}
+                </td>
 
+                <td>
+                    -
                 </td>
 
             </tr>
         `;
     });
+
+    // ==========================================
+    // PAGE NUMBER
+    // ==========================================
+
+    const pageNumber =
+        document.getElementById("pageNumber");
+
+    if (pageNumber) {
+        pageNumber.innerText =
+            historyPage;
+    }
 }
 
 /******************************************************
