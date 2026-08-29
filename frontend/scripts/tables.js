@@ -7980,66 +7980,69 @@ function loadSelectedTableHistory() {
      * CHECKOUT PLAYER DISPLAY
      ******************************************************/
 
-    const buildPlayerDisplay = (h) => {
+const buildPlayerDisplay = (h) => {
 
-        const player1 =
-            getPlayer1(h);
+    const player1 =
+        getPlayer1(h);
 
-        const player2 =
-            getPlayer2(h);
+    const player2 =
+        getPlayer2(h);
 
-        const checkoutName =
-            getCheckoutPlayer(h);
+    const checkoutName =
+        getCheckoutPlayer(h);
 
-        const checkoutNumber =
-            getCheckoutNumber(h);
-
-
-        const isPlayer1Checkout =
-            checkoutNumber === 1 ||
-            (
-                checkoutName &&
-                player1 &&
-                checkoutName.toLowerCase() ===
-                player1.toLowerCase()
-            );
+    const checkoutNumber =
+        getCheckoutNumber(h);
 
 
-        const isPlayer2Checkout =
-            checkoutNumber === 2 ||
-            (
-                checkoutName &&
-                player2 &&
-                checkoutName.toLowerCase() ===
-                player2.toLowerCase()
-            );
+    const isPlayer1Checkout =
+        checkoutNumber === 1 ||
+        (
+            checkoutName &&
+            player1 &&
+            String(checkoutName).toLowerCase().trim() ===
+            String(player1).toLowerCase().trim()
+        );
 
 
-        const p1 =
-            isPlayer1Checkout
-                ? `<span class="checkout-player-highlight">
-                       ⭐ ${player1}
-                   </span>`
-                : `<span>${player1}</span>`;
+    const isPlayer2Checkout =
+        checkoutNumber === 2 ||
+        (
+            checkoutName &&
+            player2 &&
+            String(checkoutName).toLowerCase().trim() ===
+            String(player2).toLowerCase().trim()
+        );
 
 
-        const p2 =
-            isPlayer2Checkout
-                ? `<span class="checkout-player-highlight">
-                       ⭐ ${player2}
-                   </span>`
-                : `<span>${player2}</span>`;
+    const p1 =
+        isPlayer1Checkout
+            ? `<span class="checkout-player-highlight">
+                   ⭐ ${player1}
+               </span>`
+            : `<span>${player1}</span>`;
 
 
-        return `
-            <div class="table-history-player-line">
-                ${p1}
-                <b>VS</b>
-                ${p2}
-            </div>
-        `;
+    const p2 =
+        isPlayer2Checkout
+            ? `<span class="checkout-player-highlight">
+                   ⭐ ${player2}
+               </span>`
+            : `<span>${player2}</span>`;
 
-    };
+
+    return `
+        <div class="table-history-player-line">
+
+            ${p1}
+
+            <b>VS</b>
+
+            ${p2}
+
+        </div>
+    `;
+};
 
 
     /******************************************************
