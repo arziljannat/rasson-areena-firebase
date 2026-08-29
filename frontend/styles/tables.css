@@ -6554,3 +6554,118 @@ body * {
     color: #000 !important;
 
 }
+/* ============================================================
+   🔥 TABLE HISTORY — PLAYER DISPLAY
+============================================================ */
+
+#tableHistoryPopup .table-history-player-line {
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    gap: 7px !important;
+
+    width: 100% !important;
+
+    white-space: nowrap !important;
+
+    font-size: 14px !important;
+
+    font-weight: 800 !important;
+
+}
+
+
+#tableHistoryPopup
+.table-history-player-line b {
+
+    color: #ffd700 !important;
+
+    font-size: 12px !important;
+
+    font-weight: 900 !important;
+
+}
+
+
+#tableHistoryPopup
+.table-history-player-line span {
+
+    color: #00ffff !important;
+
+    font-weight: 800 !important;
+
+}
+
+
+#tableHistoryPopup
+.checkout-player-highlight {
+
+    display: inline-block !important;
+
+    color: #ffd700 !important;
+
+    background: rgba(255,215,0,.12) !important;
+
+    border: 1px solid rgba(255,215,0,.65) !important;
+
+    border-radius: 5px !important;
+
+    padding: 2px 5px !important;
+
+    font-weight: 900 !important;
+
+    text-shadow:
+        0 0 6px #ffd700 !important;
+
+}
+
+
+/* ============================================================
+   TABLE HISTORY — SESSION ROW
+============================================================ */
+
+#tableHistoryPopup .players-cell {
+
+    min-width: 180px !important;
+
+    text-align: center !important;
+
+}
+
+
+#tableHistoryPopup .paid-btn {
+
+    display: inline-block !important;
+
+    padding: 4px 9px !important;
+
+    border-radius: 6px !important;
+
+    background: #00ff88 !important;
+
+    color: #000 !important;
+
+    font-weight: 900 !important;
+
+}
+
+
+#tableHistoryPopup .unpaid-btn {
+
+    display: inline-block !important;
+
+    padding: 4px 9px !important;
+
+    border-radius: 6px !important;
+
+    background: #ff4444 !important;
+
+    color: #fff !important;
+
+    font-weight: 900 !important;
+
+}
