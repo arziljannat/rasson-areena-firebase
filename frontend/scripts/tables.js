@@ -3177,18 +3177,67 @@ const secondsOf = (list) =>
 
 
 // =====================================================
-// 🎱 FRAME COUNTS
+// 🎱 FRAME COUNT RULE
+// SINGLE = 1
+// DOUBLE = 2
 // =====================================================
 
+const getFrameCount = (h) => {
+
+    const rate =
+        Number(
+            h.selectedRate ??
+            h.selected_rate ??
+            h.frameRate ??
+            h.frame_rate ??
+            0
+        );
+
+    const playType =
+        String(
+            h.playType ??
+            h.selectedPlayType ??
+            h.play_type ??
+            ""
+        ).toLowerCase();
+
+
+    // 👑 Century is NOT a frame
+    if (playType.includes("century")) {
+        return 0;
+    }
+
+
+    // 🎱 Double Frame
+    if (
+        rate === 200 ||
+        playType.includes("double")
+    ) {
+        return 2;
+    }
+
+
+    // 🎱 Single Frame
+    return 1;
+};
+
+
+const countFrames = (list) =>
+    list.reduce(
+        (sum, h) =>
+            sum + getFrameCount(h),
+        0
+    );
+
+
 const s1FrameCount =
-    shift1Frames.length;
+    countFrames(shift1Frames);
 
 const s2FrameCount =
-    shift2Frames.length;
+    countFrames(shift2Frames);
 
 const totalFrameCount =
     s1FrameCount + s2FrameCount;
-
 
 // =====================================================
 // 💰 FRAME AMOUNTS
@@ -3251,10 +3300,10 @@ const totalCenturySeconds =
 // =====================================================
 
 const s1PaidFrameCount =
-    shift1PaidFrames.length;
+    countFrames(shift1PaidFrames);
 
 const s2PaidFrameCount =
-    shift2PaidFrames.length;
+    countFrames(shift2PaidFrames);
 
 const totalPaidFrameCount =
     s1PaidFrameCount + s2PaidFrameCount;
@@ -3306,10 +3355,10 @@ const totalPaidCenturySeconds =
 // =====================================================
 
 const s1UnpaidFrameCount =
-    shift1UnpaidFrames.length;
+    countFrames(shift1UnpaidFrames);
 
 const s2UnpaidFrameCount =
-    shift2UnpaidFrames.length;
+    countFrames(shift2UnpaidFrames);
 
 const totalUnpaidFrameCount =
     s1UnpaidFrameCount + s2UnpaidFrameCount;
