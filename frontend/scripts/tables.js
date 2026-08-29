@@ -7774,6 +7774,44 @@ tableSel.innerHTML = sortedHistoryTables
     document.getElementById("tableHistoryTableSelect").onchange = loadSelectedTableHistory;
 }
 
+/*
+ * RASSON ARENA — TABLE HISTORY FINAL FIX
+ *
+ * Add this block ONCE in tables.js, immediately BEFORE:
+ *
+ * function loadSelectedTableHistory() {
+ *
+ * This fixes the current "formatMoney is not defined" error and
+ * also safely provides formatSeconds if it is not globally defined.
+ * The latest Table History logic for frame counts, player names and
+ * checkout-player highlighting remains unchanged.
+ */
+
+if (typeof window.formatMoney !== "function") {
+    window.formatMoney = function (value) {
+        return Number(value || 0).toLocaleString("en-PK");
+    };
+}
+
+if (typeof window.formatSeconds !== "function") {
+    window.formatSeconds = function (seconds) {
+
+        seconds = Math.max(0, Number(seconds || 0));
+
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = Math.floor(seconds % 60);
+
+        return (
+            String(h).padStart(2, "0") + ":" +
+            String(m).padStart(2, "0") + ":" +
+            String(s).padStart(2, "0")
+        );
+    };
+}
+
+
+
 /******************************************************
  * 🟢 LOAD TABLE HISTORY — FINAL
  * SAME LOGIC AS HISTORY POPUP
