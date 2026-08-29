@@ -2971,25 +2971,17 @@ function openHistory(id) {
     // 🔥 SHIFT FILTER
     // =====================================================
 
-    const shift1History =
-        historyList.filter(
-            h => Number(h.shiftNumber || 1) === 1
-        );
-
-    const shift2History =
-        historyList.filter(
-            h => Number(h.shiftNumber || 1) === 2
-        );
-
+const shift1History =
+    historyList;
+const shift2History = [];
     // =====================================================
     // 🔥 SUMMARY
     // =====================================================
 
-    const shift1Game =
-        shift1History.length;
+const shift1Game =
+    shift1History.length;
 
-    const shift2Game =
-        shift2History.length;
+const shift2Game = 0;
 
   // =====================================================
 // 🎱 FRAME / CENTURY SUMMARY
@@ -3026,29 +3018,13 @@ const shift1Frames =
         h => getPlayType(h) === "frame"
     );
 
-const shift2Frames =
-    shift2History.filter(
-        h => getPlayType(h) === "frame"
-    );
-
 const shift1Century =
     shift1History.filter(
         h => getPlayType(h) === "century"
     );
 
-const shift2Century =
-    shift2History.filter(
-        h => getPlayType(h) === "century"
-    );
-
 const shift1FrameAmount =
     shift1Frames.reduce(
-        (sum, h) => sum + getAmount(h),
-        0
-    );
-
-const shift2FrameAmount =
-    shift2Frames.reduce(
         (sum, h) => sum + getAmount(h),
         0
     );
@@ -3167,14 +3143,8 @@ const isPaid = (h) =>
 const shift1PaidFrames =
     shift1Frames.filter(isPaid);
 
-const shift2PaidFrames =
-    shift2Frames.filter(isPaid);
-
 const shift1UnpaidFrames =
     shift1Frames.filter(h => !isPaid(h));
-
-const shift2UnpaidFrames =
-    shift2Frames.filter(h => !isPaid(h));
 
 
 // ---------- CENTURY ----------
@@ -3182,14 +3152,8 @@ const shift2UnpaidFrames =
 const shift1PaidCentury =
     shift1Century.filter(isPaid);
 
-const shift2PaidCentury =
-    shift2Century.filter(isPaid);
-
 const shift1UnpaidCentury =
     shift1Century.filter(h => !isPaid(h));
-
-const shift2UnpaidCentury =
-    shift2Century.filter(h => !isPaid(h));
 
 
 // =====================================================
@@ -3258,11 +3222,8 @@ const countFrames = (list) =>
 const s1FrameCount =
     countFrames(shift1Frames);
 
-const s2FrameCount =
-    countFrames(shift2Frames);
-
 const totalFrameCount =
-    s1FrameCount + s2FrameCount;
+    countFrames(shift1Frames);
 
 // =====================================================
 // 💰 FRAME AMOUNTS
@@ -3271,11 +3232,8 @@ const totalFrameCount =
 const s1FrameAmount =
     amountOf(shift1Frames);
 
-const s2FrameAmount =
-    amountOf(shift2Frames);
-
 const totalFrameAmount =
-    s1FrameAmount + s2FrameAmount;
+    amountOf(shift1Frames);
 
 
 // =====================================================
@@ -3327,20 +3285,14 @@ const totalCenturySeconds =
 const s1PaidFrameCount =
     countFrames(shift1PaidFrames);
 
-const s2PaidFrameCount =
-    countFrames(shift2PaidFrames);
-
 const totalPaidFrameCount =
-    s1PaidFrameCount + s2PaidFrameCount;
+    s1PaidFrameCount;
 
 const s1PaidFrameAmount =
     amountOf(shift1PaidFrames);
 
-const s2PaidFrameAmount =
-    amountOf(shift2PaidFrames);
-
 const totalPaidFrameAmount =
-    s1PaidFrameAmount + s2PaidFrameAmount;
+    s1PaidFrameAmount;
 
 
 // =====================================================
@@ -3350,29 +3302,20 @@ const totalPaidFrameAmount =
 const s1PaidCenturyCount =
     shift1PaidCentury.length;
 
-const s2PaidCenturyCount =
-    shift2PaidCentury.length;
-
 const totalPaidCenturyCount =
-    s1PaidCenturyCount + s2PaidCenturyCount;
+    s1PaidCenturyCount;
 
 const s1PaidCenturyAmount =
     amountOf(shift1PaidCentury);
 
-const s2PaidCenturyAmount =
-    amountOf(shift2PaidCentury);
-
 const totalPaidCenturyAmount =
-    s1PaidCenturyAmount + s2PaidCenturyAmount;
+    s1PaidCenturyAmount;
 
 const s1PaidCenturySeconds =
     secondsOf(shift1PaidCentury);
 
-const s2PaidCenturySeconds =
-    secondsOf(shift2PaidCentury);
-
 const totalPaidCenturySeconds =
-    s1PaidCenturySeconds + s2PaidCenturySeconds;
+    s1PaidCenturySeconds;
 
 
 // =====================================================
@@ -3382,21 +3325,14 @@ const totalPaidCenturySeconds =
 const s1UnpaidFrameCount =
     countFrames(shift1UnpaidFrames);
 
-const s2UnpaidFrameCount =
-    countFrames(shift2UnpaidFrames);
-
 const totalUnpaidFrameCount =
-    s1UnpaidFrameCount + s2UnpaidFrameCount;
+    s1UnpaidFrameCount;
 
 const s1UnpaidFrameAmount =
     amountOf(shift1UnpaidFrames);
 
-const s2UnpaidFrameAmount =
-    amountOf(shift2UnpaidFrames);
-
 const totalUnpaidFrameAmount =
-    s1UnpaidFrameAmount + s2UnpaidFrameAmount;
-
+    s1UnpaidFrameAmount;
 
 // =====================================================
 // 🔴 UNPAID CENTURIES
@@ -8346,10 +8282,7 @@ function loadSelectedTableHistory() {
         );
 
 
-    const shift2History =
-        history.filter(
-            h => inShift(h, selectedDay.shift2)
-        );
+const shift2History = [];
 
 
     /* ==================================================
