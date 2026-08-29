@@ -10291,598 +10291,427 @@ ${resourceHTML}
 
 
 // ============================================================
-// TABLE HISTORY — THERMAL PRINT
+/// TABLE HISTORY — THERMAL PRINT
+/// SAME FRAME COUNT LOGIC AS TABLE HISTORY POPUP
 // ============================================================
 
 function printTableHistoryThermal() {
 
-    const tableId = document.getElementById("tableHistoryTableSelect")?.value;
-    const dayIndex = document.getElementById("tableHistoryDateSelect")?.selectedIndex;
+    const tableId =
+        document.getElementById("tableHistoryTableSelect")?.value;
 
-    const t = tables.find(x => String(x.id) === String(tableId));
-    const d = window._daysData?.[dayIndex];
+    const dayIndex =
+        document.getElementById("tableHistoryDateSelect")?.selectedIndex;
+
+    const t =
+        tables.find(x => String(x.id) === String(tableId));
+
+    const d =
+        window._daysData?.[dayIndex];
 
     if (!t || !d) {
         alert("No data found ❌");
         return;
     }
 
-    const tableData = d.tables?.find(
-        tb => String(tb.table_id) === String(t.name)
-    );
-
-    const history = Array.isArray(tableData?.history)
-        ? tableData.history
-        : [];
-
-    if (!history.length) {
-        alert("No table history found ❌");
-        return;
-    }
-
-    // ========================================================
-    // HELPERS
-    // ========================================================
-
-    const money = value => {
-        const n = Number(value || 0);
-        return `Rs ${n.toLocaleString("en-PK")}`;
-    };
-
-    const safe = value => {
-        return value === null || value === undefined || value === ""
-            ? "-"
-            : String(value);
-    };
-
-    const getPlayer1 = h => {
-        return (
-            h.player1_name ||
-            h.player1 ||
-            h.player1Name ||
-            "Player 1"
+    const tableData =
+        d.tables?.find(
+            tb => String(tb.table_id) === String(t.name)
         );
-    };
 
-    const getPlayer2 = h => {
-        return (
-            h.player2_name ||
-            h.player2 ||
-            h.player2Name ||
-            "Player 2"
-        );
-    };
+    const history =
+        Array.isArray(tableData?.history)
+            ? tableData.history
+            : [];
 
-    const getCheckoutPlayer = h => {
-        return (
-            h.checkout_player ||
-            h.checkoutPlayer ||
-            ""
-        );
-    };
 
-    const getCheckoutNumber = h => {
+    // =====================================================
+    // 🔥 SAME FRAME COUNT LOGIC AS TABLE HISTORY POPUP
+    // =====================================================
+
+    const getFrameCount = (h) => {
+
         return Number(
-            h.checkout_player_number ||
-            h.checkoutPlayerNumber ||
-            0
+            h.frame_count ??
+            h.frameCount ??
+            h.frames ??
+            (
+                String(
+                    h.play_type ??
+                    h.playType ??
+                    ""
+                )
+                .toLowerCase()
+                .includes("double")
+                    ? 2
+                    : 1
+            )
+        ) || 1;
+
+    };
+
+
+    // =====================================================
+    // 🔥 PLAY TYPE
+    // =====================================================
+
+    const getPlayType = (h) => {
+
+        return String(
+            h.selected_play_type ??
+            h.selectedPlayType ??
+            h.play_type ??
+            h.playType ??
+            ""
+        )
+        .toLowerCase()
+        .trim();
+
+    };
+
+
+    // =====================================================
+    // 🔥 PAID STATUS
+    // =====================================================
+
+    const isPaid = (h) => {
+
+        return (
+            h.paid === true ||
+            h.paid === "true" ||
+            h.status === "paid" ||
+            h.payment_status === "paid"
         );
+
     };
 
-    const isPlayer1Checkout = h => {
-        const checkout = getCheckoutPlayer(h).toLowerCase();
 
-        if (checkout) {
-            return checkout === getPlayer1(h).toLowerCase();
+    // =====================================================
+    // 🔥 SHIFT FILTER
+    // SAME AS POPUP
+    // =====================================================
+
+    const inShift = (h, shift) => {
+
+        if (!shift?.startMs || !shift?.endMs) {
+            return false;
         }
 
-        return getCheckoutNumber(h) === 1;
+        return (
+            Number(h.checkin || 0) >= Number(shift.startMs) &&
+            Number(h.checkout || 0) <= Number(shift.endMs)
+        );
+
     };
 
-    const isPlayer2Checkout = h => {
-        const checkout = getCheckoutPlayer(h).toLowerCase();
 
-        if (checkout) {
-            return checkout === getPlayer2(h).toLowerCase();
-        }
+    const shift1 =
+        d.shift1 || {};
 
-        return getCheckoutNumber(h) === 2;
+    const shift2 =
+        d.shift2 || {};
+
+
+    // =====================================================
+    // 🔥 SUMMARY
+    // =====================================================
+
+    const summary = {
+
+        frames: 0,
+        centuries: 0,
+
+        paidFrames: 0,
+        unpaidFrames: 0,
+
+        paidCenturies: 0,
+        unpaidCenturies: 0,
+
+        game: 0,
+        canteen: 0,
+        total: 0,
+        time: 0
+
     };
 
-    const playerName = (name, selected) => {
-        if (!selected) return safe(name);
 
-        return `★ ${safe(name)}`;
-    };
-
-    const formatPlayTime = seconds => {
-        const s = Number(seconds || 0);
-
-        if (typeof formatSeconds === "function") {
-            return formatSeconds(s);
-        }
-
-        const hrs = Math.floor(s / 3600);
-        const mins = Math.floor((s % 3600) / 60);
-        const secs = s % 60;
-
-        return [
-            hrs > 0 ? String(hrs).padStart(2, "0") : null,
-            String(mins).padStart(2, "0"),
-            String(secs).padStart(2, "0")
-        ]
-            .filter(Boolean)
-            .join(":");
-    };
-
-    const formatDateTime = value => {
-
-        if (!value) return "-";
-
-        const date = new Date(value);
-
-        if (Number.isNaN(date.getTime())) {
-            return safe(value);
-        }
-
-        return date.toLocaleString("en-PK", {
-            timeZone: "Asia/Karachi",
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true
-        });
-    };
-
-    // ========================================================
-    // TOTALS
-    // ========================================================
-
-    let totalFrames = 0;
-    let totalCenturies = 0;
-
-    let paidFrames = 0;
-    let paidCenturies = 0;
-
-    let unpaidFrames = 0;
-    let unpaidCenturies = 0;
-
-    let totalIncome = 0;
-    let totalDiscount = 0;
-    let totalCanteen = 0;
-
-    let totalPlaySeconds = 0;
+    // =====================================================
+    // 🔥 PROCESS HISTORY
+    // =====================================================
 
     history.forEach(h => {
 
-        const playType = String(
-            h.selected_play_type ||
-            h.play_type ||
-            h.selectedPlayType ||
-            ""
-        ).toLowerCase();
+        const type =
+            getPlayType(h);
 
-        const isCentury = playType.includes("century");
-        const isFrame = !isCentury;
+        // -------------------------
+        // ONLY SELECTED DAY SHIFTS
+        // -------------------------
 
-        const paid =
-            h.paid === true ||
-            h.paid === "true" ||
-            h.paid === 1 ||
-            h.paid === "1";
+        const belongsToShift1 =
+            inShift(h, shift1);
 
-        if (isCentury) {
+        const belongsToShift2 =
+            inShift(h, shift2);
 
-            totalCenturies++;
-
-            if (paid) {
-                paidCenturies++;
-            } else {
-                unpaidCenturies++;
-            }
-
-        } else {
-
-            totalFrames++;
-
-            if (paid) {
-                paidFrames++;
-            } else {
-                unpaidFrames++;
-            }
+        if (!belongsToShift1 && !belongsToShift2) {
+            return;
         }
 
-        totalIncome += Number(
-            h.final_amount ??
-            h.total ??
-            h.amount ??
-            h.final_game_amount ??
-            0
-        );
-
-        totalDiscount += Number(
-            h.discount || 0
-        );
-
-        totalCanteen += Number(
-            h.canteen_total ??
-            h.canteenAmount ??
-            0
-        );
-
-        totalPlaySeconds += Number(
-            h.final_seconds ??
-            h.playSeconds ??
-            h.play_seconds ??
-            0
-        );
-    });
-
-    // ========================================================
-    // SESSION ROWS
-    // ========================================================
-
-    let sessionRows = "";
-
-    history.forEach((h, index) => {
-
-        const p1 = getPlayer1(h);
-        const p2 = getPlayer2(h);
-
-        const p1Checkout = isPlayer1Checkout(h);
-        const p2Checkout = isPlayer2Checkout(h);
-
-        const p1Class = p1Checkout ? "checkout-player" : "";
-        const p2Class = p2Checkout ? "checkout-player" : "";
-
-        const p1Star = p1Checkout ? "★ " : "";
-        const p2Star = p2Checkout ? "★ " : "";
-
-        const playType =
-            h.selected_play_type ||
-            h.play_type ||
-            h.selectedPlayType ||
-            "-";
-
-        const rate =
-            h.selected_rate ??
-            h.selectedRate ??
-            h.frame_rate ??
-            h.frameRate ??
-            h.century_rate ??
-            h.centuryRate ??
-            0;
 
         const amount =
-            h.final_amount ??
-            h.final_game_amount ??
-            h.amount ??
-            0;
+            Number(
+                h.final_game_amount ??
+                h.final_amount ??
+                h.amount ??
+                h.game_amount ??
+                0
+            );
 
-        const discount =
-            h.discount || 0;
 
         const canteen =
-            h.canteen_total ??
-            h.canteenAmount ??
-            0;
+            Number(
+                h.canteenAmount ??
+                h.canteen_amount ??
+                0
+            );
+
 
         const total =
-            h.total ??
-            (Number(amount) + Number(canteen));
+            Number(
+                h.total ??
+                h.final_total ??
+                amount + canteen
+            );
 
-        const paid =
-            h.paid === true ||
-            h.paid === "true" ||
-            h.paid === 1 ||
-            h.paid === "1";
 
         const playSeconds =
-            h.final_seconds ??
-            h.playSeconds ??
-            h.play_seconds ??
-            0;
+            Number(
+                h.playSeconds ??
+                h.final_seconds ??
+                h.finalSeconds ??
+                0
+            );
 
-        sessionRows += `
-            <div class="session">
 
-                <div class="session-title">
-                    #${index + 1} &nbsp; ${safe(playType).toUpperCase()}
-                </div>
+        const paid =
+            isPaid(h);
 
-                <div class="players">
-                    <span class="${p1Class}">
-                        ${p1Star}${safe(p1)}
-                    </span>
 
-                    <span class="vs">VS</span>
+        // =================================================
+        // 👑 CENTURY
+        // =================================================
 
-                    <span class="${p2Class}">
-                        ${p2Star}${safe(p2)}
-                    </span>
-                </div>
+        if (
+            type === "century" ||
+            type === "centuries"
+        ) {
 
-                <div class="row">
-                    <span>Check-in</span>
-                    <b>${formatDateTime(h.start_time || h.checkin_time)}</b>
-                </div>
+            summary.centuries += 1;
 
-                <div class="row">
-                    <span>Checkout</span>
-                    <b>${formatDateTime(h.end_time || h.checkout_time)}</b>
-                </div>
+            if (paid) {
+                summary.paidCenturies += 1;
+            } else {
+                summary.unpaidCenturies += 1;
+            }
 
-                <div class="row">
-                    <span>Play Time</span>
-                    <b>${formatPlayTime(playSeconds)}</b>
-                </div>
+        }
 
-                <div class="row">
-                    <span>Rate</span>
-                    <b>${money(rate)}</b>
-                </div>
 
-                <div class="row">
-                    <span>Amount</span>
-                    <b>${money(amount)}</b>
-                </div>
+        // =================================================
+        // 🎱 FRAME
+        // =================================================
 
-                <div class="row">
-                    <span>Discount</span>
-                    <b>${money(discount)}</b>
-                </div>
+        else {
 
-                <div class="row">
-                    <span>Canteen</span>
-                    <b>${money(canteen)}</b>
-                </div>
+            const frameCount =
+                getFrameCount(h);
 
-                <div class="row total-row">
-                    <span>Total</span>
-                    <b>${money(total)}</b>
-                </div>
+            summary.frames += frameCount;
 
-                <div class="payment ${paid ? "paid" : "unpaid"}">
-                    ${paid ? "✓ PAID" : "✕ UNPAID"}
-                </div>
+            if (paid) {
 
-            </div>
-        `;
+                summary.paidFrames += frameCount;
+
+            } else {
+
+                summary.unpaidFrames += frameCount;
+
+            }
+
+        }
+
+
+        summary.game += amount;
+
+        summary.canteen += canteen;
+
+        summary.total += total;
+
+        summary.time += playSeconds;
+
     });
 
-    // ========================================================
-    // PRINT WINDOW
-    // ========================================================
 
-    const win = window.open(
-        "",
-        "_blank",
-        "width=420,height=900"
-    );
+    // =====================================================
+    // 🔥 PRINT WINDOW
+    // =====================================================
+
+    const win =
+        window.open(
+            "",
+            "_blank",
+            "width=350,height=800"
+        );
+
 
     if (!win) {
-        alert("Please allow popups for printing.");
+
+        alert("Please allow popups for printing ❌");
         return;
+
     }
 
-    const printTime = new Date().toLocaleString("en-PK", {
-        timeZone: "Asia/Karachi",
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true
-    });
+
+    // =====================================================
+    // 🔥 THERMAL HTML
+    // =====================================================
 
     const html = `
-<!DOCTYPE html>
 
 <html>
 
 <head>
 
-<meta charset="UTF-8">
-
-<title>Table History - ${safe(t.name)}</title>
+<title>Table History - ${t.name}</title>
 
 <style>
 
 @page {
     size: 80mm auto;
-    margin: 3mm;
+    margin: 0;
 }
 
-* {
-    box-sizing: border-box;
+html,
+body {
+
+    width: 80mm;
+
+    margin: 0;
+    padding: 0;
+
+    background: #fff;
+    color: #000;
+
+    font-family: monospace;
+
 }
 
 body {
-    width: 74mm;
-    margin: 0 auto;
-    padding: 0;
 
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
+    padding: 8px;
 
-    color: #000;
-    background: #fff;
+    box-sizing: border-box;
 
-    font-size: 11px;
+    font-size: 12px;
+
 }
 
-.header {
+.center {
+
     text-align: center;
+
 }
 
 .title {
-    font-size: 18px;
+
+    font-size: 20px;
+
     font-weight: 900;
-    margin-bottom: 3px;
+
 }
 
 .branch {
-    font-size: 13px;
-    font-weight: 700;
+
+    font-size: 15px;
+
+    font-weight: 900;
+
 }
 
-.subtitle {
-    font-size: 11px;
-    margin-top: 2px;
+.table-name {
+
+    font-size: 16px;
+
+    font-weight: 900;
+
 }
 
 .line {
-    border-top: 1px dashed #000;
-    margin: 7px 0;
+
+    border-top:
+        1px dashed #000;
+
+    margin:
+        7px 0;
+
 }
 
-.info {
+.section {
+
     text-align: center;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1.5;
-}
 
-.summary-title {
-    text-align: center;
+    font-size: 14px;
+
     font-weight: 900;
-    font-size: 13px;
-    margin-bottom: 5px;
-}
 
-.summary-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
-}
+    margin:
+        6px 0;
 
-.summary-box {
-    border: 1px solid #000;
-    padding: 4px;
-    text-align: center;
-}
-
-.summary-label {
-    font-size: 9px;
-    font-weight: 700;
-}
-
-.summary-value {
-    font-size: 13px;
-    font-weight: 900;
-}
-
-.session {
-    border: 1px solid #000;
-    margin: 7px 0;
-    padding: 5px;
-    page-break-inside: avoid;
-}
-
-.session-title {
-    text-align: center;
-    font-size: 12px;
-    font-weight: 900;
-    border-bottom: 1px solid #000;
-    padding-bottom: 3px;
-    margin-bottom: 4px;
-}
-
-.players {
-    text-align: center;
-    font-size: 11px;
-    font-weight: 900;
-    margin-bottom: 5px;
-    white-space: normal;
-}
-
-.players .vs {
-    display: inline-block;
-    margin: 0 3px;
-}
-
-.checkout-player {
-    background: #ffe600;
-    padding: 1px 3px;
-    font-weight: 900;
 }
 
 .row {
+
     display: flex;
+
     justify-content: space-between;
-    gap: 5px;
-    line-height: 1.5;
+
+    gap: 8px;
+
+    margin:
+        3px 0;
+
 }
 
-.row span {
-    font-weight: 600;
+.row span:first-child {
+
+    text-align: left;
+
 }
 
-.row b {
+.row span:last-child {
+
     text-align: right;
-}
 
-.total-row {
-    border-top: 1px dashed #000;
-    margin-top: 3px;
-    padding-top: 3px;
     font-weight: 900;
+
 }
 
-.payment {
+.total {
+
+    font-size: 16px;
+
+    font-weight: 900;
+
+}
+
+.big-total {
+
     text-align: center;
-    margin-top: 5px;
-    padding: 3px;
-    border: 1px solid #000;
+
+    font-size: 19px;
+
     font-weight: 900;
-}
-
-.paid {
-    font-weight: 900;
-}
-
-.unpaid {
-    font-weight: 900;
-}
-
-.grand-total {
-    border: 2px solid #000;
-    padding: 7px;
-    text-align: center;
-    margin-top: 7px;
-}
-
-.grand-total-title {
-    font-size: 12px;
-    font-weight: 900;
-}
-
-.grand-total-value {
-    font-size: 18px;
-    font-weight: 900;
-}
-
-.footer {
-    text-align: center;
-    font-size: 9px;
-    margin-top: 8px;
-    line-height: 1.5;
-}
-
-@media print {
-
-    body {
-        width: 74mm;
-    }
-
-    .session {
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
 
 }
 
@@ -10890,135 +10719,220 @@ body {
 
 </head>
 
+
 <body>
 
-<div class="header">
+
+<div class="center">
 
     <div class="title">
         TABLE HISTORY
     </div>
 
     <div class="branch">
-        ${safe(BRANCH).toUpperCase()}
+        ${String(BRANCH || "").toUpperCase()}
     </div>
 
-    <div class="subtitle">
-        ${safe(t.name)}
+    <div class="table-name">
+        ${t.name}
     </div>
 
-    <div class="subtitle">
-        ${safe(d.date)}
+    <div>
+        ${d.date || "-"}
     </div>
 
 </div>
 
+
 <div class="line"></div>
 
-<div class="summary-title">
+
+<div class="section">
     SUMMARY
 </div>
 
-<div class="summary-grid">
 
-    <div class="summary-box">
-        <div class="summary-label">TOTAL FRAMES</div>
-        <div class="summary-value">${totalFrames}</div>
-    </div>
+<div class="row">
 
-    <div class="summary-box">
-        <div class="summary-label">TOTAL CENTURY</div>
-        <div class="summary-value">${totalCenturies}</div>
-    </div>
+    <span>TOTAL FRAMES</span>
 
-    <div class="summary-box">
-        <div class="summary-label">PAID FRAMES</div>
-        <div class="summary-value">${paidFrames}</div>
-    </div>
-
-    <div class="summary-box">
-        <div class="summary-label">PAID CENTURY</div>
-        <div class="summary-value">${paidCenturies}</div>
-    </div>
-
-    <div class="summary-box">
-        <div class="summary-label">UNPAID FRAMES</div>
-        <div class="summary-value">${unpaidFrames}</div>
-    </div>
-
-    <div class="summary-box">
-        <div class="summary-label">UNPAID CENTURY</div>
-        <div class="summary-value">${unpaidCenturies}</div>
-    </div>
+    <span>
+        ${summary.frames}
+    </span>
 
 </div>
+
+
+<div class="row">
+
+    <span>TOTAL CENTURY</span>
+
+    <span>
+        ${summary.centuries}
+    </span>
+
+</div>
+
+
+<div class="row">
+
+    <span>PAID FRAMES</span>
+
+    <span>
+        ${summary.paidFrames}
+    </span>
+
+</div>
+
+
+<div class="row">
+
+    <span>PAID CENTURY</span>
+
+    <span>
+        ${summary.paidCenturies}
+    </span>
+
+</div>
+
+
+<div class="row">
+
+    <span>UNPAID FRAMES</span>
+
+    <span>
+        ${summary.unpaidFrames}
+    </span>
+
+</div>
+
+
+<div class="row">
+
+    <span>UNPAID CENTURY</span>
+
+    <span>
+        ${summary.unpaidCenturies}
+    </span>
+
+</div>
+
 
 <div class="line"></div>
 
-<div class="summary-title">
-    SESSION DETAILS
+
+<div class="section">
+    AMOUNT
 </div>
 
-${sessionRows}
-
-<div class="grand-total">
-
-    <div class="grand-total-title">
-        TOTAL INCOME
-    </div>
-
-    <div class="grand-total-value">
-        ${money(totalIncome)}
-    </div>
-
-</div>
-
-<div class="row" style="margin-top:5px;">
-    <span>Total Discount</span>
-    <b>${money(totalDiscount)}</b>
-</div>
 
 <div class="row">
-    <span>Total Canteen</span>
-    <b>${money(totalCanteen)}</b>
+
+    <span>GAME</span>
+
+    <span>
+        Rs ${summary.game}
+    </span>
+
 </div>
 
+
 <div class="row">
-    <span>Total Play Time</span>
-    <b>${formatPlayTime(totalPlaySeconds)}</b>
+
+    <span>CANTEEN</span>
+
+    <span>
+        Rs ${summary.canteen}
+    </span>
+
 </div>
+
+
+<div class="row total">
+
+    <span>TOTAL</span>
+
+    <span>
+        Rs ${summary.total}
+    </span>
+
+</div>
+
 
 <div class="line"></div>
 
-<div class="footer">
 
-    Printed: ${printTime}<br>
+<div class="row">
 
-    ${safe(BRANCH).toUpperCase()}<br>
+    <span>PLAY TIME</span>
 
-    RASSON SNOOKER ARENA
+    <span>
+        ${formatSeconds(summary.time)}
+    </span>
 
 </div>
+
+
+<div class="line"></div>
+
+
+<div class="big-total">
+
+    TOTAL<br>
+
+    Rs ${summary.total}
+
+</div>
+
+
+<div class="line"></div>
+
+
+<div class="center">
+
+    ${new Date().toLocaleString(
+        "en-PK",
+        {
+            timeZone:
+                "Asia/Karachi"
+        }
+    )}
+
+</div>
+
 
 </body>
 
 </html>
+
 `;
 
+
     win.document.open();
+
     win.document.write(html);
+
     win.document.close();
+
 
     setTimeout(() => {
 
         win.focus();
+
         win.print();
 
         setTimeout(() => {
-            win.close();
-        }, 1000);
 
-    }, 500);
+            win.close();
+
+        }, 800);
+
+    }, 400);
+
 }
+
+
+
 async function rebuildHistoryFromSessions() {
 
     const q = query(
