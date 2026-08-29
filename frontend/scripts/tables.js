@@ -6983,6 +6983,44 @@ function loadDayHistorySnapshot() {
             ? d.tables
             : [];
 
+      // 🔥 FIXED DAY HISTORY DISPLAY ORDER
+    // Table 1 → Table 9 → Room 1 → Room 3
+
+    const orderedTables = [...tables].sort((a, b) => {
+
+        function getOrder(item) {
+
+            const name =
+                String(item.table_id || "")
+                    .trim()
+                    .toLowerCase();
+
+            const tableMatch =
+                name.match(/^table\s*(\d+)/);
+
+            if (tableMatch) {
+
+                return Number(tableMatch[1]);
+
+            }
+
+            const roomMatch =
+                name.match(/^room\s*(\d+)/);
+
+            if (roomMatch) {
+
+                return 100 + Number(roomMatch[1]);
+
+            }
+
+            return 999;
+
+        }
+
+        return getOrder(a) - getOrder(b);
+
+    });
+
 
     /* =====================================================
        HELPERS
