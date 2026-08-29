@@ -5746,36 +5746,6 @@ async function openShiftSummary() {
 
     }
 
-
-    /* =================================================
-       SHIFT 2
-    ================================================= */
-
-    else {
-
-        title.innerText =
-            "SHIFT 2 SNAPSHOT";
-
-        document.getElementById(
-            "confirmShiftCloseBtn"
-        ).innerText =
-            "Close Shift";
-
-
-        startMs =
-            shift2?.startMs ||
-            shift1?.endMs ||
-            Number(
-                window.currentDayId
-            ) ||
-            now;
-
-
-        shiftNumber = 2;
-
-    }
-
-
     body.innerHTML =
         buildRassonSnapshot(
             startMs,
