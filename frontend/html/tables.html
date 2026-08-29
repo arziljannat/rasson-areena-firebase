@@ -539,47 +539,288 @@
 </div>
 
 
-<!-- TABLE HISTORY POPUP -->
+<!-- =====================================================
+     TABLE HISTORY POPUP
+===================================================== -->
+
 <div id="tableHistoryPopup" class="popup hidden">
-    <div class="popup-box large-popup">
-        <h2>Table History</h2>
 
-        <label>Select Day Range:</label>
-        <select id="tableHistoryDateSelect"></select>
+    <div class="popup-box large-popup table-history-popup-box">
 
-        <label>Select Table:</label>
-        <select id="tableHistoryTableSelect"></select>
+        <!-- TITLE -->
+        <h2 id="tableHistoryTitle">
+            TABLE HISTORY
+        </h2>
+
+        <!-- FILTERS -->
+        <div class="table-history-filters">
+
+            <div>
+                <label>Select Day:</label>
+                <select id="tableHistoryDateSelect"></select>
+            </div>
+
+            <div>
+                <label>Select Table:</label>
+                <select id="tableHistoryTableSelect"></select>
+            </div>
+
+        </div>
+
         <p id="tableHistoryBranch"></p>
 
-        <h3>Shift 1</h3>
-        
-        <div class="table-mobile-wrapper">
-        <table class="history-table neon-table">
-            <tbody id="tableShift1Body"></tbody>
-        </table>
+
+        <!-- =================================================
+             SUMMARY CARDS
+        ================================================== -->
+
+        <div class="table-history-summary-counters">
+
+            <!-- TOTAL FRAMES -->
+            <div class="table-history-summary-box green">
+
+                <div class="table-history-card-title">
+                    🎱 TOTAL FRAMES
+                </div>
+
+                <div class="table-history-card-head">
+                    <span>Shift 1</span>
+                    <span>Shift 2</span>
+                    <span>Total</span>
+                </div>
+
+                <div class="table-history-card-values">
+                    <strong id="tableHistoryShift1Frame">0</strong>
+                    <strong id="tableHistoryShift2Frame">0</strong>
+                    <strong id="tableHistoryTotalFrame">0</strong>
+                </div>
+
+                <div class="table-history-card-amount">
+                    <span id="tableHistoryShift1FrameAmount">Rs. 0</span>
+                    <span id="tableHistoryShift2FrameAmount">Rs. 0</span>
+                    <span id="tableHistoryTotalFrameAmount">Rs. 0</span>
+                </div>
+
+            </div>
+
+
+            <!-- TOTAL CENTURY -->
+            <div class="table-history-summary-box gold">
+
+                <div class="table-history-card-title">
+                    👑 TOTAL CENTURY
+                </div>
+
+                <div class="table-history-card-head">
+                    <span>Shift 1</span>
+                    <span>Shift 2</span>
+                    <span>Total</span>
+                </div>
+
+                <div class="table-history-card-values">
+                    <strong id="tableHistoryShift1Century">0</strong>
+                    <strong id="tableHistoryShift2Century">0</strong>
+                    <strong id="tableHistoryTotalCentury">0</strong>
+                </div>
+
+                <div class="table-history-card-amount">
+                    <span id="tableHistoryShift1CenturyAmount">Rs. 0</span>
+                    <span id="tableHistoryShift2CenturyAmount">Rs. 0</span>
+                    <span id="tableHistoryTotalCenturyAmount">Rs. 0</span>
+                </div>
+
+                <div class="table-history-card-time">
+                    <span id="tableHistoryShift1CenturyTime">00:00:00</span>
+                    <span id="tableHistoryShift2CenturyTime">00:00:00</span>
+                    <span id="tableHistoryTotalCenturyTime">00:00:00</span>
+                </div>
+
+            </div>
+
+
+            <!-- PAID FRAMES -->
+            <div class="table-history-summary-box green">
+
+                <div class="table-history-card-title">
+                    💰 PAID FRAMES
+                </div>
+
+                <div class="table-history-card-head">
+                    <span>Shift 1</span>
+                    <span>Shift 2</span>
+                    <span>Total</span>
+                </div>
+
+                <div class="table-history-card-values">
+                    <strong id="tableHistoryShift1PaidFrame">0</strong>
+                    <strong id="tableHistoryShift2PaidFrame">0</strong>
+                    <strong id="tableHistoryTotalPaidFrame">0</strong>
+                </div>
+
+                <div class="table-history-card-amount">
+                    <span id="tableHistoryShift1PaidFrameAmount">Rs. 0</span>
+                    <span id="tableHistoryShift2PaidFrameAmount">Rs. 0</span>
+                    <span id="tableHistoryTotalPaidFrameAmount">Rs. 0</span>
+                </div>
+
+            </div>
+
+
+            <!-- PAID CENTURIES -->
+            <div class="table-history-summary-box gold">
+
+                <div class="table-history-card-title">
+                    💰 PAID CENTURIES
+                </div>
+
+                <div class="table-history-card-head">
+                    <span>Shift 1</span>
+                    <span>Shift 2</span>
+                    <span>Total</span>
+                </div>
+
+                <div class="table-history-card-values">
+                    <strong id="tableHistoryShift1PaidCentury">0</strong>
+                    <strong id="tableHistoryShift2PaidCentury">0</strong>
+                    <strong id="tableHistoryTotalPaidCentury">0</strong>
+                </div>
+
+                <div class="table-history-card-amount">
+                    <span id="tableHistoryShift1PaidCenturyAmount">Rs. 0</span>
+                    <span id="tableHistoryShift2PaidCenturyAmount">Rs. 0</span>
+                    <span id="tableHistoryTotalPaidCenturyAmount">Rs. 0</span>
+                </div>
+
+                <div class="table-history-card-time">
+                    <span id="tableHistoryShift1PaidCenturyTime">00:00:00</span>
+                    <span id="tableHistoryShift2PaidCenturyTime">00:00:00</span>
+                    <span id="tableHistoryTotalPaidCenturyTime">00:00:00</span>
+                </div>
+
+            </div>
+
+
+            <!-- UNPAID FRAMES -->
+            <div class="table-history-summary-box red">
+
+                <div class="table-history-card-title">
+                    🔴 UNPAID FRAMES
+                </div>
+
+                <div class="table-history-card-head">
+                    <span>Shift 1</span>
+                    <span>Shift 2</span>
+                    <span>Total</span>
+                </div>
+
+                <div class="table-history-card-values">
+                    <strong id="tableHistoryShift1UnpaidFrame">0</strong>
+                    <strong id="tableHistoryShift2UnpaidFrame">0</strong>
+                    <strong id="tableHistoryTotalUnpaidFrame">0</strong>
+                </div>
+
+                <div class="table-history-card-amount">
+                    <span id="tableHistoryShift1UnpaidFrameAmount">Rs. 0</span>
+                    <span id="tableHistoryShift2UnpaidFrameAmount">Rs. 0</span>
+                    <span id="tableHistoryTotalUnpaidFrameAmount">Rs. 0</span>
+                </div>
+
+            </div>
+
+
+            <!-- UNPAID CENTURIES -->
+            <div class="table-history-summary-box red">
+
+                <div class="table-history-card-title">
+                    🔴 UNPAID CENTURIES
+                </div>
+
+                <div class="table-history-card-head">
+                    <span>Shift 1</span>
+                    <span>Shift 2</span>
+                    <span>Total</span>
+                </div>
+
+                <div class="table-history-card-values">
+                    <strong id="tableHistoryShift1UnpaidCentury">0</strong>
+                    <strong id="tableHistoryShift2UnpaidCentury">0</strong>
+                    <strong id="tableHistoryTotalUnpaidCentury">0</strong>
+                </div>
+
+                <div class="table-history-card-amount">
+                    <span id="tableHistoryShift1UnpaidCenturyAmount">Rs. 0</span>
+                    <span id="tableHistoryShift2UnpaidCenturyAmount">Rs. 0</span>
+                    <span id="tableHistoryTotalUnpaidCenturyAmount">Rs. 0</span>
+                </div>
+
+                <div class="table-history-card-time">
+                    <span id="tableHistoryShift1UnpaidCenturyTime">00:00:00</span>
+                    <span id="tableHistoryShift2UnpaidCenturyTime">00:00:00</span>
+                    <span id="tableHistoryTotalUnpaidCenturyTime">00:00:00</span>
+                </div>
+
+            </div>
+
         </div>
 
-        <h3>Shift 2</h3>
 
-        <div class="table-mobile-wrapper">
-        <table class="history-table neon-table">
-            <tbody id="tableShift2Body"></tbody>
-        </table>
-        </div>
-        
-        <h3>Combined</h3>
+        <!-- =================================================
+             SESSION DETAILS
+        ================================================== -->
 
-        <div class="table-mobile-wrapper">
-        <table class="history-table neon-table">
-            <tbody id="tableCombinedBody"></tbody>
-        </table>
+        <div class="table-history-details-title">
+            SESSION DETAILS
         </div>
+
+        <div class="table-mobile-wrapper table-history-details-wrapper">
+
+            <table class="history-table neon-table">
+
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>PLAYERS</th>
+                        <th>Check-in</th>
+                        <th>Checkout</th>
+                        <th>Play</th>
+                        <th>Rate</th>
+                        <th>Amount</th>
+                        <th>Discount</th>
+                        <th>Canteen</th>
+                        <th>Total</th>
+                        <th>Paid</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tableHistoryBody"></tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- BUTTONS -->
 
         <div class="popup-buttons">
-            <button id="printTableHistoryBtn" class="neon-btn">Print</button>
-            <button id="cancelTableHistoryBtn" class="neon-btn red">Cancel</button>
+
+            <button
+                id="printTableHistoryBtn"
+                class="neon-btn"
+            >
+                Print
+            </button>
+
+            <button
+                id="cancelTableHistoryBtn"
+                class="neon-btn red"
+            >
+                Close
+            </button>
+
         </div>
+
     </div>
+
 </div>
 
 <!-- PLAYER HISTORY POPUP -->
