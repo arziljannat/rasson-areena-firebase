@@ -6222,23 +6222,25 @@ async function closeDay() {
     }
 
     // --------------- BUILD COMBINED SUMMARY --------------------
-    let combined = {
-        gameTotal: (s1.gameTotal || 0) + (s2.gameTotal || 0),
-        canteenTotal: (s1.canteenTotal || 0) + (s2.canteenTotal || 0),
+let combined = {
+    gameTotal: s1.gameTotal || 0,
 
-        gameCollection: (s1.gameCollection || 0) + (s2.gameCollection || 0),
-        canteenCollection: (s1.canteenCollection || 0) + (s2.canteenCollection || 0),
+    canteenTotal: s1.canteenTotal || 0,
 
-        gameBalance: (s1.gameBalance || 0) + (s2.gameBalance || 0),
-        canteenBalance: (s1.canteenBalance || 0) + (s2.canteenBalance || 0),
+    gameCollection: s1.gameCollection || 0,
 
-        expenses: (s1.expenses || 0) + (s2.expenses || 0),
-        
-      
-        discount:(s1.discount || 0)+(s2.discount || 0),
-      
-        easypaisa: (s1.easypaisa || 0) + (s2.easypaisa || 0),
-    };
+    canteenCollection: s1.canteenCollection || 0,
+
+    gameBalance: s1.gameBalance || 0,
+
+    canteenBalance: s1.canteenBalance || 0,
+
+    expenses: s1.expenses || 0,
+
+    discount: s1.discount || 0,
+
+    easypaisa: s1.easypaisa || 0
+};
 
     combined.closingCash =
     (combined.gameCollection + combined.canteenCollection)
@@ -6247,11 +6249,59 @@ async function closeDay() {
 
 
     // 🔥🔥🔥 STEP 1: SAVE SNAPSHOT BEFORE RESET (MAIN FIX)
-    const tablesSnapshot = tables.map(t => ({
+const tablesSnapshot = tables.map(t => ({
+
     table_id: t.name,
-    history: t.history.map(h => ({ ...h }))
+
+    history: (t.history || []).map(h => ({
+        ...h
+    })),
+
+    // 🔥 RUNNING GAME AT DAY CLOSE
+    runningGame: t.isRunning === true
+        ? {
+            player1Name: t.player1Name || "",
+            player2Name: t.player2Name || "",
+
+            checkoutPlayer:
+                t.checkoutPlayer || "",
+
+            checkoutPlayerNumber:
+                t.checkoutPlayerNumber || null,
+
+            checkinTime:
+                t.checkinTime || null,
+
+            selectedPlayType:
+                t.selectedPlayType || "",
+
+            selectedRate:
+                Number(t.selectedRate || 0),
+
+            playSeconds:
+                Number(t.playSeconds || 0),
+
+            liveAmount:
+                Number(t.liveAmount || 0),
+
+            canteenTotal:
+                Number(t.canteenTotal || 0),
+
+            canteenItems:
+                { ...(t.canteenItems || {}) },
+
+            carriedFromDay:
+                window.currentDayId,
+
+            carriedAt:
+                Date.now()
+        }
+        : null
 }));
 
+  
+
+  
 
     // 🔥🔥🔥 STEP 2: FIREBASE SAVE (PEHLE SAVE KARO)
     try {
@@ -6267,7 +6317,6 @@ async function closeDay() {
 
 // 🔥 SAFE DATA CLEAN (VERY IMPORTANT)
 const safeShift1 = JSON.parse(JSON.stringify(s1 || {}));
-const safeShift2 = JSON.parse(JSON.stringify(s2 || {}));
 const safeTables = JSON.parse(JSON.stringify(tablesSnapshot || {}));
 const safeCombined = JSON.parse(JSON.stringify(combined || {}));
 
@@ -6332,12 +6381,11 @@ if (alreadyClosed) {
 await addDoc(collection(window.db, "days"), {
     tables: safeTables,
     date: today,
-    day_id: window.currentDayId, // 🔥 ADD THIS
+    day_id: window.currentDayId,
     branch: BRANCH,
     shift: "day",
 
     shift1: safeShift1,
-    shift2: safeShift2,
     combined: safeCombined,
 
     created_at: new Date().toISOString()
@@ -6345,14 +6393,16 @@ await addDoc(collection(window.db, "days"), {
 
 // 🔥 FINAL SAFE DATA (DIRECT FROM SHIFT OBJECTS)
 let printData = {
-    gameTotal: (s1?.gameTotal || 0) + (s2?.gameTotal || 0),
-    canteenTotal: (s1?.canteenTotal || 0) + (s2?.canteenTotal || 0),
+    gameTotal: s1?.gameTotal || 0,
+    canteenTotal: s1?.canteenTotal || 0,
 
-    gameCollection: (s1?.gameCollection || 0) + (s2?.gameCollection || 0),
-    canteenCollection: (s1?.canteenCollection || 0) + (s2?.canteenCollection || 0),
+    gameCollection: s1?.gameCollection || 0,
+    canteenCollection: s1?.canteenCollection || 0,
 
-    expenses: (s1?.expenses || 0) + (s2?.expenses || 0),
-  easypaisa: (s1?.easypaisa || 0) + (s2?.easypaisa || 0),
+    expenses: s1?.expenses || 0,
+    easypaisa: s1?.easypaisa || 0,
+
+    discount: s1?.discount || 0
 };
 
 printData.closingCash =
@@ -6371,7 +6421,6 @@ printDayHistoryThermal({
     tables: safeTables,
 
     shift1: shift1,
-    shift2: shift2,
 
     combined: {
         gameTotal: printData.gameTotal,
@@ -6380,17 +6429,14 @@ printDayHistoryThermal({
         gameCollection: printData.gameCollection,
         canteenCollection: printData.canteenCollection,
 
-        gameBalance:
-            (shift1?.gameBalance || 0) +
-            (shift2?.gameBalance || 0),
+gameBalance:
+    shift1?.gameBalance || 0,
 
-        canteenBalance:
-            (shift1?.canteenBalance || 0) +
-            (shift2?.canteenBalance || 0),
+canteenBalance:
+    shift1?.canteenBalance || 0,
 
-        discount:
-            (s1?.discount || 0) +
-            (s2?.discount || 0),
+discount:
+    s1?.discount || 0,
 
         expenses:
             printData.expenses,
@@ -6446,59 +6492,183 @@ for (const d of snap.docs) {
 
 
 // ======================================================
-// 🔥 FIND ALL CURRENTLY RUNNING SESSIONS
+// 🔥 DAY CLOSE → CARRY FORWARD ALL REQUIRED SESSIONS
 // ======================================================
 
-const runningSessionsQuery = query(
+const shiftCloseMs =
+    Number(s1.shiftCloseMs || s1.endMs || 0);
+
+const dayCloseMs = Date.now();
+
+const sessionsQuery = query(
     collection(window.db, "sessions"),
-    where("branch", "==", BRANCH),
-    where("end_time", "==", null)
+    where("branch", "==", BRANCH)
 );
 
-const runningSessionsSnap =
-    await getDocs(runningSessionsQuery);
+const sessionsSnap =
+    await getDocs(sessionsQuery);
 
 
 // ======================================================
-// 🔥 MOVE RUNNING SESSIONS → NEW DAY
+// 🔥 MOVE SESSIONS TO NEW DAY
+//
+// CASE 1:
+// New check-in happened AFTER Shift Close
+//
+// CASE 2:
+// Game was already running at Shift Close
+// and checkout happened AFTER Shift Close
+// or is STILL running at Day Close.
 // ======================================================
 
-for (const sessionDoc of runningSessionsSnap.docs) {
+for (const sessionDoc of sessionsSnap.docs) {
 
-    const sessionData = sessionDoc.data();
+    const sessionData =
+        sessionDoc.data();
 
-    // Deleted session ignore
-    if (sessionData.is_deleted === true) {
+    // ------------------------------------------
+    // Ignore deleted sessions
+    // ------------------------------------------
+
+    if (
+        sessionData.is_deleted === true
+    ) {
         continue;
     }
 
+
+    // ------------------------------------------
+    // Only CURRENT OLD DAY sessions
+    // ------------------------------------------
+
+    if (
+        String(sessionData.day_id) !==
+        String(oldDayId)
+    ) {
+        continue;
+    }
+
+
+    // ------------------------------------------
+    // Session start
+    // ------------------------------------------
+
+    const sessionStart =
+        new Date(
+            sessionData.start_time
+        ).getTime();
+
+
+    if (
+        !Number.isFinite(sessionStart)
+    ) {
+        continue;
+    }
+
+
+    // ------------------------------------------
+    // Session end
+    // ------------------------------------------
+
+    let sessionEnd = null;
+
+    if (sessionData.end_time) {
+
+        sessionEnd =
+            new Date(
+                sessionData.end_time
+            ).getTime();
+
+        if (
+            !Number.isFinite(sessionEnd)
+        ) {
+            sessionEnd = null;
+        }
+    }
+
+
+    // ------------------------------------------
+    // NEW CHECK-IN AFTER SHIFT CLOSE
+    // ------------------------------------------
+
+    const newAfterShift =
+        sessionStart > shiftCloseMs &&
+        sessionStart <= dayCloseMs;
+
+
+    // ------------------------------------------
+    // GAME WAS RUNNING ACROSS SHIFT CLOSE
+    //
+    // Started before/equal Shift Close
+    // AND:
+    // - still running
+    // OR
+    // - checked out after Shift Close
+    // ------------------------------------------
+
+    const crossedShift =
+        sessionStart <= shiftCloseMs &&
+        (
+            sessionEnd === null ||
+            sessionEnd > shiftCloseMs
+        );
+
+
+    // ------------------------------------------
+    // Only carry required sessions
+    // ------------------------------------------
+
+    if (
+        !newAfterShift &&
+        !crossedShift
+    ) {
+        continue;
+    }
+
+
     console.log(
-        "🔥 DAY CLOSE → CARRY FORWARD:",
+        "🔥 DAY CLOSE → CARRY SESSION:",
+        sessionDoc.id,
         sessionData.table_id,
-        sessionData.start_time
+        sessionData.start_time,
+        sessionData.end_time
     );
 
 
+    // ------------------------------------------
+    // MOVE SESSION TO NEW DAY
+    // ------------------------------------------
+
     await updateDoc(
-        doc(window.db, "sessions", sessionDoc.id),
+        doc(
+            window.db,
+            "sessions",
+            sessionDoc.id
+        ),
         {
 
             // NEW DAY
             day_id: newDayId,
 
-            // NEW DAY = SHIFT 1
+            // ONE SHIFT ONLY
             shift_number: 1,
 
-            // 🔥 ORIGINAL CHECK-IN TIME SAME
-            start_time: sessionData.start_time,
+            // Keep original check-in time
+            start_time:
+                sessionData.start_time,
 
-            // 🔥 STILL RUNNING
-            end_time: null,
+            // Keep actual checkout time
+            end_time:
+                sessionData.end_time || null,
 
-            // Information for debugging/history
+            // Carry-forward information
             carried_forward: true,
-            carried_from_day_id: oldDayId,
-            carried_at: new Date().toISOString()
+
+            carried_from_day_id:
+                oldDayId,
+
+            carried_at:
+                new Date().toISOString()
         }
     );
 }
