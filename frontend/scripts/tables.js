@@ -10289,10 +10289,9 @@ ${resourceHTML}
 }
 
 
-
 // ============================================================
-/// TABLE HISTORY — THERMAL PRINT
-/// SAME FRAME COUNT LOGIC AS TABLE HISTORY POPUP
+// TABLE HISTORY — THERMAL PRINT
+// SAME DATA / FRAME LOGIC AS TABLE HISTORY POPUP
 // ============================================================
 
 function printTableHistoryThermal() {
@@ -10321,13 +10320,13 @@ function printTableHistoryThermal() {
 
     const history =
         Array.isArray(tableData?.history)
-            ? tableData.history
+            ? [...tableData.history]
             : [];
 
 
-    // =====================================================
-    // 🔥 SAME FRAME COUNT LOGIC AS TABLE HISTORY POPUP
-    // =====================================================
+    // ============================================================
+    // SAME FRAME COUNT LOGIC AS POPUP
+    // ============================================================
 
     const getFrameCount = (h) => {
 
@@ -10339,6 +10338,8 @@ function printTableHistoryThermal() {
                 String(
                     h.play_type ??
                     h.playType ??
+                    h.selected_play_type ??
+                    h.selectedPlayType ??
                     ""
                 )
                 .toLowerCase()
@@ -10351,9 +10352,9 @@ function printTableHistoryThermal() {
     };
 
 
-    // =====================================================
-    // 🔥 PLAY TYPE
-    // =====================================================
+    // ============================================================
+    // PLAY TYPE
+    // ============================================================
 
     const getPlayType = (h) => {
 
@@ -10370,9 +10371,9 @@ function printTableHistoryThermal() {
     };
 
 
-    // =====================================================
-    // 🔥 PAID STATUS
-    // =====================================================
+    // ============================================================
+    // PAID STATUS
+    // ============================================================
 
     const isPaid = (h) => {
 
@@ -10386,10 +10387,10 @@ function printTableHistoryThermal() {
     };
 
 
-    // =====================================================
-    // 🔥 SHIFT FILTER
+    // ============================================================
+    // SHIFT FILTER
     // SAME AS POPUP
-    // =====================================================
+    // ============================================================
 
     const inShift = (h, shift) => {
 
@@ -10405,16 +10406,13 @@ function printTableHistoryThermal() {
     };
 
 
-    const shift1 =
-        d.shift1 || {};
-
-    const shift2 =
-        d.shift2 || {};
+    const shift1 = d.shift1 || {};
+    const shift2 = d.shift2 || {};
 
 
-    // =====================================================
-    // 🔥 SUMMARY
-    // =====================================================
+    // ============================================================
+    // SUMMARY
+    // ============================================================
 
     const summary = {
 
@@ -10435,18 +10433,14 @@ function printTableHistoryThermal() {
     };
 
 
-    // =====================================================
-    // 🔥 PROCESS HISTORY
-    // =====================================================
+    // ============================================================
+    // SESSION DETAILS
+    // ============================================================
+
+    const sessionHistory = [];
+
 
     history.forEach(h => {
-
-        const type =
-            getPlayType(h);
-
-        // -------------------------
-        // ONLY SELECTED DAY SHIFTS
-        // -------------------------
 
         const belongsToShift1 =
             inShift(h, shift1);
@@ -10454,9 +10448,15 @@ function printTableHistoryThermal() {
         const belongsToShift2 =
             inShift(h, shift2);
 
+
+        // SAME FILTER AS POPUP
         if (!belongsToShift1 && !belongsToShift2) {
             return;
         }
+
+
+        const type =
+            getPlayType(h);
 
 
         const amount =
@@ -10481,7 +10481,7 @@ function printTableHistoryThermal() {
             Number(
                 h.total ??
                 h.final_total ??
-                amount + canteen
+                (amount + canteen)
             );
 
 
@@ -10498,9 +10498,9 @@ function printTableHistoryThermal() {
             isPaid(h);
 
 
-        // =================================================
-        // 👑 CENTURY
-        // =================================================
+        // ========================================================
+        // FRAME / CENTURY SUMMARY
+        // ========================================================
 
         if (
             type === "century" ||
@@ -10511,16 +10511,12 @@ function printTableHistoryThermal() {
 
             if (paid) {
                 summary.paidCenturies += 1;
-            } else {
+            }
+            else {
                 summary.unpaidCenturies += 1;
             }
 
         }
-
-
-        // =================================================
-        // 🎱 FRAME
-        // =================================================
 
         else {
 
@@ -10530,52 +10526,255 @@ function printTableHistoryThermal() {
             summary.frames += frameCount;
 
             if (paid) {
-
                 summary.paidFrames += frameCount;
-
-            } else {
-
+            }
+            else {
                 summary.unpaidFrames += frameCount;
-
             }
 
         }
 
 
         summary.game += amount;
-
         summary.canteen += canteen;
-
         summary.total += total;
-
         summary.time += playSeconds;
+
+
+        // ========================================================
+        // SAVE SESSION FOR PRINT
+        // ========================================================
+
+        sessionHistory.push({
+            ...h,
+
+            amount,
+            canteen,
+            total,
+            playSeconds,
+            paid
+        });
 
     });
 
 
-    // =====================================================
-    // 🔥 PRINT WINDOW
-    // =====================================================
+    // ============================================================
+    // SORT SESSION DETAILS BY CHECK-IN
+    // ============================================================
+
+    sessionHistory.sort(
+        (a, b) =>
+            Number(a.checkin || 0) -
+            Number(b.checkin || 0)
+    );
+
+
+    // ============================================================
+    // HELPERS
+    // ============================================================
+
+    const money = (value) =>
+        Number(value || 0).toLocaleString("en-PK");
+
+
+    const safe = (value) =>
+        String(value ?? "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+
+    // ============================================================
+    // SESSION ROWS
+    // ============================================================
+
+    let sessionRows = "";
+
+
+    sessionHistory.forEach((h, index) => {
+
+        const player1 =
+            h.player1Name ||
+            h.player1_name ||
+            "Player 1";
+
+
+        const player2 =
+            h.player2Name ||
+            h.player2_name ||
+            "Player 2";
+
+
+        const checkoutNumber =
+            Number(
+                h.checkoutPlayerNumber ??
+                h.checkout_player_number ??
+                0
+            );
+
+
+        const player1Html =
+            checkoutNumber === 1
+                ? `
+                    <span class="checkout-player">
+                        ⭐ ${safe(player1)}
+                    </span>
+                  `
+                : safe(player1);
+
+
+        const player2Html =
+            checkoutNumber === 2
+                ? `
+                    <span class="checkout-player">
+                        ⭐ ${safe(player2)}
+                    </span>
+                  `
+                : safe(player2);
+
+
+        const playersHtml = `
+            <div class="players">
+                ${player1Html}
+                <span class="vs">VS</span>
+                ${player2Html}
+            </div>
+        `;
+
+
+        const checkin =
+            h.checkin
+                ? formatTime(h.checkin)
+                : "--";
+
+
+        const checkout =
+            h.checkout
+                ? formatTime(h.checkout)
+                : "--";
+
+
+        const playTime =
+            formatSeconds(
+                h.playSeconds || 0
+            );
+
+
+        const rate =
+            Number(
+                h.rate ??
+                h.selected_rate ??
+                0
+            );
+
+
+        const discount =
+            Number(
+                h.discount || 0
+            );
+
+
+        const paidText =
+            h.paid
+                ? "✓ PAID"
+                : "UNPAID";
+
+
+        const paidClass =
+            h.paid
+                ? "paid"
+                : "unpaid";
+
+
+        sessionRows += `
+
+            <div class="session">
+
+                <div class="session-number">
+                    #${index + 1}
+                </div>
+
+                ${playersHtml}
+
+                <div class="row">
+                    <span>Check-in</span>
+                    <span>${safe(checkin)}</span>
+                </div>
+
+                <div class="row">
+                    <span>Checkout</span>
+                    <span>${safe(checkout)}</span>
+                </div>
+
+                <div class="row">
+                    <span>Play Time</span>
+                    <span>${safe(playTime)}</span>
+                </div>
+
+                <div class="row">
+                    <span>Rate</span>
+                    <span>Rs ${money(rate)}</span>
+                </div>
+
+                <div class="row">
+                    <span>Amount</span>
+                    <span>Rs ${money(h.amount)}</span>
+                </div>
+
+                <div class="row">
+                    <span>Discount</span>
+                    <span>Rs ${money(discount)}</span>
+                </div>
+
+                <div class="row">
+                    <span>Canteen</span>
+                    <span>Rs ${money(h.canteen)}</span>
+                </div>
+
+                <div class="row total-row">
+                    <span>Total</span>
+                    <span>Rs ${money(h.total)}</span>
+                </div>
+
+                <div class="payment ${paidClass}">
+                    ${paidText}
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+
+    // ============================================================
+    // PRINT WINDOW
+    // ============================================================
 
     const win =
         window.open(
             "",
             "_blank",
-            "width=350,height=800"
+            "width=350,height=900"
         );
 
 
     if (!win) {
 
-        alert("Please allow popups for printing ❌");
+        alert(
+            "Please allow popups for printing ❌"
+        );
+
         return;
 
     }
 
 
-    // =====================================================
-    // 🔥 THERMAL HTML
-    // =====================================================
+    // ============================================================
+    // THERMAL PRINT HTML
+    // ============================================================
 
     const html = `
 
@@ -10583,7 +10782,10 @@ function printTableHistoryThermal() {
 
 <head>
 
-<title>Table History - ${t.name}</title>
+<title>
+Table History - ${safe(t.name)}
+</title>
+
 
 <style>
 
@@ -10591,6 +10793,12 @@ function printTableHistoryThermal() {
     size: 80mm auto;
     margin: 0;
 }
+
+
+* {
+    box-sizing: border-box;
+}
+
 
 html,
 body {
@@ -10603,41 +10811,50 @@ body {
     background: #fff;
     color: #000;
 
-    font-family: monospace;
+    font-family:
+        "Courier New",
+        monospace;
 
 }
+
 
 body {
 
-    padding: 8px;
+    width: 72mm;
 
-    box-sizing: border-box;
+    margin: 0 auto;
+
+    padding: 5px 0;
 
     font-size: 12px;
 
+    line-height: 1.35;
+
 }
+
 
 .center {
-
     text-align: center;
-
 }
+
 
 .title {
 
-    font-size: 20px;
+    font-size: 19px;
 
     font-weight: 900;
 
 }
+
 
 .branch {
 
-    font-size: 15px;
+    font-size: 14px;
 
     font-weight: 900;
 
 }
+
 
 .table-name {
 
@@ -10646,6 +10863,16 @@ body {
     font-weight: 900;
 
 }
+
+
+.date {
+
+    font-size: 12px;
+
+    margin-top: 2px;
+
+}
+
 
 .line {
 
@@ -10656,6 +10883,7 @@ body {
         7px 0;
 
 }
+
 
 .section {
 
@@ -10670,11 +10898,13 @@ body {
 
 }
 
+
 .row {
 
     display: flex;
 
-    justify-content: space-between;
+    justify-content:
+        space-between;
 
     gap: 8px;
 
@@ -10683,37 +10913,196 @@ body {
 
 }
 
+
 .row span:first-child {
-
     text-align: left;
-
 }
+
 
 .row span:last-child {
 
     text-align: right;
 
+    font-weight: 700;
+
+}
+
+
+.summary-row {
+
+    font-size: 12px;
+
+}
+
+
+.summary-total {
+
+    font-size: 15px;
+
     font-weight: 900;
 
 }
 
-.total {
 
-    font-size: 16px;
+.session {
 
-    font-weight: 900;
+    border:
+        1px solid #000;
+
+    padding:
+        6px;
+
+    margin:
+        6px 0;
+
+    break-inside:
+        avoid;
+
+    page-break-inside:
+        avoid;
 
 }
 
-.big-total {
+
+.session-number {
 
     text-align: center;
 
-    font-size: 19px;
+    font-weight: 900;
+
+    font-size: 13px;
+
+    border-bottom:
+        1px solid #000;
+
+    padding-bottom:
+        3px;
+
+    margin-bottom:
+        4px;
+
+}
+
+
+.players {
+
+    text-align: center;
 
     font-weight: 900;
 
+    margin:
+        4px 0 6px;
+
+    white-space: nowrap;
+
 }
+
+
+.players .vs {
+
+    margin:
+        0 6px;
+
+}
+
+
+.checkout-player {
+
+    background:
+        #d4af37;
+
+    color:
+        #000;
+
+    padding:
+        2px 5px;
+
+    border-radius:
+        3px;
+
+    font-weight:
+        900;
+
+}
+
+
+.total-row {
+
+    border-top:
+        1px dashed #000;
+
+    padding-top:
+        4px;
+
+    font-weight:
+        900;
+
+}
+
+
+.payment {
+
+    text-align:
+        center;
+
+    font-weight:
+        900;
+
+    border:
+        1px solid #000;
+
+    margin-top:
+        5px;
+
+    padding:
+        2px;
+
+}
+
+
+.payment.paid {
+
+    font-weight:
+        900;
+
+}
+
+
+.payment.unpaid {
+
+    font-weight:
+        900;
+
+}
+
+
+.big-total {
+
+    text-align:
+        center;
+
+    font-size:
+        18px;
+
+    font-weight:
+        900;
+
+}
+
+
+.footer {
+
+    text-align:
+        center;
+
+    font-size:
+        10px;
+
+    margin-top:
+        8px;
+
+}
+
 
 </style>
 
@@ -10723,6 +11112,8 @@ body {
 <body>
 
 
+<!-- HEADER -->
+
 <div class="center">
 
     <div class="title">
@@ -10730,15 +11121,15 @@ body {
     </div>
 
     <div class="branch">
-        ${String(BRANCH || "").toUpperCase()}
+        ${safe(BRANCH).toUpperCase()}
     </div>
 
     <div class="table-name">
-        ${t.name}
+        ${safe(t.name)}
     </div>
 
-    <div>
-        ${d.date || "-"}
+    <div class="date">
+        ${safe(d.date || "-")}
     </div>
 
 </div>
@@ -10747,74 +11138,46 @@ body {
 <div class="line"></div>
 
 
+<!-- SUMMARY -->
+
 <div class="section">
     SUMMARY
 </div>
 
 
-<div class="row">
-
+<div class="row summary-row">
     <span>TOTAL FRAMES</span>
-
-    <span>
-        ${summary.frames}
-    </span>
-
+    <span>${summary.frames}</span>
 </div>
 
 
-<div class="row">
-
+<div class="row summary-row">
     <span>TOTAL CENTURY</span>
-
-    <span>
-        ${summary.centuries}
-    </span>
-
+    <span>${summary.centuries}</span>
 </div>
 
 
-<div class="row">
-
+<div class="row summary-row">
     <span>PAID FRAMES</span>
-
-    <span>
-        ${summary.paidFrames}
-    </span>
-
+    <span>${summary.paidFrames}</span>
 </div>
 
 
-<div class="row">
-
+<div class="row summary-row">
     <span>PAID CENTURY</span>
-
-    <span>
-        ${summary.paidCenturies}
-    </span>
-
+    <span>${summary.paidCenturies}</span>
 </div>
 
 
-<div class="row">
-
+<div class="row summary-row">
     <span>UNPAID FRAMES</span>
-
-    <span>
-        ${summary.unpaidFrames}
-    </span>
-
+    <span>${summary.unpaidFrames}</span>
 </div>
 
 
-<div class="row">
-
+<div class="row summary-row">
     <span>UNPAID CENTURY</span>
-
-    <span>
-        ${summary.unpaidCenturies}
-    </span>
-
+    <span>${summary.unpaidCenturies}</span>
 </div>
 
 
@@ -10826,51 +11189,45 @@ body {
 </div>
 
 
-<div class="row">
-
+<div class="row summary-row">
     <span>GAME</span>
+    <span>Rs ${money(summary.game)}</span>
+</div>
 
-    <span>
-        Rs ${summary.game}
-    </span>
 
+<div class="row summary-row">
+    <span>CANTEEN</span>
+    <span>Rs ${money(summary.canteen)}</span>
+</div>
+
+
+<div class="row summary-total">
+    <span>TOTAL</span>
+    <span>Rs ${money(summary.total)}</span>
 </div>
 
 
 <div class="row">
-
-    <span>CANTEEN</span>
-
-    <span>
-        Rs ${summary.canteen}
-    </span>
-
-</div>
-
-
-<div class="row total">
-
-    <span>TOTAL</span>
-
-    <span>
-        Rs ${summary.total}
-    </span>
-
+    <span>PLAY TIME</span>
+    <span>${formatSeconds(summary.time)}</span>
 </div>
 
 
 <div class="line"></div>
 
 
-<div class="row">
+<!-- SESSION DETAILS -->
 
-    <span>PLAY TIME</span>
-
-    <span>
-        ${formatSeconds(summary.time)}
-    </span>
-
+<div class="section">
+    SESSION DETAILS
 </div>
+
+
+${sessionRows || `
+    <div class="center">
+        No session details found
+    </div>
+`}
 
 
 <div class="line"></div>
@@ -10880,7 +11237,7 @@ body {
 
     TOTAL<br>
 
-    Rs ${summary.total}
+    Rs ${money(summary.total)}
 
 </div>
 
@@ -10888,7 +11245,7 @@ body {
 <div class="line"></div>
 
 
-<div class="center">
+<div class="footer">
 
     ${new Date().toLocaleString(
         "en-PK",
@@ -10930,7 +11287,6 @@ body {
     }, 400);
 
 }
-
 
 
 async function rebuildHistoryFromSessions() {
