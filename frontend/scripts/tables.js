@@ -19,6 +19,13 @@ let warningAudio = null;
 let audioUnlocked = false;
 
 
+/******************************************************
+ * GLOBAL MONEY FORMATTER
+ ******************************************************/
+function formatMoney(value) {
+    return Number(value || 0).toLocaleString();
+}
+
 // 🔥 CENTRAL DAY SYSTEM (FIREBASE)
 async function initCurrentDay() {
 
@@ -7154,14 +7161,6 @@ tables.sort((a, b) => {
 
     }
 
-
-    function formatMoney(value) {
-
-        return Number(
-            value || 0
-        ).toLocaleString();
-
-    }
 
 
     function formatDateTime(value) {
