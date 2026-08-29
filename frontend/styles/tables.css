@@ -5909,3 +5909,573 @@ body * {
     max-width: 70% !important;
     text-align: center !important;
 }
+
+/* ============================================================
+   🔥 TABLE HISTORY — SAME PREMIUM STYLE AS HISTORY POPUP
+============================================================ */
+
+#tableHistoryPopup {
+    z-index: 1000 !important;
+    padding: 15px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+
+#tableHistoryPopup .table-history-popup-box {
+
+    width: min(1500px, 96vw) !important;
+    max-width: 96vw !important;
+
+    height: 88vh !important;
+    max-height: 88vh !important;
+
+    padding: 28px !important;
+
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+
+    border-radius: 20px !important;
+}
+
+
+/* TITLE */
+
+#tableHistoryPopup #tableHistoryTitle {
+
+    flex: 0 0 auto !important;
+
+    width: 100% !important;
+
+    margin: 0 0 18px !important;
+
+    text-align: center !important;
+
+    font-size: 32px !important;
+
+    font-weight: 900 !important;
+
+    color: #dffff8 !important;
+
+    text-shadow:
+        0 0 8px #00ffcc,
+        0 0 20px #00ffcc !important;
+}
+
+
+/* ============================================================
+   FILTERS
+============================================================ */
+
+#tableHistoryPopup .table-history-filters {
+
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr)) !important;
+
+    gap: 18px !important;
+
+    margin-bottom: 8px !important;
+}
+
+
+#tableHistoryPopup .table-history-filters > div {
+
+    width: 100% !important;
+
+}
+
+
+#tableHistoryPopup .table-history-filters label {
+
+    display: block !important;
+
+    text-align: center !important;
+
+    color: #00ffcc !important;
+
+    font-size: 14px !important;
+
+    font-weight: 900 !important;
+
+    margin-bottom: 6px !important;
+}
+
+
+#tableHistoryPopup .table-history-filters select {
+
+    width: 100% !important;
+
+    margin: 0 !important;
+
+}
+
+
+/* BRANCH */
+
+#tableHistoryPopup #tableHistoryBranch {
+
+    flex: 0 0 auto !important;
+
+    text-align: center !important;
+
+    color: #ffffff !important;
+
+    font-size: 14px !important;
+
+    font-weight: 800 !important;
+
+    margin: 4px 0 16px !important;
+}
+
+
+/* ============================================================
+   SUMMARY CARDS
+============================================================ */
+
+#tableHistoryPopup .table-history-summary-counters {
+
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr)) !important;
+
+    gap: 18px !important;
+
+    margin: 0 0 18px !important;
+
+    box-sizing: border-box !important;
+
+    flex: 0 0 auto !important;
+}
+
+
+#tableHistoryPopup .table-history-summary-box {
+
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    min-height: 160px !important;
+
+    padding: 18px !important;
+
+    box-sizing: border-box !important;
+
+    border-radius: 18px !important;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(5,20,17,.96),
+            rgba(0,0,0,.92)
+        ) !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: center !important;
+
+    justify-content: flex-start !important;
+
+    text-align: center !important;
+}
+
+
+#tableHistoryPopup
+.table-history-summary-box.green {
+
+    border:
+        2px solid #00ff88 !important;
+
+    box-shadow:
+        0 0 14px rgba(0,255,136,.35),
+        inset 0 0 18px rgba(0,255,136,.08) !important;
+}
+
+
+#tableHistoryPopup
+.table-history-summary-box.gold {
+
+    border:
+        2px solid #ffd700 !important;
+
+    box-shadow:
+        0 0 14px rgba(255,215,0,.35),
+        inset 0 0 18px rgba(255,215,0,.08) !important;
+}
+
+
+#tableHistoryPopup
+.table-history-summary-box.red {
+
+    border:
+        2px solid #ff4444 !important;
+
+    box-shadow:
+        0 0 14px rgba(255,68,68,.35),
+        inset 0 0 18px rgba(255,68,68,.08) !important;
+}
+
+
+/* CARD TITLE */
+
+#tableHistoryPopup
+.table-history-card-title {
+
+    width: 100% !important;
+
+    margin:
+        0 0 12px !important;
+
+    font-size: 19px !important;
+
+    line-height: 1.2 !important;
+
+    font-weight: 900 !important;
+
+    color: #00ffcc !important;
+
+    text-align: center !important;
+
+    white-space: nowrap !important;
+
+    text-shadow:
+        0 0 8px rgba(0,255,204,.5) !important;
+}
+
+
+/* HEAD / VALUES / AMOUNT / TIME */
+
+#tableHistoryPopup
+.table-history-card-head,
+
+#tableHistoryPopup
+.table-history-card-values,
+
+#tableHistoryPopup
+.table-history-card-amount,
+
+#tableHistoryPopup
+.table-history-card-time {
+
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, minmax(0,1fr)) !important;
+
+    gap: 7px !important;
+
+    text-align: center !important;
+}
+
+
+#tableHistoryPopup
+.table-history-card-head {
+
+    margin-bottom: 4px !important;
+
+}
+
+
+#tableHistoryPopup
+.table-history-card-head span {
+
+    color: #d8d8d8 !important;
+
+    font-size: 14px !important;
+
+    font-weight: 900 !important;
+
+}
+
+
+#tableHistoryPopup
+.table-history-card-values strong {
+
+    color: #ffffff !important;
+
+    font-size: 27px !important;
+
+    font-weight: 900 !important;
+}
+
+
+#tableHistoryPopup
+.table-history-card-amount {
+
+    margin-top: 5px !important;
+
+}
+
+
+#tableHistoryPopup
+.table-history-card-amount span {
+
+    color: #00ff99 !important;
+
+    font-size: 14px !important;
+
+    font-weight: 900 !important;
+}
+
+
+#tableHistoryPopup
+.table-history-card-time {
+
+    margin-top: 4px !important;
+
+}
+
+
+#tableHistoryPopup
+.table-history-card-time span {
+
+    color: #ffd700 !important;
+
+    font-size: 12px !important;
+
+    font-weight: 900 !important;
+}
+
+
+/* ============================================================
+   SESSION DETAILS TITLE
+============================================================ */
+
+#tableHistoryPopup
+.table-history-details-title {
+
+    flex: 0 0 auto !important;
+
+    width: 100% !important;
+
+    padding: 10px 15px !important;
+
+    margin: 0 0 8px !important;
+
+    text-align: center !important;
+
+    color: #ffd700 !important;
+
+    font-size: 20px !important;
+
+    font-weight: 900 !important;
+
+    letter-spacing: 1px !important;
+
+    border-top:
+        1px solid rgba(255,215,0,.5) !important;
+
+    border-bottom:
+        1px solid rgba(255,215,0,.5) !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,215,0,.08),
+            transparent
+        ) !important;
+}
+
+
+/* ============================================================
+   SESSION TABLE
+============================================================ */
+
+#tableHistoryPopup
+.table-history-details-wrapper {
+
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    flex: 1 1 auto !important;
+
+    min-height: 0 !important;
+
+    overflow-x: hidden !important;
+
+    overflow-y: auto !important;
+
+    box-sizing: border-box !important;
+}
+
+
+#tableHistoryPopup
+.table-history-details-wrapper .history-table {
+
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    max-width: 100% !important;
+
+    table-layout: fixed !important;
+
+    border-collapse: collapse !important;
+
+    margin: 5px 0 !important;
+}
+
+
+#tableHistoryPopup
+.table-history-details-wrapper th {
+
+    padding: 10px 5px !important;
+
+    font-size: 14px !important;
+
+    font-weight: 900 !important;
+
+    color: #00ffcc !important;
+
+    text-align: center !important;
+
+    white-space: nowrap !important;
+}
+
+
+#tableHistoryPopup
+.table-history-details-wrapper td {
+
+    padding: 10px 5px !important;
+
+    font-size: 13px !important;
+
+    font-weight: 700 !important;
+
+    color: #ccffee !important;
+
+    text-align: center !important;
+
+    white-space: nowrap !important;
+
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+}
+
+
+/* PLAYERS */
+
+#tableHistoryPopup
+.table-history-players {
+
+    white-space: nowrap !important;
+
+}
+
+
+#tableHistoryPopup
+.table-history-players b {
+
+    color: #ffd700 !important;
+
+    margin: 0 5px !important;
+}
+
+
+/* BUTTONS */
+
+#tableHistoryPopup .popup-buttons {
+
+    flex: 0 0 auto !important;
+
+    width: 100% !important;
+
+    display: flex !important;
+
+    justify-content: center !important;
+
+    align-items: center !important;
+
+    gap: 20px !important;
+
+    margin-top: 12px !important;
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 900px) {
+
+    #tableHistoryPopup
+    .table-history-summary-counters {
+
+        grid-template-columns:
+            repeat(2, minmax(0,1fr)) !important;
+
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    #tableHistoryPopup .table-history-popup-box {
+
+        width: 97vw !important;
+
+        max-width: 97vw !important;
+
+        height: 92vh !important;
+
+        max-height: 92vh !important;
+
+        padding: 15px !important;
+
+    }
+
+
+    #tableHistoryPopup
+    .table-history-summary-counters {
+
+        grid-template-columns: 1fr !important;
+
+    }
+
+
+    #tableHistoryPopup
+    .table-history-filters {
+
+        grid-template-columns: 1fr !important;
+
+    }
+
+
+    #tableHistoryPopup
+    .table-history-card-values strong {
+
+        font-size: 24px !important;
+
+    }
+
+
+    #tableHistoryPopup
+    .table-history-details-wrapper th,
+    #tableHistoryPopup
+    .table-history-details-wrapper td {
+
+        font-size: 11px !important;
+
+        padding: 7px 3px !important;
+
+    }
+
+}
