@@ -7775,45 +7775,271 @@ tableSel.innerHTML = sortedHistoryTables
 }
 
 /******************************************************
- * 🟢 LOAD TABLE HISTORY — HISTORY POPUP STYLE
+ * 🟢 LOAD TABLE HISTORY — FINAL
+ * SAME LOGIC AS HISTORY POPUP
+ * Single Frame = 1
+ * Double Frame = 2
+ * Century = Century
+ * Player names + Checkout Star preserved
  ******************************************************/
 function loadSelectedTableHistory() {
 
     const tableId =
         document.getElementById("tableHistoryTableSelect").value;
 
-    const t =
-        tables.find(x => String(x.id) === String(tableId));
+    const selectedTable =
+        tables.find(
+            x => String(x.id) === String(tableId)
+        );
 
-    if (!t) return;
+    if (!selectedTable) return;
+
 
     const dayIndex =
         document.getElementById("tableHistoryDateSelect").selectedIndex;
+
 
     if (
         !window._daysData ||
         dayIndex < 0 ||
         !window._daysData[dayIndex]
     ) {
+        console.log("⚠️ No day data found");
         return;
     }
+
 
     const selectedDay =
         window._daysData[dayIndex];
 
+
     const tableData =
         selectedDay.tables?.find(
-            tb => tb.table_id === t.name
+            tb =>
+                String(tb.table_id).toLowerCase() ===
+                String(selectedTable.name).toLowerCase()
         );
 
+
     const history =
-        tableData?.history || [];
+        Array.isArray(tableData?.history)
+            ? [...tableData.history]
+            : [];
+
 
     const shift1 =
-        selectedDay.shift1;
+        selectedDay.shift1 || null;
 
     const shift2 =
-        selectedDay.shift2;
+        selectedDay.shift2 || null;
+
+
+    /******************************************************
+     * NORMALIZE HISTORY VALUES
+     ******************************************************/
+
+    const getType = (h) => {
+
+        return String(
+            h.playType ??
+            h.play_type ??
+            h.selectedPlayType ??
+            h.selected_play_type ??
+            ""
+        )
+        .toLowerCase()
+        .trim();
+
+    };
+
+
+    const getRate = (h) => {
+
+        return Number(
+            h.rate ??
+            h.selectedRate ??
+            h.selected_rate ??
+            h.frameRate ??
+            h.frame_rate ??
+            0
+        );
+
+    };
+
+
+    const getAmount = (h) => {
+
+        return Number(
+            h.amount ??
+            h.finalGameAmount ??
+            h.final_game_amount ??
+            h.finalAmount ??
+            h.final_amount ??
+            0
+        );
+
+    };
+
+
+    const getSeconds = (h) => {
+
+        return Number(
+            h.playSeconds ??
+            h.play_seconds ??
+            h.finalSeconds ??
+            h.final_seconds ??
+            0
+        );
+
+    };
+
+
+    const getPlayer1 = (h) => {
+
+        return (
+            h.player1Name ??
+            h.player1_name ??
+            "Player 1"
+        );
+
+    };
+
+
+    const getPlayer2 = (h) => {
+
+        return (
+            h.player2Name ??
+            h.player2_name ??
+            "Player 2"
+        );
+
+    };
+
+
+    const getCheckoutPlayer = (h) => {
+
+        return (
+            h.checkoutPlayer ??
+            h.checkout_player ??
+            ""
+        );
+
+    };
+
+
+    const getCheckoutNumber = (h) => {
+
+        const value =
+            h.checkoutPlayerNumber ??
+            h.checkout_player_number;
+
+        return value === null ||
+               value === undefined ||
+               value === ""
+            ? null
+            : Number(value);
+
+    };
+
+
+    /******************************************************
+     * FRAME COUNT
+     ******************************************************/
+
+    const getFrameCount = (h) => {
+
+        const type =
+            getType(h);
+
+        const rate =
+            getRate(h);
+
+
+        // Century is NOT a frame
+        if (type === "century") {
+            return 0;
+        }
+
+
+        // Double Frame = 2
+        if (
+            rate === 200 ||
+            type.includes("double")
+        ) {
+            return 2;
+        }
+
+
+        // Single Frame = 1
+        return 1;
+
+    };
+
+
+    /******************************************************
+     * CHECKOUT PLAYER DISPLAY
+     ******************************************************/
+
+    const buildPlayerDisplay = (h) => {
+
+        const player1 =
+            getPlayer1(h);
+
+        const player2 =
+            getPlayer2(h);
+
+        const checkoutName =
+            getCheckoutPlayer(h);
+
+        const checkoutNumber =
+            getCheckoutNumber(h);
+
+
+        const isPlayer1Checkout =
+            checkoutNumber === 1 ||
+            (
+                checkoutName &&
+                player1 &&
+                checkoutName.toLowerCase() ===
+                player1.toLowerCase()
+            );
+
+
+        const isPlayer2Checkout =
+            checkoutNumber === 2 ||
+            (
+                checkoutName &&
+                player2 &&
+                checkoutName.toLowerCase() ===
+                player2.toLowerCase()
+            );
+
+
+        const p1 =
+            isPlayer1Checkout
+                ? `<span class="checkout-player-highlight">
+                       ⭐ ${player1}
+                   </span>`
+                : `<span>${player1}</span>`;
+
+
+        const p2 =
+            isPlayer2Checkout
+                ? `<span class="checkout-player-highlight">
+                       ⭐ ${player2}
+                   </span>`
+                : `<span>${player2}</span>`;
+
+
+        return `
+            <div class="table-history-player-line">
+                ${p1}
+                <b>VS</b>
+                ${p2}
+            </div>
+        `;
+
+    };
 
 
     /******************************************************
@@ -7822,608 +8048,380 @@ function loadSelectedTableHistory() {
 
     const inShift = (h, shift) => {
 
-        if (!shift?.startMs || !shift?.endMs) {
+        if (
+            !shift ||
+            !shift.startMs ||
+            !shift.endMs
+        ) {
             return false;
         }
 
+
+        const checkin =
+            Number(
+                h.checkin ??
+                h.check_in ??
+                0
+            );
+
+
+        const checkout =
+            Number(
+                h.checkout ??
+                h.check_out ??
+                0
+            );
+
+
         return (
-            Number(h.checkin || 0) >= Number(shift.startMs) &&
-            Number(h.checkout || 0) <= Number(shift.endMs)
+            checkin >= Number(shift.startMs) &&
+            checkout <= Number(shift.endMs)
         );
+
     };
 
 
     /******************************************************
-     * SUMMARY OBJECT
+     * BUILD SESSION ROW
      ******************************************************/
 
-    function emptySummary() {
+    const buildSessionRow = (h, index) => {
 
-        return {
+        const type =
+            getType(h);
 
-            frames: 0,
-            frameAmount: 0,
-            frameTime: 0,
+        const rate =
+            getRate(h);
 
-            centuries: 0,
-            centuryAmount: 0,
-            centuryTime: 0,
+        const amount =
+            getAmount(h);
 
-            paidFrames: 0,
-            paidFrameAmount: 0,
+        const seconds =
+            getSeconds(h);
 
-            paidCenturies: 0,
-            paidCenturyAmount: 0,
-            paidCenturyTime: 0,
+        const frameCount =
+            getFrameCount(h);
 
-            unpaidFrames: 0,
-            unpaidFrameAmount: 0,
+        const isCentury =
+            type === "century";
 
-            unpaidCenturies: 0,
-            unpaidCenturyAmount: 0,
-            unpaidCenturyTime: 0
+
+        const checkoutTime =
+            Number(
+                h.checkout ??
+                h.check_out ??
+                0
+            );
+
+
+        const checkinTime =
+            Number(
+                h.checkin ??
+                h.check_in ??
+                0
+            );
+
+
+        const checkin =
+            checkinTime
+                ? new Date(checkinTime)
+                : null;
+
+
+        const checkout =
+            checkoutTime
+                ? new Date(checkoutTime)
+                : null;
+
+
+        const formatClock = (date) => {
+
+            if (!date) return "-";
+
+            return date.toLocaleTimeString(
+                "en-PK",
+                {
+                    timeZone: "Asia/Karachi",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true
+                }
+            );
+
         };
 
-    }
 
+        const total =
+            Number(
+                h.total ??
+                amount ??
+                0
+            );
 
-    /******************************************************
-     * CALCULATE ONE SHIFT
-     ******************************************************/
 
-    function calculateSummary(shift) {
+        const discount =
+            Number(h.discount || 0);
 
-        const result =
-            emptySummary();
 
-        history.forEach(h => {
+        const canteen =
+            Number(
+                h.canteenAmount ??
+                h.canteen_total ??
+                0
+            );
 
-            if (!inShift(h, shift)) {
-                return;
-            }
 
+        const paid =
+            h.paid === true;
 
-            const type =
-                String(
-                    h.selected_play_type ??
-                    h.selectedPlayType ??
-                    h.play_type ??
-                    h.playType ??
-                    ""
-                ).toLowerCase();
 
+        return `
+            <tr>
 
-            const amount =
-                Number(
-                    h.final_game_amount ??
-                    h.final_amount ??
-                    h.amount ??
-                    h.game_amount ??
-                    0
-                );
+                <td>
+                    ${index + 1}
+                </td>
 
 
-            const total =
-                Number(
-                    h.total ??
-                    h.final_total ??
-                    amount +
-                    Number(h.canteenAmount || 0)
-                );
+                <td class="players-cell">
 
+                    ${buildPlayerDisplay(h)}
 
-            const playSeconds =
-                Number(h.playSeconds || 0);
+                </td>
 
 
-            const paid =
-                h.paid === true ||
-                h.paid === "true" ||
-                h.status === "paid" ||
-                h.payment_status === "paid";
+                <td>
+                    ${formatClock(checkin)}
+                </td>
 
 
-            /************************************************
-             * FRAME
-             ************************************************/
+                <td>
+                    ${formatClock(checkout)}
+                </td>
 
-            if (type === "frame") {
 
-                /*
-                 * IMPORTANT:
-                 * Single Frame = 1
-                 * Double Frame = 2
-                 */
+                <td>
+                    ${formatTime(seconds)}
+                </td>
 
-                const frameCount =
-                    Number(
-                        h.frame_count ??
-                        h.frameCount ??
-                        h.frames ??
-                        (
-                            String(
-                                h.play_type ??
-                                h.playType ??
-                                ""
-                            ).toLowerCase().includes("double")
-                                ? 2
-                                : 1
-                        )
-                    ) || 1;
 
+                <td>
 
-                result.frames += frameCount;
+                    ${
+                        isCentury
+                            ? "👑 Century"
+                            : frameCount === 2
+                                ? "Frame Double ×2"
+                                : "Frame Single ×1"
+                    }
 
-                result.frameAmount += amount;
+                </td>
 
-                result.frameTime += playSeconds;
 
+                <td>
+                    ${
+                        isCentury
+                            ? "Century"
+                            : frameCount
+                    }
+                </td>
 
-                if (paid) {
 
-                    result.paidFrames += frameCount;
-                    result.paidFrameAmount += amount;
+                <td>
+                    Rs ${formatMoney(amount)}
+                </td>
 
-                } else {
 
-                    result.unpaidFrames += frameCount;
-                    result.unpaidFrameAmount += amount;
+                <td>
+                    Rs ${formatMoney(discount)}
+                </td>
 
-                }
 
-            }
+                <td>
+                    Rs ${formatMoney(canteen)}
+                </td>
 
 
-            /************************************************
-             * CENTURY
-             ************************************************/
+                <td>
+                    Rs ${formatMoney(total)}
+                </td>
 
-            else if (
-                type === "century" ||
-                type === "centuries"
-            ) {
 
-                result.centuries += 1;
+                <td>
 
-                result.centuryAmount += amount;
+                    ${
+                        paid
+                            ? `<span class="paid-btn">
+                                   PAID
+                               </span>`
+                            : `<span class="unpaid-btn">
+                                   UNPAID
+                               </span>`
+                    }
+
+                </td>
+
+            </tr>
+        `;
 
-                result.centuryTime += playSeconds;
-
-
-                if (paid) {
-
-                    result.paidCenturies += 1;
-                    result.paidCenturyAmount += amount;
-                    result.paidCenturyTime += playSeconds;
-
-                } else {
-
-                    result.unpaidCenturies += 1;
-                    result.unpaidCenturyAmount += amount;
-                    result.unpaidCenturyTime += playSeconds;
-
-                }
-
-            }
-
-        });
-
-        return result;
-
-    }
-
-
-    const s1 =
-        calculateSummary(shift1);
-
-    const s2 =
-        calculateSummary(shift2);
-
-
-    const total = {
-
-        frames:
-            s1.frames + s2.frames,
-
-        frameAmount:
-            s1.frameAmount + s2.frameAmount,
-
-        frameTime:
-            s1.frameTime + s2.frameTime,
-
-
-        centuries:
-            s1.centuries + s2.centuries,
-
-        centuryAmount:
-            s1.centuryAmount + s2.centuryAmount,
-
-        centuryTime:
-            s1.centuryTime + s2.centuryTime,
-
-
-        paidFrames:
-            s1.paidFrames + s2.paidFrames,
-
-        paidFrameAmount:
-            s1.paidFrameAmount + s2.paidFrameAmount,
-
-
-        paidCenturies:
-            s1.paidCenturies + s2.paidCenturies,
-
-        paidCenturyAmount:
-            s1.paidCenturyAmount + s2.paidCenturyAmount,
-
-        paidCenturyTime:
-            s1.paidCenturyTime + s2.paidCenturyTime,
-
-
-        unpaidFrames:
-            s1.unpaidFrames + s2.unpaidFrames,
-
-        unpaidFrameAmount:
-            s1.unpaidFrameAmount + s2.unpaidFrameAmount,
-
-
-        unpaidCenturies:
-            s1.unpaidCenturies + s2.unpaidCenturies,
-
-        unpaidCenturyAmount:
-            s1.unpaidCenturyAmount + s2.unpaidCenturyAmount,
-
-        unpaidCenturyTime:
-            s1.unpaidCenturyTime + s2.unpaidCenturyTime
     };
 
 
     /******************************************************
-     * HELPER
+     * RENDER ONE SHIFT
      ******************************************************/
 
-    const money =
-        value =>
-            `Rs. ${formatMoney(Number(value || 0))}`;
-
-
-    const time =
-        value =>
-            formatSeconds(Number(value || 0));
-
-
-    /******************************************************
-     * UPDATE SUMMARY CARDS
-     ******************************************************/
-
-    document.getElementById("tableHistoryShift1Frame").textContent =
-        s1.frames;
-
-    document.getElementById("tableHistoryShift2Frame").textContent =
-        s2.frames;
-
-    document.getElementById("tableHistoryTotalFrame").textContent =
-        total.frames;
-
-
-    document.getElementById("tableHistoryShift1FrameAmount").textContent =
-        money(s1.frameAmount);
-
-    document.getElementById("tableHistoryShift2FrameAmount").textContent =
-        money(s2.frameAmount);
-
-    document.getElementById("tableHistoryTotalFrameAmount").textContent =
-        money(total.frameAmount);
-
-
-    document.getElementById("tableHistoryShift1Century").textContent =
-        s1.centuries;
-
-    document.getElementById("tableHistoryShift2Century").textContent =
-        s2.centuries;
-
-    document.getElementById("tableHistoryTotalCentury").textContent =
-        total.centuries;
-
-
-    document.getElementById("tableHistoryShift1CenturyAmount").textContent =
-        money(s1.centuryAmount);
-
-    document.getElementById("tableHistoryShift2CenturyAmount").textContent =
-        money(s2.centuryAmount);
-
-    document.getElementById("tableHistoryTotalCenturyAmount").textContent =
-        money(total.centuryAmount);
-
-
-    document.getElementById("tableHistoryShift1CenturyTime").textContent =
-        time(s1.centuryTime);
-
-    document.getElementById("tableHistoryShift2CenturyTime").textContent =
-        time(s2.centuryTime);
-
-    document.getElementById("tableHistoryTotalCenturyTime").textContent =
-        time(total.centuryTime);
-
-
-    /******************************************************
-     * PAID FRAMES
-     ******************************************************/
-
-    document.getElementById("tableHistoryShift1PaidFrame").textContent =
-        s1.paidFrames;
-
-    document.getElementById("tableHistoryShift2PaidFrame").textContent =
-        s2.paidFrames;
-
-    document.getElementById("tableHistoryTotalPaidFrame").textContent =
-        total.paidFrames;
-
-
-    document.getElementById("tableHistoryShift1PaidFrameAmount").textContent =
-        money(s1.paidFrameAmount);
-
-    document.getElementById("tableHistoryShift2PaidFrameAmount").textContent =
-        money(s2.paidFrameAmount);
-
-    document.getElementById("tableHistoryTotalPaidFrameAmount").textContent =
-        money(total.paidFrameAmount);
-
-
-    /******************************************************
-     * PAID CENTURIES
-     ******************************************************/
-
-    document.getElementById("tableHistoryShift1PaidCentury").textContent =
-        s1.paidCenturies;
-
-    document.getElementById("tableHistoryShift2PaidCentury").textContent =
-        s2.paidCenturies;
-
-    document.getElementById("tableHistoryTotalPaidCentury").textContent =
-        total.paidCenturies;
-
-
-    document.getElementById("tableHistoryShift1PaidCenturyAmount").textContent =
-        money(s1.paidCenturyAmount);
-
-    document.getElementById("tableHistoryShift2PaidCenturyAmount").textContent =
-        money(s2.paidCenturyAmount);
-
-    document.getElementById("tableHistoryTotalPaidCenturyAmount").textContent =
-        money(total.paidCenturyAmount);
-
-
-    document.getElementById("tableHistoryShift1PaidCenturyTime").textContent =
-        time(s1.paidCenturyTime);
-
-    document.getElementById("tableHistoryShift2PaidCenturyTime").textContent =
-        time(s2.paidCenturyTime);
-
-    document.getElementById("tableHistoryTotalPaidCenturyTime").textContent =
-        time(total.paidCenturyTime);
-
-
-    /******************************************************
-     * UNPAID FRAMES
-     ******************************************************/
-
-    document.getElementById("tableHistoryShift1UnpaidFrame").textContent =
-        s1.unpaidFrames;
-
-    document.getElementById("tableHistoryShift2UnpaidFrame").textContent =
-        s2.unpaidFrames;
-
-    document.getElementById("tableHistoryTotalUnpaidFrame").textContent =
-        total.unpaidFrames;
-
-
-    document.getElementById("tableHistoryShift1UnpaidFrameAmount").textContent =
-        money(s1.unpaidFrameAmount);
-
-    document.getElementById("tableHistoryShift2UnpaidFrameAmount").textContent =
-        money(s2.unpaidFrameAmount);
-
-    document.getElementById("tableHistoryTotalUnpaidFrameAmount").textContent =
-        money(total.unpaidFrameAmount);
-
-
-    /******************************************************
-     * UNPAID CENTURIES
-     ******************************************************/
-
-    document.getElementById("tableHistoryShift1UnpaidCentury").textContent =
-        s1.unpaidCenturies;
-
-    document.getElementById("tableHistoryShift2UnpaidCentury").textContent =
-        s2.unpaidCenturies;
-
-    document.getElementById("tableHistoryTotalUnpaidCentury").textContent =
-        total.unpaidCenturies;
-
-
-    document.getElementById("tableHistoryShift1UnpaidCenturyAmount").textContent =
-        money(s1.unpaidCenturyAmount);
-
-    document.getElementById("tableHistoryShift2UnpaidCenturyAmount").textContent =
-        money(s2.unpaidCenturyAmount);
-
-    document.getElementById("tableHistoryTotalUnpaidCenturyAmount").textContent =
-        money(total.unpaidCenturyAmount);
-
-
-    document.getElementById("tableHistoryShift1UnpaidCenturyTime").textContent =
-        time(s1.unpaidCenturyTime);
-
-    document.getElementById("tableHistoryShift2UnpaidCenturyTime").textContent =
-        time(s2.unpaidCenturyTime);
-
-    document.getElementById("tableHistoryTotalUnpaidCenturyTime").textContent =
-        time(total.unpaidCenturyTime);
-
-
-    /******************************************************
-     * SESSION DETAILS
-     ******************************************************/
-
-    const body =
-        document.getElementById("tableHistoryBody");
-
-    body.innerHTML = "";
-
-
-    if (!history.length) {
-
-        body.innerHTML =
-            `<tr>
-                <td colspan="11">
-                    No history found.
-                </td>
-            </tr>`;
-
-    } else {
-
-        history.forEach((h, index) => {
-
-            const p1 =
-                h.player1_name ||
-                h.player1 ||
-                "Player 1";
-
-            const p2 =
-                h.player2_name ||
-                h.player2 ||
-                "Player 2";
-
-
-            const players =
-                `${p1} <b>VS</b> ${p2}`;
-
-
-            const checkin =
-                h.checkin
-                    ? new Date(h.checkin).toLocaleTimeString(
-                        "en-PK",
-                        {
-                            timeZone: "Asia/Karachi",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            hour12: true
-                        }
+    const renderShift = (shift) => {
+
+        return history
+
+            .filter(
+                h => inShift(h, shift)
+            )
+
+            .sort(
+                (a, b) =>
+                    Number(
+                        a.checkin ||
+                        a.check_in ||
+                        0
                     )
-                    : "-";
-
-
-            const checkout =
-                h.checkout
-                    ? new Date(h.checkout).toLocaleTimeString(
-                        "en-PK",
-                        {
-                            timeZone: "Asia/Karachi",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            hour12: true
-                        }
+                    -
+                    Number(
+                        b.checkin ||
+                        b.check_in ||
+                        0
                     )
-                    : "-";
+            );
+
+    };
 
 
-            const play =
-                formatSeconds(
-                    Number(h.playSeconds || 0)
-                );
+    /******************************************************
+     * BUILD TABLE
+     ******************************************************/
 
+    const buildTable = (items) => {
 
-            const rate =
-                Number(
-                    h.selected_rate ??
-                    h.selectedRate ??
-                    h.frame_rate ??
-                    h.rate ??
-                    0
-                );
+        if (!items.length) {
 
-
-            const amount =
-                Number(
-                    h.final_game_amount ??
-                    h.final_amount ??
-                    h.amount ??
-                    0
-                );
-
-
-            const discount =
-                Number(h.discount || 0);
-
-
-            const canteen =
-                Number(
-                    h.canteenAmount ??
-                    h.canteen_total ??
-                    h.canteenTotal ??
-                    0
-                );
-
-
-            const grandTotal =
-                Number(
-                    h.total ??
-                    h.final_total ??
-                    amount + canteen - discount
-                );
-
-
-            const paid =
-                h.paid === true ||
-                h.paid === "true" ||
-                h.status === "paid" ||
-                h.payment_status === "paid";
-
-
-            body.innerHTML += `
-
+            return `
                 <tr>
-
-                    <td>${index + 1}</td>
-
-                    <td>
-                        <span class="table-history-players">
-                            ${players}
-                        </span>
+                    <td colspan="12">
+                        No history found.
                     </td>
-
-                    <td>${checkin}</td>
-
-                    <td>${checkout}</td>
-
-                    <td>${play}</td>
-
-                    <td>${rate}</td>
-
-                    <td>${amount}</td>
-
-                    <td>${discount}</td>
-
-                    <td>${canteen}</td>
-
-                    <td>${grandTotal}</td>
-
-                    <td>
-                        <span class="${paid ? "paid-btn" : "unpaid-btn"}">
-                            ${paid ? "PAID" : "UNPAID"}
-                        </span>
-                    </td>
-
                 </tr>
-
             `;
 
-        });
+        }
 
-    }
+
+        return items
+            .map(
+                (h, index) =>
+                    buildSessionRow(h, index)
+            )
+            .join("");
+
+    };
+
+
+    const shift1History =
+        renderShift(shift1);
+
+
+    const shift2History =
+        renderShift(shift2);
+
+
+    const combinedHistory =
+        [
+            ...shift1History,
+            ...shift2History
+        ]
+        .sort(
+            (a, b) =>
+                Number(
+                    a.checkin ||
+                    a.check_in ||
+                    0
+                )
+                -
+                Number(
+                    b.checkin ||
+                    b.check_in ||
+                    0
+                )
+        );
+
+
+    /******************************************************
+     * TABLE HEADERS
+     ******************************************************/
+
+    const header = `
+        <tr>
+
+            <th>#</th>
+
+            <th>Players</th>
+
+            <th>Check-in</th>
+
+            <th>Checkout</th>
+
+            <th>Play</th>
+
+            <th>Type</th>
+
+            <th>Frames</th>
+
+            <th>Amount</th>
+
+            <th>Discount</th>
+
+            <th>Canteen</th>
+
+            <th>Total</th>
+
+            <th>Status</th>
+
+        </tr>
+    `;
+
+
+    document.getElementById(
+        "tableShift1Body"
+    ).innerHTML =
+        header +
+        buildTable(shift1History);
+
+
+    document.getElementById(
+        "tableShift2Body"
+    ).innerHTML =
+        header +
+        buildTable(shift2History);
+
+
+    document.getElementById(
+        "tableCombinedBody"
+    ).innerHTML =
+        header +
+        buildTable(combinedHistory);
+
+
+    console.log(
+        "✅ TABLE HISTORY RENDERED:",
+        selectedTable.name,
+        {
+            shift1: shift1History.length,
+            shift2: shift2History.length,
+            combined: combinedHistory.length
+        }
+    );
 
 }
-
 /******************************************************
  * 🟢 CALCULATE TABLE SUMMARY FOR SPECIFIC SHIFT
  ******************************************************/
@@ -8456,44 +8454,7 @@ function getTableShiftTotalsFromDay(t, shiftData) {
 }
 
 
-/******************************************************
- * 🟢 BUILD TABLE HISTORY ROW
- ******************************************************/
-function buildTableHistoryRow(t, d) {
-    return `
-    <tr>
-    <td colspan="4">
-        <div class="history-box">
 
-            <div class="history-title">
-                🎱 ${t.name}
-            </div>
-
-            <div class="history-row">
-                <span>⏱ Play Time</span>
-                <span>${formatSeconds(d.time || 0)}</span>
-            </div>
-
-            <div class="history-row">
-                <span>🎮 Game</span>
-                <span>${d.game || 0}</span>
-            </div>
-
-            <div class="history-row">
-                <span>🍔 Canteen</span>
-                <span>${d.canteen || 0}</span>
-            </div>
-
-            <div class="history-row total">
-                <span>💵 Total</span>
-                <span>${d.total || 0}</span>
-            </div>
-
-        </div>
-    </td>
-    </tr>
-    `;
-}
 /******************************************************
  * TABLE HISTORY PAGINATION
  ******************************************************/
