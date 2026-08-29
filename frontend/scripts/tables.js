@@ -7814,50 +7814,67 @@ if (typeof window.formatSeconds !== "function") {
 
 /******************************************************
  * 🟢 LOAD TABLE HISTORY — FINAL
- * SAME LOGIC AS HISTORY POPUP
+ * SAME DATA LOGIC AS HISTORY POPUP
  * Single Frame = 1
  * Double Frame = 2
  * Century = Century
- * Player names + Checkout Star preserved
+ * Player names + checkout ⭐
  ******************************************************/
 function loadSelectedTableHistory() {
 
-    const tableId =
-        document.getElementById("tableHistoryTableSelect").value;
+    const tableSelect =
+        document.getElementById("tableHistoryTableSelect");
 
-    const selectedTable =
-        tables.find(
-            x => String(x.id) === String(tableId)
-        );
+    const dateSelect =
+        document.getElementById("tableHistoryDateSelect");
 
-    if (!selectedTable) return;
+    const body =
+        document.getElementById("tableHistoryBody");
 
-
-    const dayIndex =
-        document.getElementById("tableHistoryDateSelect").selectedIndex;
-
-
-    if (
-        !window._daysData ||
-        dayIndex < 0 ||
-        !window._daysData[dayIndex]
-    ) {
-        console.log("⚠️ No day data found");
+    if (!tableSelect || !dateSelect || !body) {
+        console.error("❌ TABLE HISTORY HTML ELEMENT MISSING");
         return;
     }
 
+    const tableId = tableSelect.value;
 
-    const selectedDay =
-        window._daysData[dayIndex];
-
-
-    const tableData =
-        selectedDay.tables?.find(
-            tb =>
-                String(tb.table_id).toLowerCase() ===
-                String(selectedTable.name).toLowerCase()
+    const selectedTable =
+        tables.find(
+            t => String(t.id) === String(tableId)
         );
 
+    if (!selectedTable) {
+        body.innerHTML =
+            `<tr><td colspan="11">No table selected.</td></tr>`;
+        return;
+    }
+
+    const dayIndex =
+        dateSelect.selectedIndex;
+
+    const selectedDay =
+        window._daysData?.[dayIndex];
+
+    if (!selectedDay) {
+        body.innerHTML =
+            `<tr><td colspan="11">No history found.</td></tr>`;
+        return;
+    }
+
+    /* ==================================================
+       FIND TABLE DATA
+    ================================================== */
+
+    const tableData =
+        (selectedDay.tables || []).find(
+            t =>
+                String(t.table_id || "")
+                    .trim()
+                    .toLowerCase() ===
+                String(selectedTable.name || "")
+                    .trim()
+                    .toLowerCase()
+        );
 
     const history =
         Array.isArray(tableData?.history)
@@ -7865,20 +7882,12 @@ function loadSelectedTableHistory() {
             : [];
 
 
-    const shift1 =
-        selectedDay.shift1 || null;
+    /* ==================================================
+       HELPERS
+    ================================================== */
 
-    const shift2 =
-        selectedDay.shift2 || null;
-
-
-    /******************************************************
-     * NORMALIZE HISTORY VALUES
-     ******************************************************/
-
-    const getType = (h) => {
-
-        return String(
+    const getType = (h) =>
+        String(
             h.playType ??
             h.play_type ??
             h.selectedPlayType ??
@@ -7888,12 +7897,9 @@ function loadSelectedTableHistory() {
         .toLowerCase()
         .trim();
 
-    };
 
-
-    const getRate = (h) => {
-
-        return Number(
+    const getRate = (h) =>
+        Number(
             h.rate ??
             h.selectedRate ??
             h.selected_rate ??
@@ -7902,12 +7908,9 @@ function loadSelectedTableHistory() {
             0
         );
 
-    };
 
-
-    const getAmount = (h) => {
-
-        return Number(
+    const getAmount = (h) =>
+        Number(
             h.amount ??
             h.finalGameAmount ??
             h.final_game_amount ??
@@ -7916,12 +7919,9 @@ function loadSelectedTableHistory() {
             0
         );
 
-    };
 
-
-    const getSeconds = (h) => {
-
-        return Number(
+    const getSeconds = (h) =>
+        Number(
             h.playSeconds ??
             h.play_seconds ??
             h.finalSeconds ??
@@ -7929,40 +7929,104 @@ function loadSelectedTableHistory() {
             0
         );
 
+
+    const getDiscount = (h) =>
+        Number(h.discount || 0);
+
+
+    const getCanteen = (h) =>
+        Number(
+            h.canteenAmount ??
+            h.canteen_total ??
+            0
+        );
+
+
+    const getTotal = (h) =>
+        Number(
+            h.total ??
+            (
+                getAmount(h) +
+                getCanteen(h)
+            )
+        );
+
+
+    const isPaid = (h) =>
+        h.paid === true ||
+        h.paid === "true";
+
+
+    const getFrameCount = (h) => {
+
+        const type = getType(h);
+        const rate = getRate(h);
+
+        if (type === "century") {
+            return 0;
+        }
+
+        if (
+            rate === 200 ||
+            type.includes("double")
+        ) {
+            return 2;
+        }
+
+        return 1;
     };
 
 
-    const getPlayer1 = (h) => {
+    const getTimeValue = (value) => {
 
-        return (
+        if (
+            typeof value === "number" &&
+            Number.isFinite(value)
+        ) {
+            return value;
+        }
+
+        const numeric =
+            Number(value);
+
+        if (
+            Number.isFinite(numeric) &&
+            numeric > 0
+        ) {
+            return numeric;
+        }
+
+        const parsed =
+            Date.parse(value);
+
+        return Number.isFinite(parsed)
+            ? parsed
+            : 0;
+    };
+
+
+    const getPlayer1 = (h) =>
+        String(
             h.player1Name ??
             h.player1_name ??
             "Player 1"
-        );
-
-    };
+        ).trim();
 
 
-    const getPlayer2 = (h) => {
-
-        return (
+    const getPlayer2 = (h) =>
+        String(
             h.player2Name ??
             h.player2_name ??
             "Player 2"
-        );
-
-    };
+        ).trim();
 
 
-    const getCheckoutPlayer = (h) => {
-
-        return (
+    const getCheckoutPlayer = (h) =>
+        String(
             h.checkoutPlayer ??
             h.checkout_player ??
             ""
-        );
-
-    };
+        ).trim();
 
 
     const getCheckoutNumber = (h) => {
@@ -7971,121 +8035,74 @@ function loadSelectedTableHistory() {
             h.checkoutPlayerNumber ??
             h.checkout_player_number;
 
-        return value === null ||
-               value === undefined ||
-               value === ""
-            ? null
-            : Number(value);
-
-    };
-
-
-    /******************************************************
-     * FRAME COUNT
-     ******************************************************/
-
-    const getFrameCount = (h) => {
-
-        const type =
-            getType(h);
-
-        const rate =
-            getRate(h);
-
-
-        // Century is NOT a frame
-        if (type === "century") {
-            return 0;
-        }
-
-
-        // Double Frame = 2
         if (
-            rate === 200 ||
-            type.includes("double")
+            value === null ||
+            value === undefined ||
+            value === ""
         ) {
-            return 2;
+            return null;
         }
 
-
-        // Single Frame = 1
-        return 1;
-
+        return Number(value);
     };
 
 
-    /******************************************************
-     * CHECKOUT PLAYER DISPLAY
-     ******************************************************/
+    const formatClock = (value) => {
 
-const buildPlayerDisplay = (h) => {
+        const ms =
+            getTimeValue(value);
 
-    const player1 =
-        getPlayer1(h);
+        if (!ms) return "-";
 
-    const player2 =
-        getPlayer2(h);
+        return new Date(ms)
+            .toLocaleTimeString(
+                "en-PK",
+                {
+                    timeZone: "Asia/Karachi",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true
+                }
+            );
+    };
 
-    const checkoutName =
-        getCheckoutPlayer(h);
 
-    const checkoutNumber =
-        getCheckoutNumber(h);
+    const formatDuration = (seconds) => {
 
+        seconds =
+            Math.max(
+                0,
+                Number(seconds || 0)
+            );
 
-    const isPlayer1Checkout =
-        checkoutNumber === 1 ||
-        (
-            checkoutName &&
-            player1 &&
-            String(checkoutName).toLowerCase().trim() ===
-            String(player1).toLowerCase().trim()
+        const h =
+            Math.floor(seconds / 3600);
+
+        const m =
+            Math.floor(
+                (seconds % 3600) / 60
+            );
+
+        const s =
+            Math.floor(seconds % 60);
+
+        return (
+            String(h).padStart(2, "0") +
+            ":" +
+            String(m).padStart(2, "0") +
+            ":" +
+            String(s).padStart(2, "0")
         );
+    };
 
 
-    const isPlayer2Checkout =
-        checkoutNumber === 2 ||
-        (
-            checkoutName &&
-            player2 &&
-            String(checkoutName).toLowerCase().trim() ===
-            String(player2).toLowerCase().trim()
-        );
+    const money = (value) =>
+        Number(value || 0).toLocaleString("en-PK");
 
 
-    const p1 =
-        isPlayer1Checkout
-            ? `<span class="checkout-player-highlight">
-                   ⭐ ${player1}
-               </span>`
-            : `<span>${player1}</span>`;
-
-
-    const p2 =
-        isPlayer2Checkout
-            ? `<span class="checkout-player-highlight">
-                   ⭐ ${player2}
-               </span>`
-            : `<span>${player2}</span>`;
-
-
-    return `
-        <div class="table-history-player-line">
-
-            ${p1}
-
-            <b>VS</b>
-
-            ${p2}
-
-        </div>
-    `;
-};
-
-
-    /******************************************************
-     * SHIFT FILTER
-     ******************************************************/
+    /* ==================================================
+       SHIFT FILTER
+    ================================================== */
 
     const inShift = (h, shift) => {
 
@@ -8097,371 +8114,626 @@ const buildPlayerDisplay = (h) => {
             return false;
         }
 
-
         const checkin =
-            Number(
+            getTimeValue(
                 h.checkin ??
-                h.check_in ??
-                0
+                h.check_in
             );
-
 
         const checkout =
-            Number(
+            getTimeValue(
                 h.checkout ??
-                h.check_out ??
-                0
+                h.check_out
             );
-
 
         return (
             checkin >= Number(shift.startMs) &&
             checkout <= Number(shift.endMs)
         );
-
-    };
-
-
-    /******************************************************
-     * BUILD SESSION ROW
-     ******************************************************/
-
-    const buildSessionRow = (h, index) => {
-
-        const type =
-            getType(h);
-
-        const rate =
-            getRate(h);
-
-        const amount =
-            getAmount(h);
-
-        const seconds =
-            getSeconds(h);
-
-        const frameCount =
-            getFrameCount(h);
-
-        const isCentury =
-            type === "century";
-
-
-        const checkoutTime =
-            Number(
-                h.checkout ??
-                h.check_out ??
-                0
-            );
-
-
-        const checkinTime =
-            Number(
-                h.checkin ??
-                h.check_in ??
-                0
-            );
-
-
-        const checkin =
-            checkinTime
-                ? new Date(checkinTime)
-                : null;
-
-
-        const checkout =
-            checkoutTime
-                ? new Date(checkoutTime)
-                : null;
-
-
-        const formatClock = (date) => {
-
-            if (!date) return "-";
-
-            return date.toLocaleTimeString(
-                "en-PK",
-                {
-                    timeZone: "Asia/Karachi",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true
-                }
-            );
-
-        };
-
-
-        const total =
-            Number(
-                h.total ??
-                amount ??
-                0
-            );
-
-
-        const discount =
-            Number(h.discount || 0);
-
-
-        const canteen =
-            Number(
-                h.canteenAmount ??
-                h.canteen_total ??
-                0
-            );
-
-
-        const paid =
-            h.paid === true;
-
-
-        return `
-            <tr>
-
-                <td>
-                    ${index + 1}
-                </td>
-
-
-                <td class="players-cell">
-
-                    ${buildPlayerDisplay(h)}
-
-                </td>
-
-
-                <td>
-                    ${formatClock(checkin)}
-                </td>
-
-
-                <td>
-                    ${formatClock(checkout)}
-                </td>
-
-
-                <td>
-                    ${formatTime(seconds)}
-                </td>
-
-
-                <td>
-
-                    ${
-                        isCentury
-                            ? "👑 Century"
-                            : frameCount === 2
-                                ? "Frame Double ×2"
-                                : "Frame Single ×1"
-                    }
-
-                </td>
-
-
-                <td>
-                    ${
-                        isCentury
-                            ? "Century"
-                            : frameCount
-                    }
-                </td>
-
-
-                <td>
-                    Rs ${formatMoney(amount)}
-                </td>
-
-
-                <td>
-                    Rs ${formatMoney(discount)}
-                </td>
-
-
-                <td>
-                    Rs ${formatMoney(canteen)}
-                </td>
-
-
-                <td>
-                    Rs ${formatMoney(total)}
-                </td>
-
-
-                <td>
-
-                    ${
-                        paid
-                            ? `<span class="paid-btn">
-                                   PAID
-                               </span>`
-                            : `<span class="unpaid-btn">
-                                   UNPAID
-                               </span>`
-                    }
-
-                </td>
-
-            </tr>
-        `;
-
-    };
-
-
-    /******************************************************
-     * RENDER ONE SHIFT
-     ******************************************************/
-
-    const renderShift = (shift) => {
-
-        return history
-
-            .filter(
-                h => inShift(h, shift)
-            )
-
-            .sort(
-                (a, b) =>
-                    Number(
-                        a.checkin ||
-                        a.check_in ||
-                        0
-                    )
-                    -
-                    Number(
-                        b.checkin ||
-                        b.check_in ||
-                        0
-                    )
-            );
-
-    };
-
-
-    /******************************************************
-     * BUILD TABLE
-     ******************************************************/
-
-    const buildTable = (items) => {
-
-        if (!items.length) {
-
-            return `
-                <tr>
-                    <td colspan="12">
-                        No history found.
-                    </td>
-                </tr>
-            `;
-
-        }
-
-
-        return items
-            .map(
-                (h, index) =>
-                    buildSessionRow(h, index)
-            )
-            .join("");
-
     };
 
 
     const shift1History =
-        renderShift(shift1);
-
-
-    const shift2History =
-        renderShift(shift2);
-
-
-    const combinedHistory =
-        [
-            ...shift1History,
-            ...shift2History
-        ]
-        .sort(
-            (a, b) =>
-                Number(
-                    a.checkin ||
-                    a.check_in ||
-                    0
-                )
-                -
-                Number(
-                    b.checkin ||
-                    b.check_in ||
-                    0
-                )
+        history.filter(
+            h => inShift(h, selectedDay.shift1)
         );
 
 
-    /******************************************************
-     * TABLE HEADERS
-     ******************************************************/
-
-    const header = `
-        <tr>
-
-            <th>#</th>
-
-            <th>Players</th>
-
-            <th>Check-in</th>
-
-            <th>Checkout</th>
-
-            <th>Play</th>
-
-            <th>Type</th>
-
-            <th>Frames</th>
-
-            <th>Amount</th>
-
-            <th>Discount</th>
-
-            <th>Canteen</th>
-
-            <th>Total</th>
-
-            <th>Status</th>
-
-        </tr>
-    `;
+    const shift2History =
+        history.filter(
+            h => inShift(h, selectedDay.shift2)
+        );
 
 
-    document.getElementById(
-        "tableShift1Body"
-    ).innerHTML =
-        header +
-        buildTable(shift1History);
+    /* ==================================================
+       TOTAL CALCULATOR
+    ================================================== */
+
+    const calculateTotals = (items) => {
+
+        const result = {
+
+            frames: 0,
+            frameAmount: 0,
+            frameTime: 0,
+
+            centuries: 0,
+            centuryAmount: 0,
+            centuryTime: 0,
+
+            paidFrames: 0,
+            paidFrameAmount: 0,
+
+            paidCenturies: 0,
+            paidCenturyAmount: 0,
+            paidCenturyTime: 0,
+
+            unpaidFrames: 0,
+            unpaidFrameAmount: 0,
+
+            unpaidCenturies: 0,
+            unpaidCenturyAmount: 0,
+            unpaidCenturyTime: 0
+        };
 
 
-    document.getElementById(
-        "tableShift2Body"
-    ).innerHTML =
-        header +
-        buildTable(shift2History);
+        items.forEach(h => {
+
+            const type =
+                getType(h);
+
+            const amount =
+                getAmount(h);
+
+            const seconds =
+                getSeconds(h);
+
+            const paid =
+                isPaid(h);
 
 
-    document.getElementById(
-        "tableCombinedBody"
-    ).innerHTML =
-        header +
-        buildTable(combinedHistory);
+            if (type === "century") {
+
+                result.centuries++;
+
+                result.centuryAmount +=
+                    amount;
+
+                result.centuryTime +=
+                    seconds;
+
+
+                if (paid) {
+
+                    result.paidCenturies++;
+
+                    result.paidCenturyAmount +=
+                        amount;
+
+                    result.paidCenturyTime +=
+                        seconds;
+
+                } else {
+
+                    result.unpaidCenturies++;
+
+                    result.unpaidCenturyAmount +=
+                        amount;
+
+                    result.unpaidCenturyTime +=
+                        seconds;
+                }
+
+            } else {
+
+                const frames =
+                    getFrameCount(h);
+
+                result.frames +=
+                    frames;
+
+                result.frameAmount +=
+                    amount;
+
+                result.frameTime +=
+                    seconds;
+
+
+                if (paid) {
+
+                    result.paidFrames +=
+                        frames;
+
+                    result.paidFrameAmount +=
+                        amount;
+
+                } else {
+
+                    result.unpaidFrames +=
+                        frames;
+
+                    result.unpaidFrameAmount +=
+                        amount;
+                }
+            }
+
+        });
+
+        return result;
+    };
+
+
+    const s1 =
+        calculateTotals(
+            shift1History
+        );
+
+    const s2 =
+        calculateTotals(
+            shift2History
+        );
+
+
+    const allTotals =
+        calculateTotals(history);
+
+
+    /* ==================================================
+       UPDATE SUMMARY CARDS
+    ================================================== */
+
+    const setText = (id, value) => {
+
+        const el =
+            document.getElementById(id);
+
+        if (el) {
+            el.textContent = value;
+        }
+    };
+
+
+    /* TOTAL FRAMES */
+
+    setText(
+        "tableHistoryShift1Frame",
+        s1.frames
+    );
+
+    setText(
+        "tableHistoryShift2Frame",
+        s2.frames
+    );
+
+    setText(
+        "tableHistoryTotalFrame",
+        allTotals.frames
+    );
+
+
+    setText(
+        "tableHistoryShift1FrameAmount",
+        `Rs. ${money(s1.frameAmount)}`
+    );
+
+    setText(
+        "tableHistoryShift2FrameAmount",
+        `Rs. ${money(s2.frameAmount)}`
+    );
+
+    setText(
+        "tableHistoryTotalFrameAmount",
+        `Rs. ${money(allTotals.frameAmount)}`
+    );
+
+
+    /* TOTAL CENTURY */
+
+    setText(
+        "tableHistoryShift1Century",
+        s1.centuries
+    );
+
+    setText(
+        "tableHistoryShift2Century",
+        s2.centuries
+    );
+
+    setText(
+        "tableHistoryTotalCentury",
+        allTotals.centuries
+    );
+
+
+    setText(
+        "tableHistoryShift1CenturyAmount",
+        `Rs. ${money(s1.centuryAmount)}`
+    );
+
+    setText(
+        "tableHistoryShift2CenturyAmount",
+        `Rs. ${money(s2.centuryAmount)}`
+    );
+
+    setText(
+        "tableHistoryTotalCenturyAmount",
+        `Rs. ${money(allTotals.centuryAmount)}`
+    );
+
+
+    setText(
+        "tableHistoryShift1CenturyTime",
+        formatDuration(s1.centuryTime)
+    );
+
+    setText(
+        "tableHistoryShift2CenturyTime",
+        formatDuration(s2.centuryTime)
+    );
+
+    setText(
+        "tableHistoryTotalCenturyTime",
+        formatDuration(allTotals.centuryTime)
+    );
+
+
+    /* PAID FRAMES */
+
+    setText(
+        "tableHistoryShift1PaidFrame",
+        s1.paidFrames
+    );
+
+    setText(
+        "tableHistoryShift2PaidFrame",
+        s2.paidFrames
+    );
+
+    setText(
+        "tableHistoryTotalPaidFrame",
+        allTotals.paidFrames
+    );
+
+
+    setText(
+        "tableHistoryShift1PaidFrameAmount",
+        `Rs. ${money(s1.paidFrameAmount)}`
+    );
+
+    setText(
+        "tableHistoryShift2PaidFrameAmount",
+        `Rs. ${money(s2.paidFrameAmount)}`
+    );
+
+    setText(
+        "tableHistoryTotalPaidFrameAmount",
+        `Rs. ${money(allTotals.paidFrameAmount)}`
+    );
+
+
+    /* PAID CENTURIES */
+
+    setText(
+        "tableHistoryShift1PaidCentury",
+        s1.paidCenturies
+    );
+
+    setText(
+        "tableHistoryShift2PaidCentury",
+        s2.paidCenturies
+    );
+
+    setText(
+        "tableHistoryTotalPaidCentury",
+        allTotals.paidCenturies
+    );
+
+
+    setText(
+        "tableHistoryShift1PaidCenturyAmount",
+        `Rs. ${money(s1.paidCenturyAmount)}`
+    );
+
+    setText(
+        "tableHistoryShift2PaidCenturyAmount",
+        `Rs. ${money(s2.paidCenturyAmount)}`
+    );
+
+    setText(
+        "tableHistoryTotalPaidCenturyAmount",
+        `Rs. ${money(allTotals.paidCenturyAmount)}`
+    );
+
+
+    setText(
+        "tableHistoryShift1PaidCenturyTime",
+        formatDuration(s1.paidCenturyTime)
+    );
+
+    setText(
+        "tableHistoryShift2PaidCenturyTime",
+        formatDuration(s2.paidCenturyTime)
+    );
+
+    setText(
+        "tableHistoryTotalPaidCenturyTime",
+        formatDuration(allTotals.paidCenturyTime)
+    );
+
+
+    /* UNPAID FRAMES */
+
+    setText(
+        "tableHistoryShift1UnpaidFrame",
+        s1.unpaidFrames
+    );
+
+    setText(
+        "tableHistoryShift2UnpaidFrame",
+        s2.unpaidFrames
+    );
+
+    setText(
+        "tableHistoryTotalUnpaidFrame",
+        allTotals.unpaidFrames
+    );
+
+
+    setText(
+        "tableHistoryShift1UnpaidFrameAmount",
+        `Rs. ${money(s1.unpaidFrameAmount)}`
+    );
+
+    setText(
+        "tableHistoryShift2UnpaidFrameAmount",
+        `Rs. ${money(s2.unpaidFrameAmount)}`
+    );
+
+    setText(
+        "tableHistoryTotalUnpaidFrameAmount",
+        `Rs. ${money(allTotals.unpaidFrameAmount)}`
+    );
+
+
+    /* UNPAID CENTURIES */
+
+    setText(
+        "tableHistoryShift1UnpaidCentury",
+        s1.unpaidCenturies
+    );
+
+    setText(
+        "tableHistoryShift2UnpaidCentury",
+        s2.unpaidCenturies
+    );
+
+    setText(
+        "tableHistoryTotalUnpaidCentury",
+        allTotals.unpaidCenturies
+    );
+
+
+    setText(
+        "tableHistoryShift1UnpaidCenturyAmount",
+        `Rs. ${money(s1.unpaidCenturyAmount)}`
+    );
+
+    setText(
+        "tableHistoryShift2UnpaidCenturyAmount",
+        `Rs. ${money(s2.unpaidCenturyAmount)}`
+    );
+
+    setText(
+        "tableHistoryTotalUnpaidCenturyAmount",
+        `Rs. ${money(allTotals.unpaidCenturyAmount)}`
+    );
+
+
+    setText(
+        "tableHistoryShift1UnpaidCenturyTime",
+        formatDuration(s1.unpaidCenturyTime)
+    );
+
+    setText(
+        "tableHistoryShift2UnpaidCenturyTime",
+        formatDuration(s2.unpaidCenturyTime)
+    );
+
+    setText(
+        "tableHistoryTotalUnpaidCenturyTime",
+        formatDuration(allTotals.unpaidCenturyTime)
+    );
+
+
+    /* ==================================================
+       SESSION DETAILS
+    ================================================== */
+
+    history.sort(
+        (a, b) =>
+            getTimeValue(
+                b.checkin ??
+                b.check_in
+            ) -
+            getTimeValue(
+                a.checkin ??
+                a.check_in
+            )
+    );
+
+
+    if (!history.length) {
+
+        body.innerHTML = `
+            <tr>
+                <td colspan="11">
+                    No history found.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+
+    body.innerHTML =
+        history
+            .map((h, index) => {
+
+                const player1 =
+                    getPlayer1(h);
+
+                const player2 =
+                    getPlayer2(h);
+
+                const checkoutName =
+                    getCheckoutPlayer(h);
+
+                const checkoutNumber =
+                    getCheckoutNumber(h);
+
+
+                const player1Checkout =
+                    checkoutNumber === 1 ||
+                    (
+                        checkoutName &&
+                        player1 &&
+                        checkoutName
+                            .toLowerCase() ===
+                        player1
+                            .toLowerCase()
+                    );
+
+
+                const player2Checkout =
+                    checkoutNumber === 2 ||
+                    (
+                        checkoutName &&
+                        player2 &&
+                        checkoutName
+                            .toLowerCase() ===
+                        player2
+                            .toLowerCase()
+                    );
+
+
+                const player1HTML =
+                    player1Checkout
+                        ? `<span class="checkout-player-highlight">⭐ ${player1}</span>`
+                        : `<span>${player1}</span>`;
+
+
+                const player2HTML =
+                    player2Checkout
+                        ? `<span class="checkout-player-highlight">⭐ ${player2}</span>`
+                        : `<span>${player2}</span>`;
+
+
+                const playersHTML = `
+                    <div class="table-history-player-line">
+                        ${player1HTML}
+                        <b>VS</b>
+                        ${player2HTML}
+                    </div>
+                `;
+
+
+                const amount =
+                    getAmount(h);
+
+                const discount =
+                    getDiscount(h);
+
+                const canteen =
+                    getCanteen(h);
+
+                const total =
+                    getTotal(h);
+
+                const seconds =
+                    getSeconds(h);
+
+                const rate =
+                    getRate(h);
+
+
+                const paid =
+                    isPaid(h);
+
+
+                return `
+                    <tr>
+
+                        <td>
+                            ${index + 1}
+                        </td>
+
+                        <td class="players-cell">
+                            ${playersHTML}
+                        </td>
+
+                        <td>
+                            ${formatClock(
+                                h.checkin ??
+                                h.check_in
+                            )}
+                        </td>
+
+                        <td>
+                            ${formatClock(
+                                h.checkout ??
+                                h.check_out
+                            )}
+                        </td>
+
+                        <td>
+                            ${formatDuration(seconds)}
+                        </td>
+
+                        <td>
+                            ${rate}
+                        </td>
+
+                        <td>
+                            Rs ${money(amount)}
+                        </td>
+
+                        <td>
+                            Rs ${money(discount)}
+                        </td>
+
+                        <td>
+                            Rs ${money(canteen)}
+                        </td>
+
+                        <td>
+                            Rs ${money(total)}
+                        </td>
+
+                        <td>
+                            ${
+                                paid
+                                    ? `<span class="paid-btn">PAID</span>`
+                                    : `<span class="unpaid-btn">UNPAID</span>`
+                            }
+                        </td>
+
+                    </tr>
+                `;
+
+            })
+            .join("");
 
 
     console.log(
-        "✅ TABLE HISTORY RENDERED:",
+        "✅ TABLE HISTORY FINAL:",
         selectedTable.name,
         {
-            shift1: shift1History.length,
-            shift2: shift2History.length,
-            combined: combinedHistory.length
+            sessions: history.length,
+            frames: allTotals.frames,
+            centuries: allTotals.centuries
         }
     );
-
 }
 /******************************************************
  * 🟢 CALCULATE TABLE SUMMARY FOR SPECIFIC SHIFT
