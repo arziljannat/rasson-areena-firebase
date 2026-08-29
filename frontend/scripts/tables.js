@@ -6941,194 +6941,697 @@ if (daySelect) {
     }
 }
 
-    loadDaySummaryFirebase();
+loadDayHistorySnapshot();
 
-    document.getElementById("dayHistoryDateSelect").onchange = loadDaySummaryFirebase;
+document.getElementById("dayHistoryDateSelect").onchange =
+    loadDayHistorySnapshot;
 
-    showPopup("dayHistoryPopup");
+showPopup("dayHistoryPopup");
 }
-function loadDaySummaryFirebase() {
 
-    let index = document.getElementById("dayHistoryDateSelect").selectedIndex;
-    let d = window._daysData[index];
 
-    if (!d) return;
+function loadDayHistorySnapshot() {
 
-    let s1 = d.shift1 || {};
-    let s2 = d.shift2 || {};
-    let c = d.combined || {};
+    const select =
+        document.getElementById("dayHistoryDateSelect");
 
-document.getElementById("dayShift1Body").innerHTML = `
-<tr>
-<td colspan="7">
-    <div class="summary-box">
+    const container =
+        document.getElementById("dayHistorySnapshot");
 
-        <div class="summary-row">
-            <span>🎮 Game</span>
-            <span>${s1.gameTotal || 0}</span>
-        </div>
+    if (!select || !container) return;
 
-        <div class="summary-row">
-            <span>🍔 Canteen</span>
-            <span>${s1.canteenTotal || 0}</span>
-        </div>
 
-        <div class="summary-row">
-            <span>💰 Game Collection</span>
-            <span>${s1.gameCollection || 0}</span>
-        </div>
+    const index =
+        select.selectedIndex;
 
-        <div class="summary-row">
-            <span>🧾 Canteen Collection</span>
-            <span>${s1.canteenCollection || 0}</span>
-        </div>
+    const d =
+        window._daysData?.[index];
 
-        <div class="summary-row">
-            <span>⚖️ Balance</span>
-            <span>${(s1.gameBalance || 0) + (s1.canteenBalance || 0)}</span>
-        </div>
+    if (!d) {
 
-        <div class="summary-row">
-            <span>💸 Expenses</span>
-            <span>${s1.expenses || 0}</span>
-        </div>
+        container.innerHTML =
+            `<div class="snapshot-empty">
+                No day data found
+             </div>`;
 
-        <div class="summary-row">
-            <span>📲 EasyPaisa</span>
-            <span>${s1.easypaisa || 0}</span>
-        </div>
-      
-              <div class="summary-row">
-          <span>🎁 Discount</span>
-          <span>${s1.discount || 0}</span>
-      </div>
+        return;
+    }
 
-        <div class="summary-row total">
-            <span>💵 Cash</span>
-            <span>${s1.closingCash || 0}</span>
-        </div>
 
-    </div>
-</td>
-</tr>
-`;
+    const tables =
+        Array.isArray(d.tables)
+            ? d.tables
+            : [];
 
-document.getElementById("dayShift2Body").innerHTML = `
-<tr>
-<td colspan="7">
-    <div class="summary-box">
 
-        <div class="summary-row">
-            <span>🎮 Game</span>
-            <span>${s2.gameTotal || 0}</span>
-        </div>
+    /* =====================================================
+       HELPERS
+    ===================================================== */
 
-        <div class="summary-row">
-            <span>🍔 Canteen</span>
-            <span>${s2.canteenTotal || 0}</span>
-        </div>
+    function getType(h) {
 
-        <div class="summary-row">
-            <span>💰 Game Collection</span>
-            <span>${s2.gameCollection || 0}</span>
-        </div>
+        return String(
+            h.selectedPlayType ??
+            h.selected_play_type ??
+            h.playType ??
+            h.play_type ??
+            ""
+        )
+        .toLowerCase()
+        .trim();
 
-        <div class="summary-row">
-            <span>🧾 Canteen Collection</span>
-            <span>${s2.canteenCollection || 0}</span>
-        </div>
+    }
 
-        <div class="summary-row">
-            <span>⚖️ Balance</span>
-            <span>${(s2.gameBalance || 0) + (s2.canteenBalance || 0)}</span>
-        </div>
 
-        <div class="summary-row">
-            <span>💸 Expenses</span>
-            <span>${s2.expenses || 0}</span>
-        </div>
+    function getRate(h) {
 
-        <div class="summary-row">
-            <span>📲 EasyPaisa</span>
-            <span>${s2.easypaisa || 0}</span>
-        </div>
+        return Number(
+            h.selectedRate ??
+            h.selected_rate ??
+            h.frameRate ??
+            h.frame_rate ??
+            h.rate ??
+            0
+        );
 
-        <div class="summary-row">
-    <span>🎁 Discount</span>
-    <span>${s2.discount || 0}</span>
-</div>
+    }
 
-        <div class="summary-row total">
-            <span>💵 Cash</span>
-            <span>${s2.closingCash || 0}</span>
-        </div>
 
-    </div>
-</td>
-</tr>
-`;
+    function getAmount(h) {
 
-document.getElementById("dayCombinedBody").innerHTML = `
-<tr>
-    <td colspan="7">
+        return Number(
+            h.finalGameAmount ??
+            h.final_game_amount ??
+            h.finalAmount ??
+            h.final_amount ??
+            h.amount ??
+            0
+        );
 
-        <div class="summary-box">
+    }
 
-            <div class="summary-row">
-                <span>🎮 Game</span>
-                <span>${c.gameTotal || 0}</span>
+
+    function getSeconds(h) {
+
+        return Number(
+            h.finalSeconds ??
+            h.final_seconds ??
+            h.playSeconds ??
+            h.play_seconds ??
+            0
+        );
+
+    }
+
+
+    function getFrameCount(h) {
+
+        const type =
+            getType(h);
+
+        const rate =
+            getRate(h);
+
+
+        // Century is NOT a frame
+
+        if (type === "century") {
+
+            return 0;
+
+        }
+
+
+        // Double frame = 2
+
+        if (
+            rate === 200 ||
+            type.includes("double")
+        ) {
+
+            return 2;
+
+        }
+
+
+        // Single frame = 1
+
+        return 1;
+
+    }
+
+
+    function formatTime(seconds) {
+
+        seconds =
+            Number(seconds || 0);
+
+
+        const hours =
+            Math.floor(
+                seconds / 3600
+            );
+
+
+        const minutes =
+            Math.floor(
+                (seconds % 3600) / 60
+            );
+
+
+        const secs =
+            Math.floor(
+                seconds % 60
+            );
+
+
+        return (
+            String(hours).padStart(2, "0") +
+            ":" +
+            String(minutes).padStart(2, "0") +
+            ":" +
+            String(secs).padStart(2, "0")
+        );
+
+    }
+
+
+    function formatMoney(value) {
+
+        return Number(
+            value || 0
+        ).toLocaleString();
+
+    }
+
+
+    function formatDateTime(value) {
+
+        if (!value) return "-";
+
+
+        const date =
+            new Date(value);
+
+
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
+
+            return "-";
+
+        }
+
+
+        return date.toLocaleString(
+            "en-PK",
+            {
+                timeZone: "Asia/Karachi",
+                dateStyle: "short",
+                timeStyle: "short"
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       BUILD TABLE / ROOM CARDS
+    ===================================================== */
+
+    let html = "";
+
+
+    tables.forEach(resource => {
+
+        const resourceName =
+            resource.table_id ||
+            resource.name ||
+            "";
+
+
+        const history =
+            Array.isArray(resource.history)
+                ? resource.history
+                : [];
+
+
+        let frames = 0;
+        let frameAmount = 0;
+        let frameSeconds = 0;
+
+
+        let centuries = 0;
+        let centuryAmount = 0;
+        let centurySeconds = 0;
+
+
+        history.forEach(h => {
+
+            const type =
+                getType(h);
+
+
+            const amount =
+                getAmount(h);
+
+
+            const seconds =
+                getSeconds(h);
+
+
+            if (
+                type === "century"
+            ) {
+
+                centuries++;
+
+                centuryAmount +=
+                    amount;
+
+                centurySeconds +=
+                    seconds;
+
+            } else {
+
+                frames +=
+                    getFrameCount(h);
+
+                frameAmount +=
+                    amount;
+
+                frameSeconds +=
+                    seconds;
+
+            }
+
+        });
+
+
+        /* =================================================
+           ROOM
+        ================================================= */
+
+        if (
+            resourceName
+                .toLowerCase()
+                .startsWith("room")
+        ) {
+
+            const totalAmount =
+                frameAmount +
+                centuryAmount;
+
+
+            html += `
+
+                <div
+                    class="shift-snapshot-card
+                           day-history-resource-card"
+                >
+
+                    <div class="snapshot-card-title">
+
+                        🏠
+                        ${resourceName.toUpperCase()}
+
+                    </div>
+
+
+                    <div class="snapshot-grid">
+
+                        <div class="snapshot-item">
+
+                            <span>
+                                Total Amount
+                            </span>
+
+                            <strong>
+                                Rs ${formatMoney(
+                                    totalAmount
+                                )}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        /* =================================================
+           TABLE
+        ================================================= */
+
+        html += `
+
+            <div
+                class="shift-snapshot-card
+                       day-history-resource-card"
+            >
+
+                <div class="snapshot-card-title">
+
+                    🎱
+                    ${resourceName.toUpperCase()}
+
+                </div>
+
+
+                <div class="snapshot-grid">
+
+
+                    <div class="snapshot-item">
+
+                        <span>
+                            Frames
+                        </span>
+
+                        <strong>
+                            ${frames}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="snapshot-item">
+
+                        <span>
+                            Frame Amount
+                        </span>
+
+                        <strong>
+                            Rs ${formatMoney(
+                                frameAmount
+                            )}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="snapshot-item">
+
+                        <span>
+                            Frame Time
+                        </span>
+
+                        <strong>
+                            ${formatTime(
+                                frameSeconds
+                            )}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="snapshot-item">
+
+                        <span>
+                            Centuries
+                        </span>
+
+                        <strong>
+                            ${centuries}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="snapshot-item">
+
+                        <span>
+                            Century Amount
+                        </span>
+
+                        <strong>
+                            Rs ${formatMoney(
+                                centuryAmount
+                            )}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="snapshot-item">
+
+                        <span>
+                            Century Time
+                        </span>
+
+                        <strong>
+                            ${formatTime(
+                                centurySeconds
+                            )}
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
             </div>
 
-            <div class="summary-row">
-                <span>🍔 Canteen</span>
-                <span>${c.canteenTotal || 0}</span>
+        `;
+
+    });
+
+
+    /* =====================================================
+       OVERALL
+    ===================================================== */
+
+    const combined =
+        d.combined || {};
+
+
+    const s1 =
+        d.shift1 || {};
+
+
+    const s2 =
+        d.shift2 || {};
+
+
+    const totalIncome =
+        Number(
+            combined.gameCollection ??
+            (
+                Number(
+                    s1.gameCollection || 0
+                ) +
+                Number(
+                    s2.gameCollection || 0
+                )
+            )
+        );
+
+
+    const discount =
+        Number(
+            combined.discount ??
+            (
+                Number(
+                    s1.discount || 0
+                ) +
+                Number(
+                    s2.discount || 0
+                )
+            )
+        );
+
+
+    const expense =
+        Number(
+            combined.expenses ??
+            (
+                Number(
+                    s1.expenses || 0
+                ) +
+                Number(
+                    s2.expenses || 0
+                )
+            )
+        );
+
+
+    const easypaisa =
+        Number(
+            combined.easypaisa ??
+            (
+                Number(
+                    s1.easypaisa || 0
+                ) +
+                Number(
+                    s2.easypaisa || 0
+                )
+            )
+        );
+
+
+    const closingCash =
+        Number(
+            combined.closingCash ??
+            (
+                totalIncome -
+                discount -
+                expense -
+                easypaisa
+            )
+        );
+
+
+    /* =====================================================
+       OPEN / CLOSE
+    ===================================================== */
+
+    const openTime =
+        formatDateTime(
+            s1.startMs ||
+            s1.start_ms
+        );
+
+
+    const closeTime =
+        formatDateTime(
+            s2.endMs ||
+            s2.end_ms
+        );
+
+
+    /* =====================================================
+       OVERALL CARD
+    ===================================================== */
+
+    html += `
+
+        <div
+            class="shift-snapshot-card
+                   day-history-overall-card"
+        >
+
+            <div class="snapshot-card-title">
+
+                💰 OVERALL
+
             </div>
 
-            <div class="summary-row">
-                <span>💰 Game Collection</span>
-                <span>${c.gameCollection || 0}</span>
+
+            <div class="snapshot-grid">
+
+
+                <div class="snapshot-item">
+
+                    <span>
+                        Total Income
+                    </span>
+
+                    <strong>
+                        Rs ${formatMoney(
+                            totalIncome
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div class="snapshot-item">
+
+                    <span>
+                        Discount
+                    </span>
+
+                    <strong>
+                        Rs ${formatMoney(
+                            discount
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div class="snapshot-item">
+
+                    <span>
+                        Expense
+                    </span>
+
+                    <strong>
+                        Rs ${formatMoney(
+                            expense
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div class="snapshot-item">
+
+                    <span>
+                        EasyPaisa
+                    </span>
+
+                    <strong>
+                        Rs ${formatMoney(
+                            easypaisa
+                        )}
+                    </strong>
+
+                </div>
+
+
+                <div
+                    class="snapshot-item
+                           snapshot-cash"
+                >
+
+                    <span>
+                        Closing Cash
+                    </span>
+
+                    <strong>
+                        Rs ${formatMoney(
+                            closingCash
+                        )}
+                    </strong>
+
+                </div>
+
+
             </div>
 
-            <div class="summary-row">
-                <span>🧾 Canteen Collection</span>
-                <span>${c.canteenCollection || 0}</span>
-            </div>
 
-            <div class="summary-row">
-                <span>⚖️ Balance</span>
+            <div class="snapshot-time">
+
+                Open:
                 <span>
-                    ${
-                        Number(c.gameBalance || 0) +
-                        Number(c.canteenBalance || 0)
-                    }
+                    ${openTime}
                 </span>
-            </div>
 
-            <div class="summary-row">
-                <span>💸 Expenses</span>
-                <span>${c.expenses || 0}</span>
-            </div>
+                &nbsp; → &nbsp;
 
-            <div class="summary-row">
-                <span>📲 EasyPaisa</span>
-                <span>${c.easypaisa || 0}</span>
-            </div>
+                Close:
+                <span>
+                    ${closeTime}
+                </span>
 
-            <div class="summary-row">
-                <span>🎁 Discount</span>
-                <span>${c.discount || 0}</span>
-            </div>
-
-            <div class="summary-row total">
-                <span>💵 Cash</span>
-                <span>${c.closingCash || 0}</span>
             </div>
 
         </div>
 
-    </td>
-</tr>
-`;
+    `;
+
+
+    container.innerHTML =
+        html;
+
 }
 
 /******************************************************
