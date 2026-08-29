@@ -6978,48 +6978,49 @@ function loadDayHistorySnapshot() {
     }
 
 
-    const tables =
-        Array.isArray(d.tables)
-            ? d.tables
-            : [];
+let tables =
+    Array.isArray(d.tables)
+        ? [...d.tables]
+        : [];
 
-      // 🔥 FIXED DAY HISTORY DISPLAY ORDER
-    // Table 1 → Table 9 → Room 1 → Room 3
+  // 🔥 FIXED DAY HISTORY DISPLAY ORDER
+// TABLE 1 → TABLE 2 → ... → TABLE 9
+// ROOM 1 → ROOM 2 → ROOM 3
 
-    const orderedTables = [...tables].sort((a, b) => {
+tables.sort((a, b) => {
 
-        function getOrder(item) {
+    function getOrder(item) {
 
-            const name =
-                String(item.table_id || "")
-                    .trim()
-                    .toLowerCase();
+        const name =
+            String(item.table_id || "")
+                .trim()
+                .toLowerCase();
 
-            const tableMatch =
-                name.match(/^table\s*(\d+)/);
+        const tableMatch =
+            name.match(/^table\s*(\d+)/);
 
-            if (tableMatch) {
+        if (tableMatch) {
 
-                return Number(tableMatch[1]);
-
-            }
-
-            const roomMatch =
-                name.match(/^room\s*(\d+)/);
-
-            if (roomMatch) {
-
-                return 100 + Number(roomMatch[1]);
-
-            }
-
-            return 999;
+            return Number(tableMatch[1]);
 
         }
 
-        return getOrder(a) - getOrder(b);
+        const roomMatch =
+            name.match(/^room\s*(\d+)/);
 
-    });
+        if (roomMatch) {
+
+            return 100 + Number(roomMatch[1]);
+
+        }
+
+        return 999;
+
+    }
+
+    return getOrder(a) - getOrder(b);
+
+});
 
 
     /* =====================================================
