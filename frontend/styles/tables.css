@@ -6479,3 +6479,78 @@ body * {
     }
 
 }
+
+/* =========================================================
+   TABLE HISTORY — PLAYERS
+========================================================= */
+
+#tableHistoryPopup .history-players {
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    gap: 7px !important;
+
+    width: 100% !important;
+
+    white-space: nowrap !important;
+
+}
+
+
+#tableHistoryPopup .history-player {
+
+    display: inline-flex !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    padding: 3px 7px !important;
+
+    color: #00ffff !important;
+
+    font-size: 14px !important;
+
+    font-weight: 800 !important;
+
+    white-space: nowrap !important;
+
+}
+
+
+#tableHistoryPopup .history-players b {
+
+    color: #ffd700 !important;
+
+    font-size: 12px !important;
+
+    font-weight: 900 !important;
+
+}
+
+
+#tableHistoryPopup .history-player.checkout-player {
+
+    background: #ffd700 !important;
+
+    color: #000 !important;
+
+    border-radius: 5px !important;
+
+    font-weight: 900 !important;
+
+    box-shadow:
+        0 0 7px rgba(255,215,0,.8) !important;
+
+}
+
+
+#tableHistoryPopup .history-player.checkout-player::first-letter {
+
+    color: #000 !important;
+
+}
