@@ -4966,6 +4966,52 @@ function snapshotTime(seconds) {
     );
 }
 
+/* =====================================================
+   🎱 SNAPSHOT FRAME COUNT
+   SINGLE FRAME = 1
+   DOUBLE FRAME = 2
+   CENTURY = 0 FRAME
+===================================================== */
+
+function getFrameCount(h) {
+
+    const rate = Number(
+        h.selectedRate ??
+        h.selected_rate ??
+        h.frameRate ??
+        h.frame_rate ??
+        h.rate ??
+        0
+    );
+
+    const playType = String(
+        h.selectedPlayType ??
+        h.selected_play_type ??
+        h.playType ??
+        h.play_type ??
+        ""
+    ).toLowerCase().trim();
+
+
+    // 👑 Century is not a frame
+    if (playType === "century") {
+        return 0;
+    }
+
+
+    // 🎱 Double Frame = 2
+    if (
+        rate === 200 ||
+        playType.includes("double")
+    ) {
+        return 2;
+    }
+
+
+    // 🎱 Single Frame = 1
+    return 1;
+}
+
 
 /* =====================================================
    TABLE DATA
