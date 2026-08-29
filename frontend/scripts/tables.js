@@ -7776,77 +7776,653 @@ tableSel.innerHTML = sortedHistoryTables
 }
 
 /******************************************************
- * 🟢 LOAD SUMMARY FOR SELECTED TABLE
+ * 🟢 LOAD TABLE HISTORY — HISTORY POPUP STYLE
  ******************************************************/
 function loadSelectedTableHistory() {
 
-    let tableId = document.getElementById("tableHistoryTableSelect").value;
-    let t = tables.find(x => String(x.id) === String(tableId));
+    const tableId =
+        document.getElementById("tableHistoryTableSelect").value;
+
+    const t =
+        tables.find(x => String(x.id) === String(tableId));
 
     if (!t) return;
 
+    const dayIndex =
+        document.getElementById("tableHistoryDateSelect").selectedIndex;
 
-let dayIndex = document.getElementById("tableHistoryDateSelect").selectedIndex;
-
-if (!window._daysData || dayIndex < 0 || !window._daysData[dayIndex]) {
-    console.log("⚠️ No day data found");
-    return;
-}
-
-let selectedDay = window._daysData[dayIndex];
-
-if (!selectedDay) return;
-
-// 🔥 find table from firebase day data
-let tableData = selectedDay.tables?.find(tb => tb.table_id === t.name);
-
-// agar data na mile
-if (!tableData) {
-    document.getElementById("tableShift1Body").innerHTML = buildTableHistoryRow(t, {});
-    document.getElementById("tableShift2Body").innerHTML = buildTableHistoryRow(t, {});
-    document.getElementById("tableCombinedBody").innerHTML = buildTableHistoryRow(t, {});
-    return;
-}
-
-// 🔥 calculate from history
-let t1 = { time:0, game:0, canteen:0, total:0 };
-let t2 = { time:0, game:0, canteen:0, total:0 };
-
-// 👉 simple version (full day same data)
-let s1 = selectedDay.shift1;
-let s2 = selectedDay.shift2;
-
-// 🔥 SHIFT 1 CALC
-tableData.history.forEach(h => {
-    if (s1 && h.checkin >= s1.startMs && h.checkout <= s1.endMs) {
-        t1.time += h.playSeconds || 0;
-        t1.game += h.amount || 0;
-        t1.canteen += h.canteenAmount || 0;
-        t1.total += h.total || 0;
+    if (
+        !window._daysData ||
+        dayIndex < 0 ||
+        !window._daysData[dayIndex]
+    ) {
+        return;
     }
-});
 
-// 🔥 SHIFT 2 CALC
-tableData.history.forEach(h => {
-    if (s2 && h.checkin >= s2.startMs && h.checkout <= s2.endMs) {
-        t2.time += h.playSeconds || 0;
-        t2.game += h.amount || 0;
-        t2.canteen += h.canteenAmount || 0;
-        t2.total += h.total || 0;
+    const selectedDay =
+        window._daysData[dayIndex];
+
+    const tableData =
+        selectedDay.tables?.find(
+            tb => tb.table_id === t.name
+        );
+
+    const history =
+        tableData?.history || [];
+
+    const shift1 =
+        selectedDay.shift1;
+
+    const shift2 =
+        selectedDay.shift2;
+
+
+    /******************************************************
+     * SHIFT FILTER
+     ******************************************************/
+
+    const inShift = (h, shift) => {
+
+        if (!shift?.startMs || !shift?.endMs) {
+            return false;
+        }
+
+        return (
+            Number(h.checkin || 0) >= Number(shift.startMs) &&
+            Number(h.checkout || 0) <= Number(shift.endMs)
+        );
+    };
+
+
+    /******************************************************
+     * SUMMARY OBJECT
+     ******************************************************/
+
+    function emptySummary() {
+
+        return {
+
+            frames: 0,
+            frameAmount: 0,
+            frameTime: 0,
+
+            centuries: 0,
+            centuryAmount: 0,
+            centuryTime: 0,
+
+            paidFrames: 0,
+            paidFrameAmount: 0,
+
+            paidCenturies: 0,
+            paidCenturyAmount: 0,
+            paidCenturyTime: 0,
+
+            unpaidFrames: 0,
+            unpaidFrameAmount: 0,
+
+            unpaidCenturies: 0,
+            unpaidCenturyAmount: 0,
+            unpaidCenturyTime: 0
+        };
+
     }
-});
 
-let combined = {
-    time: t1.time + t2.time,
-    game: t1.game + t2.game,
-    canteen: t1.canteen + t2.canteen,
-    total: t1.total + t2.total
-};
 
-document.getElementById("tableShift1Body").innerHTML = buildTableHistoryRow(t, t1);
-document.getElementById("tableShift2Body").innerHTML = buildTableHistoryRow(t, t2);
-document.getElementById("tableCombinedBody").innerHTML = buildTableHistoryRow(t, combined);
-    
+    /******************************************************
+     * CALCULATE ONE SHIFT
+     ******************************************************/
+
+    function calculateSummary(shift) {
+
+        const result =
+            emptySummary();
+
+        history.forEach(h => {
+
+            if (!inShift(h, shift)) {
+                return;
+            }
+
+
+            const type =
+                String(
+                    h.selected_play_type ??
+                    h.selectedPlayType ??
+                    h.play_type ??
+                    h.playType ??
+                    ""
+                ).toLowerCase();
+
+
+            const amount =
+                Number(
+                    h.final_game_amount ??
+                    h.final_amount ??
+                    h.amount ??
+                    h.game_amount ??
+                    0
+                );
+
+
+            const total =
+                Number(
+                    h.total ??
+                    h.final_total ??
+                    amount +
+                    Number(h.canteenAmount || 0)
+                );
+
+
+            const playSeconds =
+                Number(h.playSeconds || 0);
+
+
+            const paid =
+                h.paid === true ||
+                h.paid === "true" ||
+                h.status === "paid" ||
+                h.payment_status === "paid";
+
+
+            /************************************************
+             * FRAME
+             ************************************************/
+
+            if (type === "frame") {
+
+                /*
+                 * IMPORTANT:
+                 * Single Frame = 1
+                 * Double Frame = 2
+                 */
+
+                const frameCount =
+                    Number(
+                        h.frame_count ??
+                        h.frameCount ??
+                        h.frames ??
+                        (
+                            String(
+                                h.play_type ??
+                                h.playType ??
+                                ""
+                            ).toLowerCase().includes("double")
+                                ? 2
+                                : 1
+                        )
+                    ) || 1;
+
+
+                result.frames += frameCount;
+
+                result.frameAmount += amount;
+
+                result.frameTime += playSeconds;
+
+
+                if (paid) {
+
+                    result.paidFrames += frameCount;
+                    result.paidFrameAmount += amount;
+
+                } else {
+
+                    result.unpaidFrames += frameCount;
+                    result.unpaidFrameAmount += amount;
+
+                }
+
+            }
+
+
+            /************************************************
+             * CENTURY
+             ************************************************/
+
+            else if (
+                type === "century" ||
+                type === "centuries"
+            ) {
+
+                result.centuries += 1;
+
+                result.centuryAmount += amount;
+
+                result.centuryTime += playSeconds;
+
+
+                if (paid) {
+
+                    result.paidCenturies += 1;
+                    result.paidCenturyAmount += amount;
+                    result.paidCenturyTime += playSeconds;
+
+                } else {
+
+                    result.unpaidCenturies += 1;
+                    result.unpaidCenturyAmount += amount;
+                    result.unpaidCenturyTime += playSeconds;
+
+                }
+
+            }
+
+        });
+
+        return result;
+
+    }
+
+
+    const s1 =
+        calculateSummary(shift1);
+
+    const s2 =
+        calculateSummary(shift2);
+
+
+    const total = {
+
+        frames:
+            s1.frames + s2.frames,
+
+        frameAmount:
+            s1.frameAmount + s2.frameAmount,
+
+        frameTime:
+            s1.frameTime + s2.frameTime,
+
+
+        centuries:
+            s1.centuries + s2.centuries,
+
+        centuryAmount:
+            s1.centuryAmount + s2.centuryAmount,
+
+        centuryTime:
+            s1.centuryTime + s2.centuryTime,
+
+
+        paidFrames:
+            s1.paidFrames + s2.paidFrames,
+
+        paidFrameAmount:
+            s1.paidFrameAmount + s2.paidFrameAmount,
+
+
+        paidCenturies:
+            s1.paidCenturies + s2.paidCenturies,
+
+        paidCenturyAmount:
+            s1.paidCenturyAmount + s2.paidCenturyAmount,
+
+        paidCenturyTime:
+            s1.paidCenturyTime + s2.paidCenturyTime,
+
+
+        unpaidFrames:
+            s1.unpaidFrames + s2.unpaidFrames,
+
+        unpaidFrameAmount:
+            s1.unpaidFrameAmount + s2.unpaidFrameAmount,
+
+
+        unpaidCenturies:
+            s1.unpaidCenturies + s2.unpaidCenturies,
+
+        unpaidCenturyAmount:
+            s1.unpaidCenturyAmount + s2.unpaidCenturyAmount,
+
+        unpaidCenturyTime:
+            s1.unpaidCenturyTime + s2.unpaidCenturyTime
+    };
+
+
+    /******************************************************
+     * HELPER
+     ******************************************************/
+
+    const money =
+        value =>
+            `Rs. ${formatMoney(Number(value || 0))}`;
+
+
+    const time =
+        value =>
+            formatSeconds(Number(value || 0));
+
+
+    /******************************************************
+     * UPDATE SUMMARY CARDS
+     ******************************************************/
+
+    document.getElementById("tableHistoryShift1Frame").textContent =
+        s1.frames;
+
+    document.getElementById("tableHistoryShift2Frame").textContent =
+        s2.frames;
+
+    document.getElementById("tableHistoryTotalFrame").textContent =
+        total.frames;
+
+
+    document.getElementById("tableHistoryShift1FrameAmount").textContent =
+        money(s1.frameAmount);
+
+    document.getElementById("tableHistoryShift2FrameAmount").textContent =
+        money(s2.frameAmount);
+
+    document.getElementById("tableHistoryTotalFrameAmount").textContent =
+        money(total.frameAmount);
+
+
+    document.getElementById("tableHistoryShift1Century").textContent =
+        s1.centuries;
+
+    document.getElementById("tableHistoryShift2Century").textContent =
+        s2.centuries;
+
+    document.getElementById("tableHistoryTotalCentury").textContent =
+        total.centuries;
+
+
+    document.getElementById("tableHistoryShift1CenturyAmount").textContent =
+        money(s1.centuryAmount);
+
+    document.getElementById("tableHistoryShift2CenturyAmount").textContent =
+        money(s2.centuryAmount);
+
+    document.getElementById("tableHistoryTotalCenturyAmount").textContent =
+        money(total.centuryAmount);
+
+
+    document.getElementById("tableHistoryShift1CenturyTime").textContent =
+        time(s1.centuryTime);
+
+    document.getElementById("tableHistoryShift2CenturyTime").textContent =
+        time(s2.centuryTime);
+
+    document.getElementById("tableHistoryTotalCenturyTime").textContent =
+        time(total.centuryTime);
+
+
+    /******************************************************
+     * PAID FRAMES
+     ******************************************************/
+
+    document.getElementById("tableHistoryShift1PaidFrame").textContent =
+        s1.paidFrames;
+
+    document.getElementById("tableHistoryShift2PaidFrame").textContent =
+        s2.paidFrames;
+
+    document.getElementById("tableHistoryTotalPaidFrame").textContent =
+        total.paidFrames;
+
+
+    document.getElementById("tableHistoryShift1PaidFrameAmount").textContent =
+        money(s1.paidFrameAmount);
+
+    document.getElementById("tableHistoryShift2PaidFrameAmount").textContent =
+        money(s2.paidFrameAmount);
+
+    document.getElementById("tableHistoryTotalPaidFrameAmount").textContent =
+        money(total.paidFrameAmount);
+
+
+    /******************************************************
+     * PAID CENTURIES
+     ******************************************************/
+
+    document.getElementById("tableHistoryShift1PaidCentury").textContent =
+        s1.paidCenturies;
+
+    document.getElementById("tableHistoryShift2PaidCentury").textContent =
+        s2.paidCenturies;
+
+    document.getElementById("tableHistoryTotalPaidCentury").textContent =
+        total.paidCenturies;
+
+
+    document.getElementById("tableHistoryShift1PaidCenturyAmount").textContent =
+        money(s1.paidCenturyAmount);
+
+    document.getElementById("tableHistoryShift2PaidCenturyAmount").textContent =
+        money(s2.paidCenturyAmount);
+
+    document.getElementById("tableHistoryTotalPaidCenturyAmount").textContent =
+        money(total.paidCenturyAmount);
+
+
+    document.getElementById("tableHistoryShift1PaidCenturyTime").textContent =
+        time(s1.paidCenturyTime);
+
+    document.getElementById("tableHistoryShift2PaidCenturyTime").textContent =
+        time(s2.paidCenturyTime);
+
+    document.getElementById("tableHistoryTotalPaidCenturyTime").textContent =
+        time(total.paidCenturyTime);
+
+
+    /******************************************************
+     * UNPAID FRAMES
+     ******************************************************/
+
+    document.getElementById("tableHistoryShift1UnpaidFrame").textContent =
+        s1.unpaidFrames;
+
+    document.getElementById("tableHistoryShift2UnpaidFrame").textContent =
+        s2.unpaidFrames;
+
+    document.getElementById("tableHistoryTotalUnpaidFrame").textContent =
+        total.unpaidFrames;
+
+
+    document.getElementById("tableHistoryShift1UnpaidFrameAmount").textContent =
+        money(s1.unpaidFrameAmount);
+
+    document.getElementById("tableHistoryShift2UnpaidFrameAmount").textContent =
+        money(s2.unpaidFrameAmount);
+
+    document.getElementById("tableHistoryTotalUnpaidFrameAmount").textContent =
+        money(total.unpaidFrameAmount);
+
+
+    /******************************************************
+     * UNPAID CENTURIES
+     ******************************************************/
+
+    document.getElementById("tableHistoryShift1UnpaidCentury").textContent =
+        s1.unpaidCenturies;
+
+    document.getElementById("tableHistoryShift2UnpaidCentury").textContent =
+        s2.unpaidCenturies;
+
+    document.getElementById("tableHistoryTotalUnpaidCentury").textContent =
+        total.unpaidCenturies;
+
+
+    document.getElementById("tableHistoryShift1UnpaidCenturyAmount").textContent =
+        money(s1.unpaidCenturyAmount);
+
+    document.getElementById("tableHistoryShift2UnpaidCenturyAmount").textContent =
+        money(s2.unpaidCenturyAmount);
+
+    document.getElementById("tableHistoryTotalUnpaidCenturyAmount").textContent =
+        money(total.unpaidCenturyAmount);
+
+
+    document.getElementById("tableHistoryShift1UnpaidCenturyTime").textContent =
+        time(s1.unpaidCenturyTime);
+
+    document.getElementById("tableHistoryShift2UnpaidCenturyTime").textContent =
+        time(s2.unpaidCenturyTime);
+
+    document.getElementById("tableHistoryTotalUnpaidCenturyTime").textContent =
+        time(total.unpaidCenturyTime);
+
+
+    /******************************************************
+     * SESSION DETAILS
+     ******************************************************/
+
+    const body =
+        document.getElementById("tableHistoryBody");
+
+    body.innerHTML = "";
+
+
+    if (!history.length) {
+
+        body.innerHTML =
+            `<tr>
+                <td colspan="11">
+                    No history found.
+                </td>
+            </tr>`;
+
+    } else {
+
+        history.forEach((h, index) => {
+
+            const p1 =
+                h.player1_name ||
+                h.player1 ||
+                "Player 1";
+
+            const p2 =
+                h.player2_name ||
+                h.player2 ||
+                "Player 2";
+
+
+            const players =
+                `${p1} <b>VS</b> ${p2}`;
+
+
+            const checkin =
+                h.checkin
+                    ? new Date(h.checkin).toLocaleTimeString(
+                        "en-PK",
+                        {
+                            timeZone: "Asia/Karachi",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true
+                        }
+                    )
+                    : "-";
+
+
+            const checkout =
+                h.checkout
+                    ? new Date(h.checkout).toLocaleTimeString(
+                        "en-PK",
+                        {
+                            timeZone: "Asia/Karachi",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true
+                        }
+                    )
+                    : "-";
+
+
+            const play =
+                formatSeconds(
+                    Number(h.playSeconds || 0)
+                );
+
+
+            const rate =
+                Number(
+                    h.selected_rate ??
+                    h.selectedRate ??
+                    h.frame_rate ??
+                    h.rate ??
+                    0
+                );
+
+
+            const amount =
+                Number(
+                    h.final_game_amount ??
+                    h.final_amount ??
+                    h.amount ??
+                    0
+                );
+
+
+            const discount =
+                Number(h.discount || 0);
+
+
+            const canteen =
+                Number(
+                    h.canteenAmount ??
+                    h.canteen_total ??
+                    h.canteenTotal ??
+                    0
+                );
+
+
+            const grandTotal =
+                Number(
+                    h.total ??
+                    h.final_total ??
+                    amount + canteen - discount
+                );
+
+
+            const paid =
+                h.paid === true ||
+                h.paid === "true" ||
+                h.status === "paid" ||
+                h.payment_status === "paid";
+
+
+            body.innerHTML += `
+
+                <tr>
+
+                    <td>${index + 1}</td>
+
+                    <td>
+                        <span class="table-history-players">
+                            ${players}
+                        </span>
+                    </td>
+
+                    <td>${checkin}</td>
+
+                    <td>${checkout}</td>
+
+                    <td>${play}</td>
+
+                    <td>${rate}</td>
+
+                    <td>${amount}</td>
+
+                    <td>${discount}</td>
+
+                    <td>${canteen}</td>
+
+                    <td>${grandTotal}</td>
+
+                    <td>
+                        <span class="${paid ? "paid-btn" : "unpaid-btn"}">
+                            ${paid ? "PAID" : "UNPAID"}
+                        </span>
+                    </td>
+
+                </tr>
+
+            `;
+
+        });
+
+    }
+
 }
 
 /******************************************************
