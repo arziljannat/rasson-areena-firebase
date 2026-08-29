@@ -5776,3 +5776,120 @@ body * {
     }
 
 }
+
+/* =========================================================
+   🔥 DAY HISTORY — SAME STYLE AS DAY SNAPSHOT
+========================================================= */
+
+#dayHistoryPopup .day-history-snapshot {
+
+    width: 100% !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    gap: 18px !important;
+
+}
+
+
+#dayHistoryPopup
+.day-history-resource-card {
+
+    width: 100% !important;
+
+    box-sizing: border-box !important;
+
+}
+
+
+#dayHistoryPopup
+.day-history-overall-card {
+
+    border-color:
+        #ffd700 !important;
+
+    box-shadow:
+        0 0 20px
+        rgba(255,215,0,.35) !important;
+
+}
+
+
+#dayHistoryPopup
+.day-history-overall-card
+.snapshot-card-title {
+
+    color:
+        #ffd700 !important;
+
+}
+
+
+#dayHistoryPopup
+.day-history-snapshot
+.snapshot-grid {
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr)) !important;
+
+    gap: 10px !important;
+
+}
+
+
+#dayHistoryPopup
+.day-history-snapshot
+.snapshot-item {
+
+    min-height:
+        65px !important;
+
+}
+
+
+#dayHistoryPopup
+.day-history-snapshot
+.snapshot-item span {
+
+    font-size:
+        13px !important;
+
+}
+
+
+#dayHistoryPopup
+.day-history-snapshot
+.snapshot-item strong {
+
+    font-size:
+        20px !important;
+
+}
+
+
+#dayHistoryPopup
+.day-history-snapshot
+.snapshot-card-title {
+
+    font-size:
+        22px !important;
+
+}
+
+
+@media(max-width:700px) {
+
+    #dayHistoryPopup
+    .day-history-snapshot
+    .snapshot-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0,1fr)) !important;
+
+    }
+
+}
