@@ -10288,99 +10288,735 @@ ${resourceHTML}
 
 }
 
-/// table history thermal print
+// ============================================================
+// TABLE HISTORY — THERMAL PRINT
+// ============================================================
 
 function printTableHistoryThermal() {
 
-    let tableId = document.getElementById("tableHistoryTableSelect").value;
-    let t = tables.find(x => String(x.id) === String(tableId));
+    const tableId = document.getElementById("tableHistoryTableSelect")?.value;
+    const dayIndex = document.getElementById("tableHistoryDateSelect")?.selectedIndex;
 
-    let dayIndex = document.getElementById("tableHistoryDateSelect").selectedIndex;
-    let d = window._daysData[dayIndex];
+    const t = tables.find(x => String(x.id) === String(tableId));
+    const d = window._daysData?.[dayIndex];
 
     if (!t || !d) {
         alert("No data found ❌");
         return;
     }
 
-    let tableData = d.tables?.find(tb => tb.table_id === t.name);
+    const tableData = d.tables?.find(
+        tb => String(tb.table_id) === String(t.name)
+    );
 
-    let total = 0;
-    let game = 0;
-    let canteen = 0;
-    let time = 0;
+    const history = Array.isArray(tableData?.history)
+        ? tableData.history
+        : [];
 
-    (tableData?.history || []).forEach(h => {
-        total += Number(h.total || 0);
-        game += Number(h.amount || 0);
-        canteen += Number(h.canteenAmount || 0);
-        time += Number(h.playSeconds || 0);
+    if (!history.length) {
+        alert("No table history found ❌");
+        return;
+    }
+
+    // ========================================================
+    // HELPERS
+    // ========================================================
+
+    const money = value => {
+        const n = Number(value || 0);
+        return `Rs ${n.toLocaleString("en-PK")}`;
+    };
+
+    const safe = value => {
+        return value === null || value === undefined || value === ""
+            ? "-"
+            : String(value);
+    };
+
+    const getPlayer1 = h => {
+        return (
+            h.player1_name ||
+            h.player1 ||
+            h.player1Name ||
+            "Player 1"
+        );
+    };
+
+    const getPlayer2 = h => {
+        return (
+            h.player2_name ||
+            h.player2 ||
+            h.player2Name ||
+            "Player 2"
+        );
+    };
+
+    const getCheckoutPlayer = h => {
+        return (
+            h.checkout_player ||
+            h.checkoutPlayer ||
+            ""
+        );
+    };
+
+    const getCheckoutNumber = h => {
+        return Number(
+            h.checkout_player_number ||
+            h.checkoutPlayerNumber ||
+            0
+        );
+    };
+
+    const isPlayer1Checkout = h => {
+        const checkout = getCheckoutPlayer(h).toLowerCase();
+
+        if (checkout) {
+            return checkout === getPlayer1(h).toLowerCase();
+        }
+
+        return getCheckoutNumber(h) === 1;
+    };
+
+    const isPlayer2Checkout = h => {
+        const checkout = getCheckoutPlayer(h).toLowerCase();
+
+        if (checkout) {
+            return checkout === getPlayer2(h).toLowerCase();
+        }
+
+        return getCheckoutNumber(h) === 2;
+    };
+
+    const playerName = (name, selected) => {
+        if (!selected) return safe(name);
+
+        return `★ ${safe(name)}`;
+    };
+
+    const formatPlayTime = seconds => {
+        const s = Number(seconds || 0);
+
+        if (typeof formatSeconds === "function") {
+            return formatSeconds(s);
+        }
+
+        const hrs = Math.floor(s / 3600);
+        const mins = Math.floor((s % 3600) / 60);
+        const secs = s % 60;
+
+        return [
+            hrs > 0 ? String(hrs).padStart(2, "0") : null,
+            String(mins).padStart(2, "0"),
+            String(secs).padStart(2, "0")
+        ]
+            .filter(Boolean)
+            .join(":");
+    };
+
+    const formatDateTime = value => {
+
+        if (!value) return "-";
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return safe(value);
+        }
+
+        return date.toLocaleString("en-PK", {
+            timeZone: "Asia/Karachi",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+        });
+    };
+
+    // ========================================================
+    // TOTALS
+    // ========================================================
+
+    let totalFrames = 0;
+    let totalCenturies = 0;
+
+    let paidFrames = 0;
+    let paidCenturies = 0;
+
+    let unpaidFrames = 0;
+    let unpaidCenturies = 0;
+
+    let totalIncome = 0;
+    let totalDiscount = 0;
+    let totalCanteen = 0;
+
+    let totalPlaySeconds = 0;
+
+    history.forEach(h => {
+
+        const playType = String(
+            h.selected_play_type ||
+            h.play_type ||
+            h.selectedPlayType ||
+            ""
+        ).toLowerCase();
+
+        const isCentury = playType.includes("century");
+        const isFrame = !isCentury;
+
+        const paid =
+            h.paid === true ||
+            h.paid === "true" ||
+            h.paid === 1 ||
+            h.paid === "1";
+
+        if (isCentury) {
+
+            totalCenturies++;
+
+            if (paid) {
+                paidCenturies++;
+            } else {
+                unpaidCenturies++;
+            }
+
+        } else {
+
+            totalFrames++;
+
+            if (paid) {
+                paidFrames++;
+            } else {
+                unpaidFrames++;
+            }
+        }
+
+        totalIncome += Number(
+            h.final_amount ??
+            h.total ??
+            h.amount ??
+            h.final_game_amount ??
+            0
+        );
+
+        totalDiscount += Number(
+            h.discount || 0
+        );
+
+        totalCanteen += Number(
+            h.canteen_total ??
+            h.canteenAmount ??
+            0
+        );
+
+        totalPlaySeconds += Number(
+            h.final_seconds ??
+            h.playSeconds ??
+            h.play_seconds ??
+            0
+        );
     });
 
-    let win = window.open("", "_blank", "width=300,height=600");
+    // ========================================================
+    // SESSION ROWS
+    // ========================================================
 
-    let html = `
-    <html>
-    <head>
-        <style>
-            body { 
-                font-family: monospace; 
-                width: 250px; 
-                margin:auto; 
-                text-align:center;
-            }
-            .line { border-top:1px dashed #000; margin:6px 0; }
-            .big { font-size:18px; font-weight:bold; }
-        </style>
-    </head>
-    <body>
+    let sessionRows = "";
 
-    <div class="big">TABLE HISTORY</div>
-    <div>${BRANCH.toUpperCase()}</div>
+    history.forEach((h, index) => {
 
-    <div class="line"></div>
+        const p1 = getPlayer1(h);
+        const p2 = getPlayer2(h);
 
-    <div>
-        ${t.name}<br>
-        ${d.date}
+        const p1Checkout = isPlayer1Checkout(h);
+        const p2Checkout = isPlayer2Checkout(h);
+
+        const p1Class = p1Checkout ? "checkout-player" : "";
+        const p2Class = p2Checkout ? "checkout-player" : "";
+
+        const p1Star = p1Checkout ? "★ " : "";
+        const p2Star = p2Checkout ? "★ " : "";
+
+        const playType =
+            h.selected_play_type ||
+            h.play_type ||
+            h.selectedPlayType ||
+            "-";
+
+        const rate =
+            h.selected_rate ??
+            h.selectedRate ??
+            h.frame_rate ??
+            h.frameRate ??
+            h.century_rate ??
+            h.centuryRate ??
+            0;
+
+        const amount =
+            h.final_amount ??
+            h.final_game_amount ??
+            h.amount ??
+            0;
+
+        const discount =
+            h.discount || 0;
+
+        const canteen =
+            h.canteen_total ??
+            h.canteenAmount ??
+            0;
+
+        const total =
+            h.total ??
+            (Number(amount) + Number(canteen));
+
+        const paid =
+            h.paid === true ||
+            h.paid === "true" ||
+            h.paid === 1 ||
+            h.paid === "1";
+
+        const playSeconds =
+            h.final_seconds ??
+            h.playSeconds ??
+            h.play_seconds ??
+            0;
+
+        sessionRows += `
+            <div class="session">
+
+                <div class="session-title">
+                    #${index + 1} &nbsp; ${safe(playType).toUpperCase()}
+                </div>
+
+                <div class="players">
+                    <span class="${p1Class}">
+                        ${p1Star}${safe(p1)}
+                    </span>
+
+                    <span class="vs">VS</span>
+
+                    <span class="${p2Class}">
+                        ${p2Star}${safe(p2)}
+                    </span>
+                </div>
+
+                <div class="row">
+                    <span>Check-in</span>
+                    <b>${formatDateTime(h.start_time || h.checkin_time)}</b>
+                </div>
+
+                <div class="row">
+                    <span>Checkout</span>
+                    <b>${formatDateTime(h.end_time || h.checkout_time)}</b>
+                </div>
+
+                <div class="row">
+                    <span>Play Time</span>
+                    <b>${formatPlayTime(playSeconds)}</b>
+                </div>
+
+                <div class="row">
+                    <span>Rate</span>
+                    <b>${money(rate)}</b>
+                </div>
+
+                <div class="row">
+                    <span>Amount</span>
+                    <b>${money(amount)}</b>
+                </div>
+
+                <div class="row">
+                    <span>Discount</span>
+                    <b>${money(discount)}</b>
+                </div>
+
+                <div class="row">
+                    <span>Canteen</span>
+                    <b>${money(canteen)}</b>
+                </div>
+
+                <div class="row total-row">
+                    <span>Total</span>
+                    <b>${money(total)}</b>
+                </div>
+
+                <div class="payment ${paid ? "paid" : "unpaid"}">
+                    ${paid ? "✓ PAID" : "✕ UNPAID"}
+                </div>
+
+            </div>
+        `;
+    });
+
+    // ========================================================
+    // PRINT WINDOW
+    // ========================================================
+
+    const win = window.open(
+        "",
+        "_blank",
+        "width=420,height=900"
+    );
+
+    if (!win) {
+        alert("Please allow popups for printing.");
+        return;
+    }
+
+    const printTime = new Date().toLocaleString("en-PK", {
+        timeZone: "Asia/Karachi",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+    });
+
+    const html = `
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Table History - ${safe(t.name)}</title>
+
+<style>
+
+@page {
+    size: 80mm auto;
+    margin: 3mm;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    width: 74mm;
+    margin: 0 auto;
+    padding: 0;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    color: #000;
+    background: #fff;
+
+    font-size: 11px;
+}
+
+.header {
+    text-align: center;
+}
+
+.title {
+    font-size: 18px;
+    font-weight: 900;
+    margin-bottom: 3px;
+}
+
+.branch {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.subtitle {
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.line {
+    border-top: 1px dashed #000;
+    margin: 7px 0;
+}
+
+.info {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.summary-title {
+    text-align: center;
+    font-weight: 900;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+}
+
+.summary-box {
+    border: 1px solid #000;
+    padding: 4px;
+    text-align: center;
+}
+
+.summary-label {
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.summary-value {
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.session {
+    border: 1px solid #000;
+    margin: 7px 0;
+    padding: 5px;
+    page-break-inside: avoid;
+}
+
+.session-title {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 900;
+    border-bottom: 1px solid #000;
+    padding-bottom: 3px;
+    margin-bottom: 4px;
+}
+
+.players {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 900;
+    margin-bottom: 5px;
+    white-space: normal;
+}
+
+.players .vs {
+    display: inline-block;
+    margin: 0 3px;
+}
+
+.checkout-player {
+    background: #ffe600;
+    padding: 1px 3px;
+    font-weight: 900;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    line-height: 1.5;
+}
+
+.row span {
+    font-weight: 600;
+}
+
+.row b {
+    text-align: right;
+}
+
+.total-row {
+    border-top: 1px dashed #000;
+    margin-top: 3px;
+    padding-top: 3px;
+    font-weight: 900;
+}
+
+.payment {
+    text-align: center;
+    margin-top: 5px;
+    padding: 3px;
+    border: 1px solid #000;
+    font-weight: 900;
+}
+
+.paid {
+    font-weight: 900;
+}
+
+.unpaid {
+    font-weight: 900;
+}
+
+.grand-total {
+    border: 2px solid #000;
+    padding: 7px;
+    text-align: center;
+    margin-top: 7px;
+}
+
+.grand-total-title {
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.grand-total-value {
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.footer {
+    text-align: center;
+    font-size: 9px;
+    margin-top: 8px;
+    line-height: 1.5;
+}
+
+@media print {
+
+    body {
+        width: 74mm;
+    }
+
+    .session {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+    <div class="title">
+        TABLE HISTORY
     </div>
 
-    <div class="line"></div>
-
-    <div>Play Time : ${formatSeconds(time)}</div>
-    <div>Game : Rs ${game}</div>
-    <div>Canteen : Rs ${canteen}</div>
-
-    <div class="line"></div>
-
-    <div class="big">TOTAL<br>Rs ${total}</div>
-
-    <div class="line"></div>
-
-    <div>
-        ${new Date().toLocaleString('en-PK', {
-            timeZone: 'Asia/Karachi'
-        })}
+    <div class="branch">
+        ${safe(BRANCH).toUpperCase()}
     </div>
 
-    </body>
-    </html>
-    `;
+    <div class="subtitle">
+        ${safe(t.name)}
+    </div>
 
+    <div class="subtitle">
+        ${safe(d.date)}
+    </div>
+
+</div>
+
+<div class="line"></div>
+
+<div class="summary-title">
+    SUMMARY
+</div>
+
+<div class="summary-grid">
+
+    <div class="summary-box">
+        <div class="summary-label">TOTAL FRAMES</div>
+        <div class="summary-value">${totalFrames}</div>
+    </div>
+
+    <div class="summary-box">
+        <div class="summary-label">TOTAL CENTURY</div>
+        <div class="summary-value">${totalCenturies}</div>
+    </div>
+
+    <div class="summary-box">
+        <div class="summary-label">PAID FRAMES</div>
+        <div class="summary-value">${paidFrames}</div>
+    </div>
+
+    <div class="summary-box">
+        <div class="summary-label">PAID CENTURY</div>
+        <div class="summary-value">${paidCenturies}</div>
+    </div>
+
+    <div class="summary-box">
+        <div class="summary-label">UNPAID FRAMES</div>
+        <div class="summary-value">${unpaidFrames}</div>
+    </div>
+
+    <div class="summary-box">
+        <div class="summary-label">UNPAID CENTURY</div>
+        <div class="summary-value">${unpaidCenturies}</div>
+    </div>
+
+</div>
+
+<div class="line"></div>
+
+<div class="summary-title">
+    SESSION DETAILS
+</div>
+
+${sessionRows}
+
+<div class="grand-total">
+
+    <div class="grand-total-title">
+        TOTAL INCOME
+    </div>
+
+    <div class="grand-total-value">
+        ${money(totalIncome)}
+    </div>
+
+</div>
+
+<div class="row" style="margin-top:5px;">
+    <span>Total Discount</span>
+    <b>${money(totalDiscount)}</b>
+</div>
+
+<div class="row">
+    <span>Total Canteen</span>
+    <b>${money(totalCanteen)}</b>
+</div>
+
+<div class="row">
+    <span>Total Play Time</span>
+    <b>${formatPlayTime(totalPlaySeconds)}</b>
+</div>
+
+<div class="line"></div>
+
+<div class="footer">
+
+    Printed: ${printTime}<br>
+
+    ${safe(BRANCH).toUpperCase()}<br>
+
+    RASSON SNOOKER ARENA
+
+</div>
+
+</body>
+
+</html>
+`;
+
+    win.document.open();
     win.document.write(html);
     win.document.close();
 
-      setTimeout(() => {
-      
-          win.print();
-      
-          setTimeout(() => {
-              win.close();
-          }, 800);
-      
-      }, 300);
-}
+    setTimeout(() => {
 
+        win.focus();
+        win.print();
+
+        setTimeout(() => {
+            win.close();
+        }, 1000);
+
+    }, 500);
+}
 async function rebuildHistoryFromSessions() {
 
     const q = query(
