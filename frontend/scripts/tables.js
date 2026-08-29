@@ -3181,34 +3181,28 @@ const secondsOf = (list) =>
 // SINGLE = 1
 // DOUBLE = 2
 // =====================================================
-
 const getFrameCount = (h) => {
 
-    const rate =
-        Number(
-            h.selectedRate ??
-            h.selected_rate ??
-            h.frameRate ??
-            h.frame_rate ??
-            0
-        );
+    const rate = Number(
+        h.selectedRate ??
+        h.selected_rate ??
+        h.frameRate ??
+        h.frame_rate ??
+        h.rate ??
+        0
+    );
 
-    const playType =
-        String(
-            h.playType ??
-            h.selectedPlayType ??
-            h.play_type ??
-            ""
-        ).toLowerCase();
+    const playType = String(
+        h.selectedPlayType ??
+        h.playType ??
+        h.play_type ??
+        ""
+    ).toLowerCase();
 
-
-    // 👑 Century is NOT a frame
-    if (playType.includes("century")) {
+    if (playType === "century") {
         return 0;
     }
 
-
-    // 🎱 Double Frame
     if (
         rate === 200 ||
         playType.includes("double")
@@ -3216,8 +3210,6 @@ const getFrameCount = (h) => {
         return 2;
     }
 
-
-    // 🎱 Single Frame
     return 1;
 };
 
