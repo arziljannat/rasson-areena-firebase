@@ -6274,17 +6274,40 @@ console.log("🔥 DAY PRINT DATA:", printData);
 // 🔥 PRINT FORMAT AS DAY HISTORY PRINT
 printDayHistoryThermal({
     date: today,
+
+    // 🔥 SAME DATA USED BY DAY SNAPSHOT
+    tables: safeTables,
+
     shift1: shift1,
     shift2: shift2,
+
     combined: {
         gameTotal: printData.gameTotal,
         canteenTotal: printData.canteenTotal,
+
         gameCollection: printData.gameCollection,
         canteenCollection: printData.canteenCollection,
-        gameBalance: (shift1?.gameBalance || 0) + (shift2?.gameBalance || 0),
-        canteenBalance: (shift1?.canteenBalance || 0) + (shift2?.canteenBalance || 0),
-        expenses: printData.expenses,
-        closingCash: printData.closingCash
+
+        gameBalance:
+            (shift1?.gameBalance || 0) +
+            (shift2?.gameBalance || 0),
+
+        canteenBalance:
+            (shift1?.canteenBalance || 0) +
+            (shift2?.canteenBalance || 0),
+
+        discount:
+            (s1?.discount || 0) +
+            (s2?.discount || 0),
+
+        expenses:
+            printData.expenses,
+
+        easypaisa:
+            printData.easypaisa,
+
+        closingCash:
+            printData.closingCash
     }
 });
 } catch (err) {
