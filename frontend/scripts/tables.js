@@ -8072,144 +8072,715 @@ function printShiftThermal(title, data, s1 = {}, s2 = {}) {
 
 function printDayHistoryThermal(d) {
 
-    let s1 = d.shift1 || {};
-    let s2 = d.shift2 || {};
-    let c = d.combined || {};
+    const tablesData = Array.isArray(d.tables)
+        ? d.tables
+        : [];
 
-    let openTime = s1.startMs 
-        ? new Date(s1.startMs).toLocaleTimeString('en-PK', {
-    timeZone: 'Asia/Karachi',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
-}) 
-        : "-";
+    const s1 = d.shift1 || {};
+    const s2 = d.shift2 || {};
+    const c  = d.combined || {};
 
-    let closeTime = s2.endMs 
-        ? new Date(s2.endMs).toLocaleTimeString('en-PK', {
-    timeZone: 'Asia/Karachi',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
-}) 
-        : "-";
 
-    let win = window.open("", "_blank", "width=300,height=600");
+    // =====================================================
+    // 🔥 TIME FORMAT
+    // =====================================================
 
-    let html = `
-    <html>
-    <head>
-        <style>
-            body { 
-                font-family: monospace; 
-                width: 250px; 
-                margin:auto; 
-                text-align:center;
+    const formatPrintTime = (ms) => {
+
+        if (!ms) return "-";
+
+        return new Date(ms).toLocaleTimeString(
+            "en-PK",
+            {
+                timeZone: "Asia/Karachi",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true
             }
-            .row { text-align:center; margin:3px 0; }
-.line { border-top:1px dashed #000; margin:6px 0; }
-.big { font-size:16px; font-weight:bold; }
-            hr { border:1px dashed #000; }
-        </style>
-    </head>
-    <body>
+        );
+    };
 
-    <div class="big">DAY HISTORY</div>
-    <div>${BRANCH.toUpperCase()}</div>
 
-    <hr>
+    const openTime =
+        formatPrintTime(s1.startMs);
 
-    <div>
-        ${d.date}<br>
-        (${openTime} → ${closeTime})
+    const closeTime =
+        formatPrintTime(s2.endMs);
+
+
+    // =====================================================
+    // 🔥 FRAME COUNT
+    // SINGLE = 1
+    // DOUBLE = 2
+    // CENTURY = 0
+    // =====================================================
+
+    const getPrintFrameCount = (h) => {
+
+        const rate = Number(
+            h.selectedRate ??
+            h.selected_rate ??
+            h.frameRate ??
+            h.frame_rate ??
+            h.rate ??
+            0
+        );
+
+        const playType = String(
+            h.selectedPlayType ??
+            h.selected_play_type ??
+            h.playType ??
+            h.play_type ??
+            ""
+        ).toLowerCase().trim();
+
+
+        // 👑 Century
+        if (playType === "century") {
+            return 0;
+        }
+
+
+        // 🎱 Double
+        if (
+            rate === 200 ||
+            playType.includes("double")
+        ) {
+            return 2;
+        }
+
+
+        // 🎱 Single
+        return 1;
+    };
+
+
+    // =====================================================
+    // 🔥 BUILD TABLE / ROOM DATA
+    // =====================================================
+
+    const buildResourceData = (resource) => {
+
+        let frames = 0;
+        let frameAmount = 0;
+        let frameTime = 0;
+
+        let centuries = 0;
+        let centuryAmount = 0;
+        let centuryTime = 0;
+
+        const history =
+            Array.isArray(resource.history)
+                ? resource.history
+                : [];
+
+
+        history.forEach(h => {
+
+            const type = String(
+                h.selectedPlayType ??
+                h.selected_play_type ??
+                h.playType ??
+                h.play_type ??
+                ""
+            ).toLowerCase().trim();
+
+
+            const amount = Number(
+                h.amount ??
+                h.finalGameAmount ??
+                h.final_game_amount ??
+                h.finalAmount ??
+                h.final_amount ??
+                0
+            );
+
+
+            const seconds = Number(
+                h.playSeconds ??
+                h.finalSeconds ??
+                h.final_seconds ??
+                0
+            );
+
+
+            // 👑 CENTURY
+            if (type === "century") {
+
+                centuries += 1;
+
+                centuryAmount += amount;
+
+                centuryTime += seconds;
+
+            }
+
+            // 🎱 FRAME
+            else {
+
+                frames +=
+                    getPrintFrameCount(h);
+
+                frameAmount += amount;
+
+                frameTime += seconds;
+            }
+
+        });
+
+
+        // 🏠 ROOM
+        if (
+            String(resource.table_type || resource.tableType)
+                .toLowerCase() === "room"
+            ||
+            String(resource.name || resource.table_id)
+                .toLowerCase()
+                .startsWith("room")
+        ) {
+
+            return {
+                type: "room",
+                name:
+                    resource.name ||
+                    resource.table_id ||
+                    "Room",
+
+                amount:
+                    frameAmount +
+                    centuryAmount
+            };
+        }
+
+
+        // 🎱 TABLE
+        return {
+
+            type: "table",
+
+            name:
+                resource.name ||
+                resource.table_id ||
+                "Table",
+
+            frames,
+
+            frameAmount,
+
+            frameTime,
+
+            centuries,
+
+            centuryAmount,
+
+            centuryTime
+
+        };
+
+    };
+
+
+    // =====================================================
+    // 🔥 SORT
+    // TABLE 1 → TABLE 9 → ROOM 1 → ROOM 2 → ROOM 3
+    // =====================================================
+
+    const resources =
+        tablesData
+            .map(buildResourceData)
+            .sort((a, b) => {
+
+                const getOrder = (name) => {
+
+                    const n =
+                        String(name)
+                            .toLowerCase();
+
+                    if (
+                        n.startsWith("table")
+                    ) return 1;
+
+                    if (
+                        n.startsWith("room")
+                    ) return 2;
+
+                    return 3;
+                };
+
+
+                const typeA =
+                    getOrder(a.name);
+
+                const typeB =
+                    getOrder(b.name);
+
+
+                if (
+                    typeA !== typeB
+                ) {
+                    return typeA - typeB;
+                }
+
+
+                const numA =
+                    Number(
+                        (
+                            String(a.name)
+                                .match(/\d+/)
+                            || [0]
+                        )[0]
+                    );
+
+
+                const numB =
+                    Number(
+                        (
+                            String(b.name)
+                                .match(/\d+/)
+                            || [0]
+                        )[0]
+                    );
+
+
+                return numA - numB;
+
+            });
+
+
+    // =====================================================
+    // 🔥 RESOURCE HTML
+    // =====================================================
+
+    let resourceHTML = "";
+
+
+    resources.forEach(r => {
+
+        if (r.type === "room") {
+
+            resourceHTML += `
+
+                <div class="section-title">
+                    ${r.name.toUpperCase()}
+                </div>
+
+                <div class="row">
+                    <span>Amount</span>
+                    <span>Rs ${r.amount}</span>
+                </div>
+
+                <div class="line"></div>
+
+            `;
+
+            return;
+        }
+
+
+        resourceHTML += `
+
+            <div class="section-title">
+                ${r.name.toUpperCase()}
+            </div>
+
+            <div class="row">
+                <span>Frames</span>
+                <span>${r.frames}</span>
+            </div>
+
+            <div class="row">
+                <span>Frame Amount</span>
+                <span>Rs ${r.frameAmount}</span>
+            </div>
+
+            <div class="row">
+                <span>Frame Time</span>
+                <span>${formatSeconds(r.frameTime)}</span>
+            </div>
+
+            <div class="row">
+                <span>Centuries</span>
+                <span>${r.centuries}</span>
+            </div>
+
+            <div class="row">
+                <span>Century Amount</span>
+                <span>Rs ${r.centuryAmount}</span>
+            </div>
+
+            <div class="row">
+                <span>Century Time</span>
+                <span>${formatSeconds(r.centuryTime)}</span>
+            </div>
+
+            <div class="line"></div>
+
+        `;
+
+    });
+
+
+    // =====================================================
+    // 🔥 OVERALL
+    // =====================================================
+
+    const totalIncome =
+        Number(c.gameCollection || 0);
+
+    const discount =
+        Number(c.discount || 0);
+
+    const expenses =
+        Number(c.expenses || 0);
+
+    const easypaisa =
+        Number(c.easypaisa || 0);
+
+    const closingCash =
+        Number(c.closingCash || 0);
+
+
+    // =====================================================
+    // 🔥 PRINT WINDOW
+    // =====================================================
+
+    const win =
+        window.open(
+            "",
+            "_blank",
+            "width=320,height=900"
+        );
+
+
+    if (!win) {
+
+        alert("Popup blocked ❌");
+
+        return;
+    }
+
+
+    // =====================================================
+    // 🔥 THERMAL HTML
+    // =====================================================
+
+    const html = `
+
+<html>
+
+<head>
+
+<title>Day Snapshot</title>
+
+<style>
+
+@page {
+    size: 80mm auto;
+    margin: 0;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+
+    width: 72mm;
+
+    margin: 0 auto;
+
+    padding: 5px 0;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    color: #000;
+
+    background: #fff;
+
+    font-size: 12px;
+
+    line-height: 1.35;
+
+}
+
+.center {
+
+    text-align: center;
+
+}
+
+.title {
+
+    font-size: 18px;
+
+    font-weight: 900;
+
+    margin-bottom: 2px;
+
+}
+
+.subtitle {
+
+    font-size: 15px;
+
+    font-weight: 900;
+
+}
+
+.date {
+
+    font-size: 12px;
+
+    margin-top: 4px;
+
+}
+
+.line {
+
+    border-top:
+        1px dashed #000;
+
+    margin: 7px 0;
+
+}
+
+.row {
+
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    gap: 8px;
+
+    margin: 3px 0;
+
+}
+
+.row span:first-child {
+
+    text-align: left;
+
+}
+
+.row span:last-child {
+
+    text-align: right;
+
+    font-weight: 700;
+
+}
+
+.section-title {
+
+    text-align: center;
+
+    font-size: 14px;
+
+    font-weight: 900;
+
+    margin-top: 8px;
+
+    margin-bottom: 4px;
+
+}
+
+.overall {
+
+    font-size: 13px;
+
+}
+
+.overall .total-income {
+
+    font-weight: 900;
+
+}
+
+.overall .closing {
+
+    font-size: 16px;
+
+    font-weight: 900;
+
+    margin-top: 5px;
+
+}
+
+.small {
+
+    font-size: 11px;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="center">
+
+    <div class="title">
+        RASSON SNOOKER ARENA
     </div>
 
-    <hr>
+    <div class="subtitle">
+        DAY SNAPSHOT
+    </div>
 
-<b>Shift 1</b>
-<div class="row">
-    <span>${s1.startMs ? new Date(s1.startMs).toLocaleTimeString('en-PK',{timeZone:'Asia/Karachi',hour:'2-digit',minute:'2-digit',hour12:true}) : "-"}</span>
-    <span>To</span>
-    <span>${s1.endMs ? new Date(s1.endMs).toLocaleTimeString('en-PK',{timeZone:'Asia/Karachi',hour:'2-digit',minute:'2-digit',hour12:true}) : "-"}</span>
+    <div class="date">
+        ${d.date || "-"}
+    </div>
+
 </div>
-<div class="row">Game : Rs ${s1.gameTotal || 0}</div>
-<div class="row">Canteen : Rs ${s1.canteenTotal || 0}</div>
-<div class="row">Game Collection : Rs ${s1.gameCollection || 0}</div>
-<div class="row">Canteen Collection : Rs ${s1.canteenCollection || 0}</div>
-<div class="row">Balance : Rs ${(s1.gameBalance || 0)+(s1.canteenBalance || 0)}</div>
-<div class="row">Expenses : Rs ${s1.expenses || 0}</div>
-<div class="row">EasyPaisa : Rs ${s1.easypaisa || 0}</div>
 
-<div class="row">Discount : Rs ${s1.discount || 0}</div>
-
-<div class="row"><b>Cash</b><b>Rs ${s1.closingCash || 0}</b></div>
-
-<hr>
-
-<b>Shift 2</b>
-<div class="row">
-    <span>${s2.startMs ? new Date(s2.startMs).toLocaleTimeString('en-PK',{timeZone:'Asia/Karachi',hour:'2-digit',minute:'2-digit',hour12:true}) : "-"}</span>
-    <span>To</span>
-    <span>${s2.endMs ? new Date(s2.endMs).toLocaleTimeString('en-PK',{timeZone:'Asia/Karachi',hour:'2-digit',minute:'2-digit',hour12:true}) : "-"}</span>
-</div>
-<div class="row">Game : Rs ${s2.gameTotal || 0}</div>
-<div class="row">Canteen : Rs ${s2.canteenTotal || 0}</div>
-<div class="row">Game Collection : Rs ${s2.gameCollection || 0}</div>
-<div class="row">Canteen Collection : Rs ${s2.canteenCollection || 0}</div>
-<div class="row">Balance : Rs ${(s2.gameBalance || 0)+(s2.canteenBalance || 0)}</div>
-<div class="row">Expenses : Rs ${s2.expenses || 0}</div>
-<div class="row">EasyPaisa : Rs ${s2.easypaisa || 0}</div>
-
-<div class="row">Discount : Rs ${s2.discount || 0}</div>
-
-<div class="row"><b>Cash</b><b>Rs ${s2.closingCash || 0}</b></div>
-
-<hr>
-
-<b>Combined</b>
-<div class="row">
-    <span>${s1.startMs ? new Date(s1.startMs).toLocaleTimeString('en-PK',{timeZone:'Asia/Karachi',hour:'2-digit',minute:'2-digit',hour12:true}) : "-"}</span>
-    <span>To</span>
-    <span>${s2.endMs ? new Date(s2.endMs).toLocaleTimeString('en-PK',{timeZone:'Asia/Karachi',hour:'2-digit',minute:'2-digit',hour12:true}) : "-"}</span>
-</div>
-<div class="row"><span>Game : Rs ${c.gameTotal || 0}</div>
-<div class="row"><span>Canteen : Rs ${c.canteenTotal || 0}</div>
-<div class="row"><span>Collection : Rs ${(c.gameCollection||0)+(c.canteenCollection||0)}</div>
-<div class="row"><span>Balance : Rs ${(c.gameBalance||0)+(c.canteenBalance||0)}</div>
-<div class="row"><span>Expenses : Rs ${c.expenses || 0}</div>
-<div class="row"><span>EasyPaisa : Rs ${c.easypaisa || 0}</div>
-
-<div class="row"><span>Discount : Rs ${c.discount || 0}</div>
-
-<hr>
 
 <div class="line"></div>
-<div class="big">FINAL CASH<br>Rs ${c.closingCash || 0}</div>
+
+
+<div class="row">
+
+    <span>Open Time</span>
+
+    <span>${openTime}</span>
+
+</div>
+
+
+<div class="row">
+
+    <span>Close Time</span>
+
+    <span>${closeTime}</span>
+
+</div>
+
+
 <div class="line"></div>
 
-    <hr>
 
-    <div>${new Date().toLocaleString('en-PK', {
-    timeZone: 'Asia/Karachi'
-})}</div>
+${resourceHTML}
 
-    </body>
-    </html>
-    `;
+
+<div class="section-title">
+    OVERALL
+</div>
+
+
+<div class="line"></div>
+
+
+<div class="overall">
+
+    <div class="row total-income">
+
+        <span>TOTAL INCOME</span>
+
+        <span>
+            Rs ${totalIncome}
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span>DISCOUNT</span>
+
+        <span>
+            Rs ${discount}
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span>EXPENSE</span>
+
+        <span>
+            Rs ${expenses}
+        </span>
+
+    </div>
+
+
+    <div class="row">
+
+        <span>EASYPAISA</span>
+
+        <span>
+            Rs ${easypaisa}
+        </span>
+
+    </div>
+
+
+    <div class="line"></div>
+
+
+    <div class="row closing">
+
+        <span>CLOSING CASH</span>
+
+        <span>
+            Rs ${closingCash}
+        </span>
+
+    </div>
+
+</div>
+
+
+<div class="line"></div>
+
+
+<div class="center small">
+
+    ${new Date().toLocaleString(
+        "en-PK",
+        {
+            timeZone:
+                "Asia/Karachi"
+        }
+    )}
+
+</div>
+
+
+</body>
+
+</html>
+
+`;
+
 
     win.document.open();
+
     win.document.write(html);
+
     win.document.close();
 
+
     setTimeout(() => {
-    
+
+        win.focus();
+
         win.print();
-    
+
         setTimeout(() => {
+
             win.close();
+
         }, 800);
-    
-    }, 300);
+
+    }, 400);
+
 }
 
 /// table history thermal print
