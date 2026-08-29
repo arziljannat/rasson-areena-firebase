@@ -4941,32 +4941,36 @@ oldT.checkoutPlayerNumber = null;
  ******************************************************/
 function bindShiftButtons() {
 
-    // 🔥 SHIFT START TRACKER
-    document.getElementById("shiftCloseBtn").onclick = openShiftSummary;
+    // 🔥 ONE SHIFT ONLY
+    document.getElementById("shiftCloseBtn").onclick =
+        openShiftSummary;
 
-document.getElementById("confirmShiftCloseBtn").onclick = () => {
+    document.getElementById("confirmShiftCloseBtn").onclick = () => {
 
-    const btn =
-        document.getElementById("shiftCloseBtn");
+        const btn =
+            document.getElementById("shiftCloseBtn");
 
-    if (
-        btn.innerText.trim() === "Day Close"
-    ) {
+        // DAY CLOSE
+        if (
+            btn.innerText
+                .trim()
+                .includes("Day")
+        ) {
 
-        closeDay();
+            closeDay();
+            return;
+        }
 
-    } else {
-
+        // ONE SHIFT CLOSE
         closeShift1();
+    };
 
-    }
-
-};
-
-    document.getElementById("cancelShiftSummaryBtn").onclick =
+    document.getElementById(
+        "cancelShiftSummaryBtn"
+    ).onclick =
         () => hidePopup("shiftSummaryPopup");
-    hidePopup("shiftSummaryPopup");
 
+    hidePopup("shiftSummaryPopup");
 }
 
 /******************************************************
