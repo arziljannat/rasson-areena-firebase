@@ -5035,19 +5035,19 @@ function getSnapshotTableData(
             ).toLowerCase();
 
 
-        if (type === "century") {
+if (type === "century") {
 
-            centuries++;
-            centuryAmount += amount;
-            centuryTime += seconds;
+    centuries++;
+    centuryAmount += amount;
+    centuryTime += seconds;
 
-        } else {
+} else {
 
-            frames++;
-            frameAmount += amount;
-            frameTime += seconds;
+    frames += getFrameCount(h);
+    frameAmount += amount;
+    frameTime += seconds;
 
-        }
+}
 
     });
 
@@ -5405,6 +5405,16 @@ function buildRassonSnapshot(
             accounting.easypaisa || 0
         );
 
+    const expenses =
+    Number(
+        accounting.expenses || 0
+    );
+
+const gameCollection =
+    Number(
+        accounting.gameCollection || 0
+    );
+  
 
     const closingCash =
         Number(
@@ -5423,103 +5433,83 @@ function buildRassonSnapshot(
     </div>
 
 
-    <div class="snapshot-overall">
+<div class="snapshot-overall">
 
-        <div class="snapshot-overall-card">
+    <div class="snapshot-overall-card income-total">
 
-            <div class="snapshot-overall-title">
-                🎱 TOTAL FRAMES
-            </div>
-
-            <strong>
-                ${totalFrames}
-            </strong>
-
-            <span>
-                ${snapshotMoney(
-                    totalFrameAmount
-                )}
-            </span>
-
-            <small>
-                ${snapshotTime(
-                    totalFrameTime
-                )}
-            </small>
-
+        <div class="snapshot-overall-title">
+            💰 TOTAL INCOME
         </div>
 
-
-        <div class="snapshot-overall-card century-total">
-
-            <div class="snapshot-overall-title">
-                👑 TOTAL CENTURIES
-            </div>
-
-            <strong>
-                ${totalCenturies}
-            </strong>
-
-            <span>
-                ${snapshotMoney(
-                    totalCenturyAmount
-                )}
-            </span>
-
-            <small>
-                ${snapshotTime(
-                    totalCenturyTime
-                )}
-            </small>
-
-        </div>
-
-
-        <div class="snapshot-overall-card discount-total">
-
-            <div class="snapshot-overall-title">
-                🎁 DISCOUNT
-            </div>
-
-            <strong>
-                ${snapshotMoney(
-                    discount
-                )}
-            </strong>
-
-        </div>
-
-
-        <div class="snapshot-overall-card easypaisa-total">
-
-            <div class="snapshot-overall-title">
-                📲 EASYPAISA
-            </div>
-
-            <strong>
-                ${snapshotMoney(
-                    easypaisa
-                )}
-            </strong>
-
-        </div>
-
-
-        <div class="snapshot-overall-card cash-total">
-
-            <div class="snapshot-overall-title">
-                💵 CLOSING CASH
-            </div>
-
-            <strong>
-                ${snapshotMoney(
-                    closingCash
-                )}
-            </strong>
-
-        </div>
+        <strong>
+            ${snapshotMoney(
+                gameCollection
+            )}
+        </strong>
 
     </div>
+
+
+    <div class="snapshot-overall-card discount-total">
+
+        <div class="snapshot-overall-title">
+            🎁 DISCOUNT
+        </div>
+
+        <strong>
+            ${snapshotMoney(
+                discount
+            )}
+        </strong>
+
+    </div>
+
+
+    <div class="snapshot-overall-card expense-total">
+
+        <div class="snapshot-overall-title">
+            💸 EXPENSE
+        </div>
+
+        <strong>
+            ${snapshotMoney(
+                expenses
+            )}
+        </strong>
+
+    </div>
+
+
+    <div class="snapshot-overall-card easypaisa-total">
+
+        <div class="snapshot-overall-title">
+            📲 EASYPAISA
+        </div>
+
+        <strong>
+            ${snapshotMoney(
+                easypaisa
+            )}
+        </strong>
+
+    </div>
+
+
+    <div class="snapshot-overall-card cash-total">
+
+        <div class="snapshot-overall-title">
+            💵 CLOSING CASH
+        </div>
+
+        <strong>
+            ${snapshotMoney(
+                closingCash
+            )}
+        </strong>
+
+    </div>
+
+</div>
 
     `;
 
