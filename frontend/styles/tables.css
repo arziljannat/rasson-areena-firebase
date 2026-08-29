@@ -6675,12 +6675,12 @@ body * {
 
 #tableHistoryPopup .table-history-popup-box {
 
-    width: 1350px !important;
+    width: 1450px !important;
 
-    max-width: 97vw !important;
+    max-width: 99vw !important;
 
-    height: 92vh !important;
+    height: 95vh !important;
 
-    max-height: 92vh !important;
+    max-height: 95vh !important;
 
 }
