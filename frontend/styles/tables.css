@@ -5893,3 +5893,17 @@ body * {
     }
 
 }
+
+/* ============================================================
+   🔥 DAY HISTORY — ROOM TOTAL AMOUNT CENTER
+============================================================ */
+
+#dayHistoryPopup .day-history-resource-card:has(.snapshot-card-title) .snapshot-grid {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+#dayHistoryPopup .day-history-resource-card .snapshot-item {
+    text-align: center !important;
+}
