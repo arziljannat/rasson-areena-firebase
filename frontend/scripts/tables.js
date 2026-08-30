@@ -8216,10 +8216,8 @@ function loadSelectedTableHistory() {
     };
 
 
-    const shift1History =
-        history.filter(
-            h => inShift(h, selectedDay.shift1)
-        );
+const shift1History =
+    history;
 
 
 const shift2History = [];
