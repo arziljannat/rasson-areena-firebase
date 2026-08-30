@@ -7323,15 +7323,15 @@ tableSel.innerHTML = sortedHistoryTables
     document.getElementById("tableHistoryBranch").innerText =
         "Branch: " + (BRANCH || "Rasson1");
 
-window.loadSelectedTableHistory();
+loadSelectedTableHistory();
 
 showPopup("tableHistoryPopup");
 
 document.getElementById("tableHistoryDateSelect").onchange =
-    window.loadSelectedTableHistory;
+    loadSelectedTableHistory;
 
 document.getElementById("tableHistoryTableSelect").onchange =
-    window.loadSelectedTableHistory;
+    loadSelectedTableHistory;
 }
 
 /*
