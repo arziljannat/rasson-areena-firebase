@@ -7710,12 +7710,6 @@ function loadSelectedTableHistory() {
         );
 
 
-    const shift2History =
-        history.filter(
-            h => inShift(h, selectedDay.shift2)
-        );
-
-
     /* ==================================================
        TOTAL CALCULATOR
     ================================================== */
@@ -7837,11 +7831,6 @@ function loadSelectedTableHistory() {
     const s1 =
         calculateTotals(
             shift1History
-        );
-
-    const s2 =
-        calculateTotals(
-            shift2History
         );
 
 
