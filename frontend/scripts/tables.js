@@ -4907,22 +4907,57 @@ oldT.checkoutPlayerNumber = null;
 
 
 /******************************************************
- * SHIFT BUTTON BINDING
+ * SHIFT BUTTON BINDING — SINGLE SHIFT
  ******************************************************/
 function bindShiftButtons() {
 
-    document.getElementById("shiftCloseBtn").onclick =
-        openShiftSummary;
+    const shiftCloseBtn =
+        document.getElementById("shiftCloseBtn");
 
-    document.getElementById("confirmShiftCloseBtn").onclick =
-        () => {
-            closeShift();
-        };
+    const confirmShiftCloseBtn =
+        document.getElementById("confirmShiftCloseBtn");
 
-    document.getElementById("cancelShiftSummaryBtn").onclick =
-        () => hidePopup("shiftSummaryPopup");
+    const cancelShiftSummaryBtn =
+        document.getElementById("cancelShiftSummaryBtn");
 
-    hidePopup("shiftSummaryPopup");
+
+    // 🔥 OPEN SHIFT SNAPSHOT
+    if (shiftCloseBtn) {
+
+        shiftCloseBtn.onclick =
+            openShiftSummary;
+
+    }
+
+
+    // 🔥 CONFIRM SINGLE SHIFT CLOSE
+    if (confirmShiftCloseBtn) {
+
+        confirmShiftCloseBtn.onclick =
+            () => {
+
+                closeShift();
+
+            };
+
+    }
+
+
+    // 🔥 CANCEL
+    if (cancelShiftSummaryBtn) {
+
+        cancelShiftSummaryBtn.onclick =
+            () =>
+                hidePopup(
+                    "shiftSummaryPopup"
+                );
+
+    }
+
+
+    hidePopup(
+        "shiftSummaryPopup"
+    );
 }
 
 /******************************************************
@@ -5611,16 +5646,20 @@ const gameCollection =
 
 
 /******************************************************
- * 🔥 OPEN SHIFT / DAY SNAPSHOT
+ * 🔥 OPEN SINGLE SHIFT SNAPSHOT
  ******************************************************/
 
 async function openShiftSummary() {
 
     const body =
-        document.getElementById("shiftSummaryBody");
+        document.getElementById(
+            "shiftSummaryBody"
+        );
 
     const title =
-        document.getElementById("shiftSummaryTitle");
+        document.getElementById(
+            "shiftSummaryTitle"
+        );
 
     await rebuildHistoryFromSessions();
 
@@ -5632,12 +5671,13 @@ async function openShiftSummary() {
 
     let endMs = now;
 
-    // 🔥 ONE SHIFT SNAPSHOT
-    title.innerText = "SHIFT SNAPSHOT";
+    title.innerText =
+        "SHIFT SNAPSHOT";
 
     document.getElementById(
         "confirmShiftCloseBtn"
-    ).innerText = "Close Shift";
+    ).innerText =
+        "Close Shift";
 
     body.innerHTML =
         buildRassonSnapshot(
