@@ -440,6 +440,61 @@
 </div>
 
 <!-- =====================================================
+     UNPAID BILLS — SHIFT CLOSE BLOCK
+===================================================== -->
+
+<div id="unpaidBillsPopup" class="popup hidden">
+
+    <div class="popup-box large-popup">
+
+        <h2 style="
+            color:#ff4444;
+            text-align:center;
+            font-weight:900;
+        ">
+            🔴 SHIFT CLOSE BLOCKED
+        </h2>
+
+        <p style="
+            text-align:center;
+            color:#ffffff;
+            font-size:17px;
+            font-weight:700;
+            margin-bottom:20px;
+        ">
+            Please clear all unpaid bills before closing the shift.
+        </p>
+
+        <div
+            id="unpaidBillsList"
+            style="
+                width:100%;
+                display:flex;
+                flex-direction:column;
+                gap:12px;
+                max-height:55vh;
+                overflow-y:auto;
+            "
+        ></div>
+
+        <div class="popup-buttons">
+
+            <button
+                id="closeUnpaidBillsBtn"
+                class="neon-btn red"
+            >
+                Close
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+    
+
+<!-- =====================================================
      DAY / SHIFT SNAPSHOT
 ===================================================== -->
 <div id="shiftSummaryPopup" class="popup hidden">
