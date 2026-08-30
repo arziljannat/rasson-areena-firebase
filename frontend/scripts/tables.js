@@ -6101,173 +6101,199 @@ tables.forEach(t => {
 }
 
 
-// 🔥 REFRESH CURRENT DAY HISTORY
+/******************************************************
+ * 🔥 REFRESH CURRENT DAY HISTORY — SINGLE SHIFT
+ ******************************************************/
 async function refreshCurrentDayHistory(dayId = null) {
 
     try {
 
-        console.log("🔥 Refreshing current day history...");
-window.historyData = [];
-window.combinedHistoryData = [];
+        console.log(
+            "🔥 Refreshing current day history..."
+        );
 
-        // 🔥 GET CURRENT DAY
-dayId = dayId || window.currentDayId;
+        window.historyData = [];
+        window.combinedHistoryData = [];
 
-const q = query(
-    collection(window.db, "days"),
-    where("branch", "==", BRANCH),
-    where("day_id", "==", Number(dayId))
-);
+        // 🔥 CURRENT DAY
+        dayId =
+            dayId ||
+            window.currentDayId;
 
-        const snap = await getDocs(q);
+        const q = query(
+            collection(window.db, "days"),
+            where("branch", "==", BRANCH),
+            where("day_id", "==", Number(dayId))
+        );
 
-if (snap.empty) {
+        const snap =
+            await getDocs(q);
 
-    console.log("⏳ Day history not created yet:", dayId);
+        if (snap.empty) {
 
-    return;
-}
+            console.log(
+                "⏳ Day history not created yet:",
+                dayId
+            );
 
-        // 🔥 REBUILD TABLE HISTORY
-        await rebuildSpecificDayHistory(dayId);
-
-        // 🔥 GET SHIFTS
-const shiftsQ = query(
-    collection(window.db, "shifts"),
-    where("branch", "==", BRANCH),
-    where("day_id", "==", Number(dayId))
-);
-
-        const shiftsSnap = await getDocs(shiftsQ);
-
-        let latestShift1 = null;
-        let latestShift2 = null;
-
-        shiftsSnap.forEach(docSnap => {
-
-            const d = docSnap.data();
-
-            if (d.shift_number === 1) {
-                latestShift1 = d;
-            }
-
-            if (d.shift_number === 2) {
-                latestShift2 = d;
-            }
-        });
-
-        if (!latestShift1 || !latestShift2) {
-            console.log("⚠️ Shift data missing");
             return;
         }
 
-        // 🔥 RECALCULATE
-        const newShift1 = calculateShiftSnapshot(
-            latestShift1.start_ms,
-            latestShift1.end_ms
+        // 🔥 REBUILD TABLE HISTORY
+        await rebuildSpecificDayHistory(
+            dayId
         );
 
-        const newShift2 = calculateShiftSnapshot(
-            latestShift2.start_ms,
-            latestShift2.end_ms
+        // 🔥 GET SINGLE SHIFT
+        const shiftsQ = query(
+            collection(window.db, "shifts"),
+            where("branch", "==", BRANCH),
+            where("day_id", "==", Number(dayId))
         );
 
-        // 🔥 COMBINED
-        const combined = {
+        const shiftsSnap =
+            await getDocs(shiftsQ);
 
-            gameTotal:
-                newShift1.gameTotal + newShift2.gameTotal,
+        let latestShift1 = null;
 
-            canteenTotal:
-                newShift1.canteenTotal + newShift2.canteenTotal,
+        shiftsSnap.forEach(
+            docSnap => {
 
-            gameCollection:
-                newShift1.gameCollection + newShift2.gameCollection,
+                const d =
+                    docSnap.data();
 
-            canteenCollection:
-                newShift1.canteenCollection + newShift2.canteenCollection,
+                if (
+                    d.shift_number === 1
+                ) {
 
-            gameBalance:
-                newShift1.gameBalance + newShift2.gameBalance,
+                    latestShift1 = d;
 
-            canteenBalance:
-                newShift1.canteenBalance + newShift2.canteenBalance,
+                }
 
-            expenses:
-                newShift1.expenses + newShift2.expenses,
+            }
+        );
 
-            easypaisa:
-            newShift1.easypaisa + newShift2.easypaisa,
-            
-            discount:
-            (newShift1.discount || 0)
-            +
-            (newShift2.discount || 0),
-            
-            closingCash:
-            newShift1.closingCash + newShift2.closingCash
-        };
+        if (!latestShift1) {
+
+            console.log(
+                "⚠️ Shift data missing"
+            );
+
+            return;
+        }
+
+        // 🔥 RECALCULATE SINGLE SHIFT
+        const newShift1 =
+            calculateShiftSnapshot(
+                latestShift1.start_ms,
+                latestShift1.end_ms
+            );
 
         // 🔥 TABLE SNAPSHOT
-        const tablesSnapshot = tables.map(t => ({
-            table_id: t.name,
-            history: t.history.map(h => ({ ...h }))
-        }));
+        const tablesSnapshot =
+            tables.map(t => ({
+
+                table_id:
+                    t.name,
+
+                history:
+                    t.history.map(
+                        h => ({
+                            ...h
+                        })
+                    )
+
+            }));
 
         // 🔥 UPDATE DAY HISTORY
-        snap.forEach(async (d) => {
+        for (
+            const d of snap.docs
+        ) {
 
             await updateDoc(
-                doc(window.db, "days", d.id),
+                doc(
+                    window.db,
+                    "days",
+                    d.id
+                ),
                 {
 
-                    tables: tablesSnapshot,
+                    tables:
+                        tablesSnapshot,
 
                     shift1: {
                         ...latestShift1,
                         ...newShift1
                     },
 
-                    shift2: {
-                        ...latestShift2,
-                        ...newShift2
-                    },
+                    // 🔥 SINGLE SHIFT
+                    shift:
+                        {
+                            ...latestShift1,
+                            ...newShift1
+                        },
 
-                    combined
+                    // 🔥 NO SHIFT 2
+                    combined:
+                        {
+                            ...newShift1
+                        }
+
                 }
             );
 
-          // 🔥 UPDATE LIVE SHIFT VARIABLES
-                shift1 = {
-                      ...shift1,
-                      ...newShift1
-                              };
+        }
 
-                shift2 = {
-                      ...shift2,
-                      ...newShift2
-                              };
-        });
+        // 🔥 UPDATE LIVE SHIFT
+        shift1 = {
+            ...shift1,
+            ...newShift1
+        };
 
-        console.log("✅ Day history updated");
-      await loadShiftsFromFirebase();
-      // 🔥 REFRESH DAY HISTORY CACHE
-const latestDaysQ = query(
-    collection(window.db, "days"),
-    where("branch", "==", BRANCH)
-);
+        console.log(
+            "✅ Single shift history updated"
+        );
 
-const latestDaysSnap = await getDocs(latestDaysQ);
+        await loadShiftsFromFirebase();
 
-window._daysData = [];
+        // 🔥 REFRESH DAY HISTORY CACHE
+        const latestDaysQ =
+            query(
+                collection(
+                    window.db,
+                    "days"
+                ),
+                where(
+                    "branch",
+                    "==",
+                    BRANCH
+                )
+            );
 
-latestDaysSnap.forEach(docSnap => {
-    window._daysData.push(docSnap.data());
-});
+        const latestDaysSnap =
+            await getDocs(
+                latestDaysQ
+            );
+
+        window._daysData = [];
+
+        latestDaysSnap.forEach(
+            docSnap => {
+
+                window._daysData.push(
+                    docSnap.data()
+                );
+
+            }
+        );
 
     } catch (err) {
 
-        console.error("❌ refreshCurrentDayHistory:", err);
+        console.error(
+            "❌ refreshCurrentDayHistory:",
+            err
+        );
+
     }
 }
 
