@@ -7323,12 +7323,15 @@ tableSel.innerHTML = sortedHistoryTables
     document.getElementById("tableHistoryBranch").innerText =
         "Branch: " + (BRANCH || "Rasson1");
 
-    loadSelectedTableHistory();
+window.loadSelectedTableHistory();
 
-    showPopup("tableHistoryPopup");
+showPopup("tableHistoryPopup");
 
-    document.getElementById("tableHistoryDateSelect").onchange = loadSelectedTableHistory;
-    document.getElementById("tableHistoryTableSelect").onchange = loadSelectedTableHistory;
+document.getElementById("tableHistoryDateSelect").onchange =
+    window.loadSelectedTableHistory;
+
+document.getElementById("tableHistoryTableSelect").onchange =
+    window.loadSelectedTableHistory;
 }
 
 /*
@@ -7417,6 +7420,8 @@ function loadSelectedTableHistory() {
             `<tr><td colspan="11">No history found.</td></tr>`;
         return;
     }
+
+  window.loadSelectedTableHistory = loadSelectedTableHistory;
 
     /* ==================================================
        FIND TABLE DATA
