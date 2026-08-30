@@ -152,7 +152,7 @@ if (!shift1) {
     btn.innerText = "Day Close";
 }
 
-    console.log("🔥 REALTIME SHIFTS:", shift1, shift2);
+    console.log("🔥 REALTIME SHIFT:", shift1);
 
 });
 }
