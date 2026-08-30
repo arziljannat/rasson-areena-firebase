@@ -6089,6 +6089,82 @@ async function closeDay() {
     const newDayId =
         Date.now();
 
+  // ======================================================
+// 🔥 DAY CLOSE → RUNNING GAMES CARRY FORWARD
+// ======================================================
+
+// OLD DAY ID
+const oldDayId =
+    window.currentDayId;
+
+// FIND ALL RUNNING SESSIONS
+const runningSessionsQuery =
+    query(
+        collection(window.db, "sessions"),
+        where("branch", "==", BRANCH),
+        where("end_time", "==", null)
+    );
+
+const runningSessionsSnap =
+    await getDocs(runningSessionsQuery);
+
+
+// MOVE RUNNING SESSIONS TO NEW DAY
+for (
+    const sessionDoc of runningSessionsSnap.docs
+) {
+
+    const sessionData =
+        sessionDoc.data();
+
+    // Deleted session ignore
+    if (sessionData.is_deleted === true) {
+        continue;
+    }
+
+    console.log(
+        "🔥 DAY CLOSE → CARRY FORWARD:",
+        sessionData.table_id,
+        sessionData.start_time
+    );
+
+    await updateDoc(
+        doc(
+            window.db,
+            "sessions",
+            sessionDoc.id
+        ),
+        {
+
+            // NEW DAY
+            day_id:
+                newDayId,
+
+            // NEW DAY = SHIFT 1
+            shift_number:
+                1,
+
+            // ORIGINAL CHECK-IN SAME
+            start_time:
+                sessionData.start_time,
+
+            // GAME STILL RUNNING
+            end_time:
+                null,
+
+            // DEBUG / TRACKING
+            carried_forward:
+                true,
+
+            carried_from_day_id:
+                oldDayId,
+
+            carried_at:
+                new Date().toISOString()
+        }
+    );
+}
+
     const systemQ =
         query(
             collection(
