@@ -8968,14 +8968,6 @@ async function restoreRunningTables() {
 
         let start = new Date(s.start_time).getTime();
 
-        // 🔥 FIX: if time is too old (more than 12 hours), ignore
-        let now = Date.now();
-        let diffHours = (now - start) / (1000 * 60 * 60);
-
-        if (diffHours > 12) {
-            console.log("⚠️ OLD SESSION IGNORED:", s);
-            return;
-        }
 
         t.isRunning = true;
 t.checkinTime = start;
@@ -9030,14 +9022,6 @@ tables.forEach(t => {
             if (!t) return;
 
             let start = new Date(s.start_time).getTime();
-
-            let now = Date.now();
-            let diffHours = (now - start) / (1000 * 60 * 60);
-
-            if (diffHours > 12){
-                console.log("⚠️ OLD SESSION IGNORED:", s);
-                return;
-            }
 
             // ❌ AGAR CHECKOUT HO CHUKA HAI TO IGNORE
 if (t.afterCheckout) return;
