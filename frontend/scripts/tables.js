@@ -5627,7 +5627,7 @@ const gameCollection =
 
 
 /******************************************************
- * 🔥 OPEN SINGLE SHIFT SNAPSHOT
+ * 🔥 OPEN DAY CLOSE SNAPSHOT — SINGLE SHIFT
  ******************************************************/
 
 async function openShiftSummary() {
@@ -5646,36 +5646,28 @@ async function openShiftSummary() {
 
     const now = Date.now();
 
-    // 🔥 SINGLE SHIFT
-    let startMs =
+    // 🔥 CURRENT DAY START
+    const startMs =
         Number(window.currentDayId) || now;
 
-    let endMs = now;
+    const endMs =
+        now;
 
-    title.innerText =
-        "SHIFT SNAPSHOT";
-
-const confirmBtn =
-    document.getElementById(
-        "confirmShiftCloseBtn"
-    );
-
-if (shift1) {
-
+    // 🔥 SINGLE SHIFT SYSTEM
     title.innerText =
         "DAY CLOSE";
 
-    confirmBtn.innerText =
-        "Day Close";
+    const confirmBtn =
+        document.getElementById(
+            "confirmShiftCloseBtn"
+        );
 
-} else {
+    if (confirmBtn) {
 
-    title.innerText =
-        "SHIFT SNAPSHOT";
+        confirmBtn.innerText =
+            "Day Close";
 
-    confirmBtn.innerText =
-        "Close Shift";
-}
+    }
 
     body.innerHTML =
         buildRassonSnapshot(
