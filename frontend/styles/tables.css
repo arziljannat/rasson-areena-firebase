@@ -2051,26 +2051,7 @@ body * {
 
 /* COMBINED */
 
-.combined-card {
 
-    border-color: #ffd700;
-
-    box-shadow:
-        0 0 22px
-        rgba(255,215,0,0.55);
-
-}
-
-
-.combined-card
-.snapshot-card-title {
-
-    color: #ffd700;
-
-    text-shadow:
-        0 0 10px #ffd700;
-
-}
 
 
 /* EMPTY */
