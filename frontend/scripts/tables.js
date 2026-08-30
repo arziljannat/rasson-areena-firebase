@@ -117,7 +117,6 @@ const q = query(
 onSnapshot(q, (snapshot) => {
 
     shift1 = null;
-    shift2 = null;
 
     snapshot.forEach(docSnap => {
         const d = docSnap.data();
