@@ -3341,30 +3341,20 @@ const totalUnpaidFrameAmount =
 const s1UnpaidCenturyCount =
     shift1UnpaidCentury.length;
 
-const s2UnpaidCenturyCount =
-    shift2UnpaidCentury.length;
-
 const totalUnpaidCenturyCount =
-    s1UnpaidCenturyCount + s2UnpaidCenturyCount;
+    s1UnpaidCenturyCount;
 
 const s1UnpaidCenturyAmount =
     amountOf(shift1UnpaidCentury);
 
-const s2UnpaidCenturyAmount =
-    amountOf(shift2UnpaidCentury);
-
 const totalUnpaidCenturyAmount =
-    s1UnpaidCenturyAmount + s2UnpaidCenturyAmount;
+    s1UnpaidCenturyAmount;
 
 const s1UnpaidCenturySeconds =
     secondsOf(shift1UnpaidCentury);
 
-const s2UnpaidCenturySeconds =
-    secondsOf(shift2UnpaidCentury);
-
 const totalUnpaidCenturySeconds =
-    s1UnpaidCenturySeconds +
-    s2UnpaidCenturySeconds;
+    s1UnpaidCenturySeconds;
 
 
 // =====================================================
@@ -3505,11 +3495,6 @@ setText(
 );
 
 setText(
-    "historyShift2PaidFrame",
-    s2PaidFrameCount
-);
-
-setText(
     "historyTotalPaidFrame",
     totalPaidFrameCount
 );
@@ -3517,11 +3502,6 @@ setText(
 setText(
     "historyShift1PaidFrameAmount",
     `Rs. ${s1PaidFrameAmount.toLocaleString()}`
-);
-
-setText(
-    "historyShift2PaidFrameAmount",
-    `Rs. ${s2PaidFrameAmount.toLocaleString()}`
 );
 
 setText(
@@ -3540,11 +3520,6 @@ setText(
 );
 
 setText(
-    "historyShift2PaidCentury",
-    s2PaidCenturyCount
-);
-
-setText(
     "historyTotalPaidCentury",
     totalPaidCenturyCount
 );
@@ -3555,11 +3530,6 @@ setText(
 );
 
 setText(
-    "historyShift2PaidCenturyAmount",
-    `Rs. ${s2PaidCenturyAmount.toLocaleString()}`
-);
-
-setText(
     "historyTotalPaidCenturyAmount",
     `Rs. ${totalPaidCenturyAmount.toLocaleString()}`
 );
@@ -3567,11 +3537,6 @@ setText(
 setText(
     "historyShift1PaidCenturyTime",
     formatSummaryTime(s1PaidCenturySeconds)
-);
-
-setText(
-    "historyShift2PaidCenturyTime",
-    formatSummaryTime(s2PaidCenturySeconds)
 );
 
 setText(
@@ -3590,11 +3555,6 @@ setText(
 );
 
 setText(
-    "historyShift2UnpaidFrame",
-    s2UnpaidFrameCount
-);
-
-setText(
     "historyTotalUnpaidFrame",
     totalUnpaidFrameCount
 );
@@ -3602,11 +3562,6 @@ setText(
 setText(
     "historyShift1UnpaidFrameAmount",
     `Rs. ${s1UnpaidFrameAmount.toLocaleString()}`
-);
-
-setText(
-    "historyShift2UnpaidFrameAmount",
-    `Rs. ${s2UnpaidFrameAmount.toLocaleString()}`
 );
 
 setText(
@@ -3625,11 +3580,6 @@ setText(
 );
 
 setText(
-    "historyShift2UnpaidCentury",
-    s2UnpaidCenturyCount
-);
-
-setText(
     "historyTotalUnpaidCentury",
     totalUnpaidCenturyCount
 );
@@ -3640,11 +3590,6 @@ setText(
 );
 
 setText(
-    "historyShift2UnpaidCenturyAmount",
-    `Rs. ${s2UnpaidCenturyAmount.toLocaleString()}`
-);
-
-setText(
     "historyTotalUnpaidCenturyAmount",
     `Rs. ${totalUnpaidCenturyAmount.toLocaleString()}`
 );
@@ -3652,11 +3597,6 @@ setText(
 setText(
     "historyShift1UnpaidCenturyTime",
     formatSummaryTime(s1UnpaidCenturySeconds)
-);
-
-setText(
-    "historyShift2UnpaidCenturyTime",
-    formatSummaryTime(s2UnpaidCenturySeconds)
 );
 
 setText(
