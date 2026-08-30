@@ -5788,360 +5788,171 @@ alert("Shift closed successfully ✅");
 }
 
 /******************************************************
- * DAY CLOSE — RESET EVERYTHING + NEW DAY START
+ * DAY CLOSE — SINGLE SHIFT
  ******************************************************/
 async function closeDay() {
 
-   const today = new Date().toLocaleDateString("en-CA"); // ✅ FIX
-    let s1 = shift1;
-    let s2 = shift2;
+    const today =
+        new Date().toLocaleDateString("en-CA");
 
-    if (!s1 || !s2) {
-        alert("Please close Shift 1 and Shift 2 before Day Close.");
+    const s1 = shift1;
+
+    if (!s1) {
+        alert(
+            "Please close the shift before Day Close."
+        );
         return;
     }
 
-    // --------------- BUILD COMBINED SUMMARY --------------------
-    let combined = {
-        gameTotal: (s1.gameTotal || 0) + (s2.gameTotal || 0),
-        canteenTotal: (s1.canteenTotal || 0) + (s2.canteenTotal || 0),
+    // 🔥 CURRENT SHIFT DATA
+    const combined = {
 
-        gameCollection: (s1.gameCollection || 0) + (s2.gameCollection || 0),
-        canteenCollection: (s1.canteenCollection || 0) + (s2.canteenCollection || 0),
+        gameTotal:
+            s1.gameTotal || 0,
 
-        gameBalance: (s1.gameBalance || 0) + (s2.gameBalance || 0),
-        canteenBalance: (s1.canteenBalance || 0) + (s2.canteenBalance || 0),
+        canteenTotal:
+            s1.canteenTotal || 0,
 
-        expenses: (s1.expenses || 0) + (s2.expenses || 0),
-        
-      
-        discount:(s1.discount || 0)+(s2.discount || 0),
-      
-        easypaisa: (s1.easypaisa || 0) + (s2.easypaisa || 0),
-    };
+        gameCollection:
+            s1.gameCollection || 0,
 
-    combined.closingCash =
-    (combined.gameCollection + combined.canteenCollection)
-    - combined.expenses
-    - (combined.easypaisa || 0);
-
-
-    // 🔥🔥🔥 STEP 1: SAVE SNAPSHOT BEFORE RESET (MAIN FIX)
-    const tablesSnapshot = tables.map(t => ({
-    table_id: t.name,
-    history: t.history.map(h => ({ ...h }))
-}));
-
-
-    // 🔥🔥🔥 STEP 2: FIREBASE SAVE (PEHLE SAVE KARO)
-    try {
-
-       
-// ==========================
-// 🔥 DUPLICATE SHIFT CHECK (ADD THIS)
-// ==========================
-
-
-// 👉 identify shift (simple logic)
-
-
-// 🔥 SAFE DATA CLEAN (VERY IMPORTANT)
-const safeShift1 = JSON.parse(JSON.stringify(s1 || {}));
-const safeShift2 = JSON.parse(JSON.stringify(s2 || {}));
-const safeTables = JSON.parse(JSON.stringify(tablesSnapshot || {}));
-const safeCombined = JSON.parse(JSON.stringify(combined || {}));
-
-const q = query(
-    collection(window.db, "days"),
-    where("branch", "==", BRANCH),
-    where("day_id", "==", window.currentDayId)
-);
-
-const snap = await getDocs(q);
-
-// 🔥 ONLY BLOCK IF DAY REALLY EXISTS
-let alreadyClosed = false;
-
-snap.forEach(docSnap => {
-
-    const d = docSnap.data();
-
-    // ✅ SAME DAY ONLY
-    if (String(d.day_id) === String(window.currentDayId)) {
-        alreadyClosed = true;
-    }
-});
-
-if (alreadyClosed) {
-
-    // 🔥 BUTTON RESET
-    document.getElementById("shiftCloseBtn").innerText = "Shift 1 Close";
-
-    // 🔥 RESET LOCAL SHIFTS
-    shift1 = null;
-    shift2 = null;
-
-    // 🔥 FORCE NEW DAY
-    const newDayId = Date.now();
-
-    const systemQ = query(
-        collection(window.db, "system"),
-        where("branch", "==", BRANCH),
-        where("type", "==", "current_day")
-    );
-
-    const systemSnap = await getDocs(systemQ);
-
-    for (const d of systemSnap.docs) {
-
-        await updateDoc(doc(window.db, "system", d.id), {
-            day_id: newDayId,
-            created_at: new Date().toISOString()
-        });
-    }
-
-    window.currentDayId = newDayId;
-
-    alert("Previous day already closed ✅ New day started.");
-
-    hidePopup("shiftSummaryPopup");
-
-    return;
-}
-
-await addDoc(collection(window.db, "days"), {
-    tables: safeTables,
-    date: today,
-    day_id: window.currentDayId, // 🔥 ADD THIS
-    branch: BRANCH,
-    shift: "day",
-
-    shift1: safeShift1,
-    shift2: safeShift2,
-    combined: safeCombined,
-
-    created_at: new Date().toISOString()
-});
-
-// 🔥 FINAL SAFE DATA (DIRECT FROM SHIFT OBJECTS)
-let printData = {
-    gameTotal: (s1?.gameTotal || 0) + (s2?.gameTotal || 0),
-    canteenTotal: (s1?.canteenTotal || 0) + (s2?.canteenTotal || 0),
-
-    gameCollection: (s1?.gameCollection || 0) + (s2?.gameCollection || 0),
-    canteenCollection: (s1?.canteenCollection || 0) + (s2?.canteenCollection || 0),
-
-    expenses: (s1?.expenses || 0) + (s2?.expenses || 0),
-  easypaisa: (s1?.easypaisa || 0) + (s2?.easypaisa || 0),
-};
-
-printData.closingCash =
-    (printData.gameCollection + printData.canteenCollection)
-    - printData.expenses
-    - (printData.easypaisa || 0);
-
-// 🔥 DEBUG (optional)
-console.log("🔥 DAY PRINT DATA:", printData);
-
-// 🔥 PRINT FORMAT AS DAY HISTORY PRINT
-printDayHistoryThermal({
-    date: today,
-
-    // 🔥 SAME DATA USED BY DAY SNAPSHOT
-    tables: safeTables,
-
-    shift1: shift1,
-    shift2: shift2,
-
-    combined: {
-        gameTotal: printData.gameTotal,
-        canteenTotal: printData.canteenTotal,
-
-        gameCollection: printData.gameCollection,
-        canteenCollection: printData.canteenCollection,
+        canteenCollection:
+            s1.canteenCollection || 0,
 
         gameBalance:
-            (shift1?.gameBalance || 0) +
-            (shift2?.gameBalance || 0),
+            s1.gameBalance || 0,
 
         canteenBalance:
-            (shift1?.canteenBalance || 0) +
-            (shift2?.canteenBalance || 0),
-
-        discount:
-            (s1?.discount || 0) +
-            (s2?.discount || 0),
+            s1.canteenBalance || 0,
 
         expenses:
-            printData.expenses,
+            s1.expenses || 0,
 
         easypaisa:
-            printData.easypaisa,
+            s1.easypaisa || 0,
 
-        closingCash:
-            printData.closingCash
-    }
-});
-} catch (err) {
-    alert("Error saving day data ❌");
-    return;
-}
+        discount:
+            s1.discount || 0
+    };
 
 
-    // 🔥 UPDATE CENTRAL DAY (FIREBASE)
-const q = query(
-    collection(window.db, "system"),
-    where("branch", "==", BRANCH),
-    where("type", "==", "current_day")
-);
-
-const snap = await getDocs(q);
-
-// ======================================================
-// 🔥 DAY CLOSE → NEW DAY
-// ======================================================
-
-// OLD DAY ID save karo
-const oldDayId = window.currentDayId;
-
-// NEW DAY ID
-const newDayId = Date.now();
+    combined.closingCash =
+        (
+            combined.gameCollection +
+            combined.canteenCollection
+        )
+        - combined.expenses
+        - combined.easypaisa;
 
 
-// ======================================================
-// 🔥 UPDATE CENTRAL CURRENT DAY
-// ======================================================
+    // 🔥 TABLE SNAPSHOT
+    const safeTables =
+        tables.map(t => ({
+            table_id: t.name,
+            history: t.history.map(h => ({
+                ...h
+            }))
+        }));
 
-for (const d of snap.docs) {
 
-    await updateDoc(
-        doc(window.db, "system", d.id),
+    // 🔥 SAVE DAY HISTORY
+    await addDoc(
+        collection(window.db, "days"),
         {
-            day_id: newDayId,
-            created_at: new Date().toISOString()
+            tables: safeTables,
+
+            date: today,
+
+            day_id:
+                window.currentDayId,
+
+            branch:
+                BRANCH,
+
+            shift:
+                "day",
+
+            shift1:
+                s1,
+
+            combined:
+                combined,
+
+            created_at:
+                new Date().toISOString()
         }
     );
 
-}
+
+    // 🔥 RESET SHIFT
+    shift1 = null;
 
 
-// ======================================================
-// 🔥 FIND ALL CURRENTLY RUNNING SESSIONS
-// ======================================================
+    // 🔥 NEW DAY
+    const newDayId =
+        Date.now();
 
-const runningSessionsQuery = query(
-    collection(window.db, "sessions"),
-    where("branch", "==", BRANCH),
-    where("end_time", "==", null)
-);
-
-const runningSessionsSnap =
-    await getDocs(runningSessionsQuery);
-
-
-// ======================================================
-// 🔥 MOVE RUNNING SESSIONS → NEW DAY
-// ======================================================
-
-for (const sessionDoc of runningSessionsSnap.docs) {
-
-    const sessionData = sessionDoc.data();
-
-    // Deleted session ignore
-    if (sessionData.is_deleted === true) {
-        continue;
-    }
-
-    console.log(
-        "🔥 DAY CLOSE → CARRY FORWARD:",
-        sessionData.table_id,
-        sessionData.start_time
-    );
-
-
-    await updateDoc(
-        doc(window.db, "sessions", sessionDoc.id),
-        {
-
-            // NEW DAY
-            day_id: newDayId,
-
-            // NEW DAY = SHIFT 1
-            shift_number: 1,
-
-            // 🔥 ORIGINAL CHECK-IN TIME SAME
-            start_time: sessionData.start_time,
-
-            // 🔥 STILL RUNNING
-            end_time: null,
-
-            // Information for debugging/history
-            carried_forward: true,
-            carried_from_day_id: oldDayId,
-            carried_at: new Date().toISOString()
-        }
-    );
-}
-
-
-// ======================================================
-// 🔥 UPDATE LOCAL TABLES
-// ======================================================
-
-window.currentDayId = newDayId;
-
-
-tables.forEach(t => {
-
-    // 🔥 RUNNING TABLE KO RESET NAHI KARNA
-    if (t.isRunning) {
-
-        console.log(
-            "🔥 TABLE CARRIED TO NEW DAY:",
-            t.name
+    const systemQ =
+        query(
+            collection(
+                window.db,
+                "system"
+            ),
+            where(
+                "branch",
+                "==",
+                BRANCH
+            ),
+            where(
+                "type",
+                "==",
+                "current_day"
+            )
         );
 
-        // History clear karni hai,
-        // lekin running session preserve karna hai.
-        t.history = [];
+    const systemSnap =
+        await getDocs(systemQ);
 
-        t.checkoutTime = null;
 
-        // Timer/session information preserve
-        // t.isRunning remains true
-        // t.checkinTime remains same
-        // t.playSeconds will continue
+    for (
+        const d of systemSnap.docs
+    ) {
 
-        return;
+        await updateDoc(
+            doc(
+                window.db,
+                "system",
+                d.id
+            ),
+            {
+                day_id:
+                    newDayId,
+
+                created_at:
+                    new Date().toISOString()
+            }
+        );
     }
 
 
-    // ==================================================
-    // FREE TABLE → NORMAL RESET
-    // ==================================================
+    window.currentDayId =
+        newDayId;
 
-    t.history = [];
-    t.isRunning = false;
-    t.checkinTime = null;
-    t.checkoutTime = null;
-    t.playSeconds = 0;
-    t.liveAmount = 0;
-    t.canteenTotal = 0;
-    t.canteenItems = {};
-});
 
-     
-    renderTables();
+    document.getElementById(
+        "shiftCloseBtn"
+    ).innerText =
+        "Shift Close";
 
-    document.getElementById("shiftCloseBtn").innerText = "Shift 1 Close";
 
-    hidePopup("shiftSummaryPopup");
+    hidePopup(
+        "shiftSummaryPopup"
+    );
 
-    shift1 = null;
-    shift2 = null;
 
-    alert("Day Closed Successfully & Saved in Day History!");
-  setTimeout(autoRefreshUI, 1200);
+    alert(
+        "Day closed successfully ✅ New day started."
+    );
 }
 
 
