@@ -6097,13 +6097,24 @@ async function closeDay() {
 const oldDayId =
     window.currentDayId;
 
-// FIND ALL RUNNING SESSIONS
+// 🔥 FIND ONLY CURRENT-DAY RUNNING SESSIONS
 const runningSessionsQuery =
     query(
         collection(window.db, "sessions"),
+
+        // SAME BRANCH
         where("branch", "==", BRANCH),
+
+        // 🔥 VERY IMPORTANT:
+        // ONLY OLD/CURRENT DAY SESSIONS
+        where("day_id", "==", oldDayId),
+
+        // ONLY STILL RUNNING
         where("end_time", "==", null)
     );
+
+const runningSessionsSnap =
+    await getDocs(runningSessionsQuery);
 
 const runningSessionsSnap =
     await getDocs(runningSessionsQuery);
