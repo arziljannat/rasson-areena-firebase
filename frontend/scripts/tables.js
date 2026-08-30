@@ -5788,12 +5788,6 @@ alert("Shift closed successfully ✅");
   loadShiftsFromFirebase();
 }
 
-
-
-
-
-
-
 /******************************************************
  * DAY CLOSE — RESET EVERYTHING + NEW DAY START
  ******************************************************/
