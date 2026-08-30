@@ -6116,9 +6116,6 @@ const runningSessionsQuery =
 const runningSessionsSnap =
     await getDocs(runningSessionsQuery);
 
-const runningSessionsSnap =
-    await getDocs(runningSessionsQuery);
-
 
 // MOVE RUNNING SESSIONS TO NEW DAY
 for (
