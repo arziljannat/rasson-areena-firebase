@@ -5744,7 +5744,7 @@ async function openShiftSummary() {
 /******************************************************
  * SHIFT 1 CLOSE (running tables allowed)
  ******************************************************/
-async function closeShift1() {
+async function closeShift() {
   const q = query(
     collection(window.db, "shifts"),
     where("branch", "==", BRANCH),
@@ -5801,7 +5801,7 @@ let shiftData = calculateShiftSnapshot(startMs, endMs);
 
     
 
-    document.getElementById("shiftCloseBtn").innerText = "Shift 2 Close";
+    document.getElementById("shiftCloseBtn").innerText = "Day Close";
     hidePopup("shiftSummaryPopup");
 
 
@@ -5851,7 +5851,7 @@ if (!docRef?.id) {
     alert("Shift1 save failed ❌");
     return;
 }
-alert("Shift 1 closed successfully ✅");
+alert("Shift closed successfully ✅");
   loadShiftsFromFirebase();
 }
 
