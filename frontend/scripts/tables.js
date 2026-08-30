@@ -7851,10 +7851,6 @@ function loadSelectedTableHistory() {
         s1.frames
     );
 
-    setText(
-        "tableHistoryShift2Frame",
-        s2.frames
-    );
 
     setText(
         "tableHistoryTotalFrame",
@@ -7867,10 +7863,6 @@ function loadSelectedTableHistory() {
         `Rs. ${money(s1.frameAmount)}`
     );
 
-    setText(
-        "tableHistoryShift2FrameAmount",
-        `Rs. ${money(s2.frameAmount)}`
-    );
 
     setText(
         "tableHistoryTotalFrameAmount",
@@ -7885,10 +7877,7 @@ function loadSelectedTableHistory() {
         s1.centuries
     );
 
-    setText(
-        "tableHistoryShift2Century",
-        s2.centuries
-    );
+
 
     setText(
         "tableHistoryTotalCentury",
@@ -7902,11 +7891,6 @@ function loadSelectedTableHistory() {
     );
 
     setText(
-        "tableHistoryShift2CenturyAmount",
-        `Rs. ${money(s2.centuryAmount)}`
-    );
-
-    setText(
         "tableHistoryTotalCenturyAmount",
         `Rs. ${money(allTotals.centuryAmount)}`
     );
@@ -7915,11 +7899,6 @@ function loadSelectedTableHistory() {
     setText(
         "tableHistoryShift1CenturyTime",
         formatDuration(s1.centuryTime)
-    );
-
-    setText(
-        "tableHistoryShift2CenturyTime",
-        formatDuration(s2.centuryTime)
     );
 
     setText(
@@ -7935,10 +7914,6 @@ function loadSelectedTableHistory() {
         s1.paidFrames
     );
 
-    setText(
-        "tableHistoryShift2PaidFrame",
-        s2.paidFrames
-    );
 
     setText(
         "tableHistoryTotalPaidFrame",
@@ -7949,11 +7924,6 @@ function loadSelectedTableHistory() {
     setText(
         "tableHistoryShift1PaidFrameAmount",
         `Rs. ${money(s1.paidFrameAmount)}`
-    );
-
-    setText(
-        "tableHistoryShift2PaidFrameAmount",
-        `Rs. ${money(s2.paidFrameAmount)}`
     );
 
     setText(
@@ -7970,11 +7940,6 @@ function loadSelectedTableHistory() {
     );
 
     setText(
-        "tableHistoryShift2PaidCentury",
-        s2.paidCenturies
-    );
-
-    setText(
         "tableHistoryTotalPaidCentury",
         allTotals.paidCenturies
     );
@@ -7986,11 +7951,6 @@ function loadSelectedTableHistory() {
     );
 
     setText(
-        "tableHistoryShift2PaidCenturyAmount",
-        `Rs. ${money(s2.paidCenturyAmount)}`
-    );
-
-    setText(
         "tableHistoryTotalPaidCenturyAmount",
         `Rs. ${money(allTotals.paidCenturyAmount)}`
     );
@@ -7999,11 +7959,6 @@ function loadSelectedTableHistory() {
     setText(
         "tableHistoryShift1PaidCenturyTime",
         formatDuration(s1.paidCenturyTime)
-    );
-
-    setText(
-        "tableHistoryShift2PaidCenturyTime",
-        formatDuration(s2.paidCenturyTime)
     );
 
     setText(
@@ -8020,11 +7975,6 @@ function loadSelectedTableHistory() {
     );
 
     setText(
-        "tableHistoryShift2UnpaidFrame",
-        s2.unpaidFrames
-    );
-
-    setText(
         "tableHistoryTotalUnpaidFrame",
         allTotals.unpaidFrames
     );
@@ -8033,11 +7983,6 @@ function loadSelectedTableHistory() {
     setText(
         "tableHistoryShift1UnpaidFrameAmount",
         `Rs. ${money(s1.unpaidFrameAmount)}`
-    );
-
-    setText(
-        "tableHistoryShift2UnpaidFrameAmount",
-        `Rs. ${money(s2.unpaidFrameAmount)}`
     );
 
     setText(
@@ -8054,11 +7999,6 @@ function loadSelectedTableHistory() {
     );
 
     setText(
-        "tableHistoryShift2UnpaidCentury",
-        s2.unpaidCenturies
-    );
-
-    setText(
         "tableHistoryTotalUnpaidCentury",
         allTotals.unpaidCenturies
     );
@@ -8070,11 +8010,6 @@ function loadSelectedTableHistory() {
     );
 
     setText(
-        "tableHistoryShift2UnpaidCenturyAmount",
-        `Rs. ${money(s2.unpaidCenturyAmount)}`
-    );
-
-    setText(
         "tableHistoryTotalUnpaidCenturyAmount",
         `Rs. ${money(allTotals.unpaidCenturyAmount)}`
     );
@@ -8083,11 +8018,6 @@ function loadSelectedTableHistory() {
     setText(
         "tableHistoryShift1UnpaidCenturyTime",
         formatDuration(s1.unpaidCenturyTime)
-    );
-
-    setText(
-        "tableHistoryShift2UnpaidCenturyTime",
-        formatDuration(s2.unpaidCenturyTime)
     );
 
     setText(
