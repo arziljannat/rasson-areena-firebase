@@ -5616,125 +5616,35 @@ const gameCollection =
 
 async function openShiftSummary() {
 
-    const btn =
-        document.getElementById(
-            "shiftCloseBtn"
-        );
-
     const body =
-        document.getElementById(
-            "shiftSummaryBody"
-        );
+        document.getElementById("shiftSummaryBody");
 
     const title =
-        document.getElementById(
-            "shiftSummaryTitle"
-        );
+        document.getElementById("shiftSummaryTitle");
 
     await rebuildHistoryFromSessions();
 
-
     const now = Date.now();
 
+    // 🔥 SINGLE SHIFT
+    let startMs =
+        Number(window.currentDayId) || now;
 
-    let startMs = 0;
     let endMs = now;
-    let shiftNumber = null;
 
+    // 🔥 ONE SHIFT SNAPSHOT
+    title.innerText = "SHIFT SNAPSHOT";
 
-    /* =================================================
-       DAY CLOSE
-    ================================================= */
-
-    if (
-        btn.innerText.includes("Day")
-    ) {
-
-        title.innerText =
-            "DAY SNAPSHOT";
-
-        document.getElementById(
-            "confirmShiftCloseBtn"
-        ).innerText =
-            "Close Day";
-
-
-        startMs =
-            Number(
-                window.currentDayId
-            ) || now;
-
-        shiftNumber = null;
-
-    }
-
-
-    /* =================================================
-       SHIFT 1
-    ================================================= */
-
-    else if (
-        btn.innerText.includes("1")
-    ) {
-
-        title.innerText =
-            "SHIFT 1 SNAPSHOT";
-
-        document.getElementById(
-            "confirmShiftCloseBtn"
-        ).innerText =
-            "Close Shift";
-
-
-        startMs =
-            shift1?.startMs ||
-            Number(
-                window.currentDayId
-            ) ||
-            now;
-
-
-        shiftNumber = 1;
-
-    }
-
-
-    /* =================================================
-       SHIFT 2
-    ================================================= */
-
-    else {
-
-        title.innerText =
-            "SHIFT 2 SNAPSHOT";
-
-        document.getElementById(
-            "confirmShiftCloseBtn"
-        ).innerText =
-            "Close Shift";
-
-
-        startMs =
-            shift2?.startMs ||
-            shift1?.endMs ||
-            Number(
-                window.currentDayId
-            ) ||
-            now;
-
-
-        shiftNumber = 2;
-
-    }
-
+    document.getElementById(
+        "confirmShiftCloseBtn"
+    ).innerText = "Close Shift";
 
     body.innerHTML =
         buildRassonSnapshot(
             startMs,
             endMs,
-            shiftNumber
+            1
         );
-
 
     showPopup(
         "shiftSummaryPopup"
