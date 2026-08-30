@@ -6475,16 +6475,9 @@ let operationalDate = d.shift1?.startMs
 }) 
         : "-";
 
-    let closeTime = d.shift2?.endMs 
-        ? new Date(d.shift2.endMs).toLocaleTimeString('en-PK', {
-    timeZone: 'Asia/Karachi',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
-}) 
-        : "-";
 
-sel.innerHTML += `<option>${operationalDate.getFullYear()}-${String(operationalDate.getMonth() + 1).padStart(2, "0")}-${String(operationalDate.getDate()).padStart(2, "0")} (${openTime} → ${closeTime})</option>`;
+
+sel.innerHTML += `<option>${operationalDate.getFullYear()}-${String(operationalDate.getMonth() + 1).padStart(2, "0")}-${String(operationalDate.getDate()).padStart(2, "0")} (${openTime})</option>`;
 });
 
     window._daysData = days;
@@ -7277,14 +7270,7 @@ let operationalDate = d.shift1?.startMs
 }) 
     : "-";
 
-let closeTime = d.shift2?.endMs 
-    ? new Date(d.shift2.endMs).toLocaleTimeString('en-PK', {
-    timeZone: 'Asia/Karachi',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
-}) 
-    : "-";
+
 
 dateSel.innerHTML += `<option value="${i}">${operationalDate.getFullYear()}-${String(operationalDate.getMonth() + 1).padStart(2, "0")}-${String(operationalDate.getDate()).padStart(2, "0")} (${openTime} → ${closeTime})</option>`;
     });
