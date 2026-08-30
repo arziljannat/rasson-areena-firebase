@@ -4923,16 +4923,20 @@ if (confirmShiftCloseBtn) {
 
         console.log("🔥 CLOSE ACTION:", action);
 
-        if (action === "close shift") {
-
-            await closeShift();
-
-        }
-        else if (action === "close day") {
+        // 🔥 DAY CLOSE
+        if (action.includes("day")) {
 
             await closeDay();
 
         }
+
+        // 🔥 SHIFT CLOSE
+        else if (action.includes("shift")) {
+
+            await closeShift();
+
+        }
+
         else {
 
             console.error(
