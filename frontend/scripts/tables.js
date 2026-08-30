@@ -4911,17 +4911,17 @@ function bindShiftButtons() {
     }
 
 
-    // 🔥 CONFIRM SINGLE SHIFT CLOSE
-    if (confirmShiftCloseBtn) {
+// 🔥 CONFIRM DAY CLOSE
+if (confirmShiftCloseBtn) {
 
-        confirmShiftCloseBtn.onclick =
-            () => {
+    confirmShiftCloseBtn.onclick =
+        () => {
 
-                closeShift();
+            closeDay();
 
-            };
+        };
 
-    }
+}
 
 
     // 🔥 CANCEL
