@@ -4911,15 +4911,38 @@ function bindShiftButtons() {
     }
 
 
-// 🔥 CONFIRM DAY CLOSE
+// 🔥 CONFIRM SHIFT / DAY CLOSE
 if (confirmShiftCloseBtn) {
 
-    confirmShiftCloseBtn.onclick =
-        () => {
+    confirmShiftCloseBtn.onclick = async () => {
 
-            closeDay();
+        const action =
+            confirmShiftCloseBtn.innerText
+                .trim()
+                .toLowerCase();
 
-        };
+        console.log("🔥 CLOSE ACTION:", action);
+
+        if (action === "close shift") {
+
+            await closeShift();
+
+        }
+        else if (action === "close day") {
+
+            await closeDay();
+
+        }
+        else {
+
+            console.error(
+                "❌ UNKNOWN CLOSE ACTION:",
+                action
+            );
+
+        }
+
+    };
 
 }
 
