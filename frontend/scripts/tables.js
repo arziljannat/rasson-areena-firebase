@@ -7272,7 +7272,7 @@ let operationalDate = d.shift1?.startMs
 
 
 
-dateSel.innerHTML += `<option value="${i}">${operationalDate.getFullYear()}-${String(operationalDate.getMonth() + 1).padStart(2, "0")}-${String(operationalDate.getDate()).padStart(2, "0")} (${openTime} → ${closeTime})</option>`;
+dateSel.innerHTML += `<option value="${i}">${operationalDate.getFullYear()}-${String(operationalDate.getMonth() + 1).padStart(2, "0")}-${String(operationalDate.getDate()).padStart(2, "0")} (${openTime})</option>`;
     });
 
 let tableSel = document.getElementById("tableHistoryTableSelect");
