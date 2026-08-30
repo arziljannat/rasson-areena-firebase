@@ -5655,10 +5655,27 @@ async function openShiftSummary() {
     title.innerText =
         "SHIFT SNAPSHOT";
 
+const confirmBtn =
     document.getElementById(
         "confirmShiftCloseBtn"
-    ).innerText =
+    );
+
+if (shift1) {
+
+    title.innerText =
+        "DAY CLOSE";
+
+    confirmBtn.innerText =
+        "Day Close";
+
+} else {
+
+    title.innerText =
+        "SHIFT SNAPSHOT";
+
+    confirmBtn.innerText =
         "Close Shift";
+}
 
     body.innerHTML =
         buildRassonSnapshot(
