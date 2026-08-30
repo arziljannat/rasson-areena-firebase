@@ -162,18 +162,14 @@ onSnapshot(q, (snapshot) => {
         }
     });
 
-    // 🔥 BUTTON AUTO UPDATE
-    const btn = document.getElementById("shiftCloseBtn");
+// 🔥 SINGLE SHIFT BUTTON
+const btn = document.getElementById("shiftCloseBtn");
 
-    if (!shift1) {
-        btn.innerText = "Shift 1 Close";
-    }
-    else if (!shift2) {
-        btn.innerText = "Shift 2 Close";
-    }
-    else {
-        btn.innerText = "Day Close";
-    }
+if (!shift1) {
+    btn.innerText = "Shift Close";
+} else {
+    btn.innerText = "Day Close";
+}
 
     console.log("🔥 REALTIME SHIFTS:", shift1, shift2);
 
@@ -4915,28 +4911,18 @@ oldT.checkoutPlayerNumber = null;
  ******************************************************/
 function bindShiftButtons() {
 
-    // 🔥 SHIFT START TRACKER
-    document.getElementById("shiftCloseBtn").onclick = openShiftSummary;
+    document.getElementById("shiftCloseBtn").onclick =
+        openShiftSummary;
 
-    document.getElementById("confirmShiftCloseBtn").onclick = () => {
-
-        let btn = document.getElementById("shiftCloseBtn");
-
-        if (btn.innerText.includes("Day")) {
-            closeDay();
-        }
-        else if (btn.innerText.includes("1")) {
-            closeShift1();
-        }
-        else {
-            closeShift2();
-        }
-    };
+    document.getElementById("confirmShiftCloseBtn").onclick =
+        () => {
+            closeShift();
+        };
 
     document.getElementById("cancelShiftSummaryBtn").onclick =
         () => hidePopup("shiftSummaryPopup");
-    hidePopup("shiftSummaryPopup");
 
+    hidePopup("shiftSummaryPopup");
 }
 
 /******************************************************
