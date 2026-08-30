@@ -5760,6 +5760,134 @@ if (!snap.empty) {
     return;
 }
 
+// ======================================================
+// 🔴 SHIFT CLOSE — UNPAID BILLS CHECK
+// ======================================================
+
+const unpaidBillsQuery = query(
+    collection(window.db, "sessions"),
+    where("branch", "==", BRANCH),
+    where("day_id", "==", window.currentDayId)
+);
+
+const unpaidBillsSnap =
+    await getDocs(unpaidBillsQuery);
+
+const unpaidBills = [];
+
+unpaidBillsSnap.forEach(docSnap => {
+
+    const data = docSnap.data();
+
+    // Deleted session ignore
+    if (data.is_deleted === true) {
+        return;
+    }
+
+    // Running game ka bill abhi complete nahi hua
+    if (!data.end_time) {
+        return;
+    }
+
+    // Paid bill ignore
+    if (data.paid === true) {
+        return;
+    }
+
+    const total =
+        Number(
+            data.total_bill_amount ??
+            (
+                Number(
+                    data.final_game_amount ??
+                    data.final_amount ??
+                    0
+                ) +
+                Number(
+                    data.canteen_total ??
+                    data.canteen_amount ??
+                    0
+                )
+            )
+        );
+
+    const paid =
+        Number(
+            data.paid_amount ??
+            data.amount_paid ??
+            data.paidAmount ??
+            0
+        );
+
+    const remaining =
+        Number(
+            data.remaining_payment ??
+            Math.max(0, total - paid)
+        );
+
+    // Fully paid
+    if (remaining <= 0) {
+        return;
+    }
+
+    unpaidBills.push({
+
+        tableId:
+            data.table_id ??
+            data.tableId ??
+            "Unknown",
+
+        player1:
+            data.player1_name ??
+            data.player1Name ??
+            "Player 1",
+
+        player2:
+            data.player2_name ??
+            data.player2Name ??
+            "Player 2",
+
+        total,
+        paid,
+        remaining
+
+    });
+
+});
+
+
+// ======================================================
+// 🔴 UNPAID BILL MILA → SHIFT CLOSE BLOCK
+// ======================================================
+
+if (unpaidBills.length > 0) {
+
+    let message =
+        "SHIFT CLOSE BLOCKED ❌\n\n" +
+        "Pehle tamam unpaid bills clear karein:\n\n";
+
+    unpaidBills.forEach((bill, index) => {
+
+        message +=
+            `${index + 1}. Table ${bill.tableId}\n` +
+            `${bill.player1} VS ${bill.player2}\n` +
+            `Total: Rs. ${bill.total.toLocaleString("en-PK")}\n` +
+            `Paid: Rs. ${bill.paid.toLocaleString("en-PK")}\n` +
+            `Remaining: Rs. ${bill.remaining.toLocaleString("en-PK")}\n\n`;
+
+    });
+
+    alert(message);
+
+    return;
+}
+
+console.log(
+    "✅ SHIFT CLOSE — No unpaid bills"
+);
+  
+
+  
 
 let now = Date.now();
 
