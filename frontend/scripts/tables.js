@@ -8878,30 +8878,7 @@ function renderHistoryPage() {
 
     let history = [...t.history];
 
-    // ==========================================
-    // SHIFT FILTER
-    // ==========================================
 
-    const shiftSelect =
-        document.getElementById("tableHistoryShiftSelect");
-
-    const selectedShift =
-        shiftSelect ? shiftSelect.value : "all";
-
-    if (selectedShift === "1") {
-
-        history =
-            history.filter(
-                h => Number(h.shiftNumber) === 1
-            );
-
-    } else if (selectedShift === "2") {
-
-        history =
-            history.filter(
-                h => Number(h.shiftNumber) === 2
-            );
-    }
 
     // ==========================================
     // LATEST FIRST
