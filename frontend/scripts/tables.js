@@ -5627,7 +5627,8 @@ const gameCollection =
 
 
 /******************************************************
- * 🔥 OPEN DAY CLOSE SNAPSHOT — SINGLE SHIFT
+ * 🔥 OPEN SHIFT / DAY SNAPSHOT
+ * SINGLE SHIFT — TWO STEP FLOW
  ******************************************************/
 
 async function openShiftSummary() {
@@ -5642,45 +5643,78 @@ async function openShiftSummary() {
             "shiftSummaryTitle"
         );
 
+    const confirmBtn =
+        document.getElementById(
+            "confirmShiftCloseBtn"
+        );
+
     await rebuildHistoryFromSessions();
 
     const now = Date.now();
 
-    // 🔥 CURRENT DAY START
     const startMs =
         Number(window.currentDayId) || now;
 
     const endMs =
         now;
 
-    // 🔥 SINGLE SHIFT SYSTEM
-    title.innerText =
-        "DAY CLOSE";
 
-    const confirmBtn =
-        document.getElementById(
-            "confirmShiftCloseBtn"
-        );
+    // =================================================
+    // 🔥 STEP 1 — SHIFT NOT CLOSED YET
+    // =================================================
 
-    if (confirmBtn) {
+    if (!shift1) {
 
-        confirmBtn.innerText =
-            "Day Close";
+        title.innerText =
+            "SHIFT SNAPSHOT";
+
+        if (confirmBtn) {
+
+            confirmBtn.innerText =
+                "Close Shift";
+
+        }
+
+        body.innerHTML =
+            buildRassonSnapshot(
+                startMs,
+                endMs,
+                1
+            );
 
     }
 
-    body.innerHTML =
-        buildRassonSnapshot(
-            startMs,
-            endMs,
-            1
-        );
+
+    // =================================================
+    // 🔥 STEP 2 — SHIFT ALREADY CLOSED
+    // =================================================
+
+    else {
+
+        title.innerText =
+            "DAY CLOSE";
+
+        if (confirmBtn) {
+
+            confirmBtn.innerText =
+                "Day Close";
+
+        }
+
+        body.innerHTML =
+            buildRassonSnapshot(
+                startMs,
+                endMs,
+                null
+            );
+
+    }
+
 
     showPopup(
         "shiftSummaryPopup"
     );
 }
-
 /******************************************************
  * SHIFT 1 CLOSE (running tables allowed)
  ******************************************************/
