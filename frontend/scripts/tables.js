@@ -105,105 +105,79 @@ function getItemStock(item) {
  ******************************************************/
 let tables = [];
 
-let currentShift = null;
-let shiftClosed = false;
-let shiftCloseMs = 0;
-
+let shift1 = null;   // ✅ ADD
+let shift2 = null;   // ✅ ADD
 function loadShiftsFromFirebase() {
 
-    const q = query(
-        collection(window.db, "shifts"),
-        where("branch", "==", BRANCH),
-        where("day_id", "==", window.currentDayId),
-        where("shift_number", "==", 1)
-    );
+const q = query(
+    collection(window.db, "shifts"),
+    where("branch", "==", BRANCH),
+    where("day_id", "==", window.currentDayId)
+);
 
-    onSnapshot(q, (snapshot) => {
+onSnapshot(q, (snapshot) => {
 
-        currentShift = null;
+    shift1 = null;
+    shift2 = null;
 
-        snapshot.forEach(docSnap => {
+    snapshot.forEach(docSnap => {
+        const d = docSnap.data();
 
-            const d = docSnap.data();
-
-            if (!currentShift) {
-
-                currentShift = {
-                    openTime: d.open_time || "",
-                    closeTime: d.close_time || "",
-
-                    startMs:
-                        Number(d.start_ms) || 0,
-
-                    endMs:
-                        Number(d.end_ms) || 0,
-
-                    gameTotal:
-                        Number(d.game_total || 0),
-
-                    canteenTotal:
-                        Number(d.canteen_total || 0),
-
-                    gameCollection:
-                        Number(d.game_collection || 0),
-
-                    canteenCollection:
-                        Number(d.canteen_collection || 0),
-
-                    gameBalance:
-                        Number(d.game_balance || 0),
-
-                    canteenBalance:
-                        Number(d.canteen_balance || 0),
-
-                    expenses:
-                        Number(d.expenses || 0),
-
-                    easypaisa:
-                        Number(d.easypaisa || 0),
-
-                    discount:
-                        Number(d.discount || 0),
-
-                    closingCash:
-                        Number(d.closing_cash || 0),
-
-                    shiftClosed:
-                        d.shift_closed === true,
-
-                    shiftCloseMs:
-                        Number(d.shift_close_ms || 0)
-                };
-
-                shiftClosed =
-                    d.shift_closed === true;
-
-                shiftCloseMs =
-                    Number(d.shift_close_ms || 0);
-            }
-        });
-
-        const btn =
-            document.getElementById("shiftCloseBtn");
-
-        if (!btn) return;
-
-        if (shiftClosed) {
-
-            btn.innerText = "Day Close";
-
-        } else {
-
-            btn.innerText = "Shift Close";
-
+        if (d.shift_number === 1 && !shift1) {
+            shift1 = {
+                openTime: d.open_time,
+                closeTime: d.close_time,
+                startMs: Number(d.start_ms) || 0,
+                endMs: Number(d.end_ms) || 0,
+                gameTotal: d.game_total,
+                canteenTotal: d.canteen_total,
+                gameCollection: d.game_collection,
+                canteenCollection: d.canteen_collection,
+                expenses: d.expenses,
+                easypaisa: d.easypaisa || 0,
+                discount: d.discount || 0,
+                closingCash: d.closing_cash,
+                gameBalance: d.game_balance || 0,
+               canteenBalance: d.canteen_balance || 0
+            };
         }
 
-        console.log(
-            "🔥 ONE SHIFT:",
-            currentShift
-        );
-
+        if (d.shift_number === 2 && !shift2) {
+            shift2 = {
+                openTime: d.open_time,
+                closeTime: d.close_time,
+                startMs: Number(d.start_ms) || 0,
+                endMs: Number(d.end_ms) || 0,
+                gameTotal: d.game_total,
+                canteenTotal: d.canteen_total,
+                gameCollection: d.game_collection,
+                canteenCollection: d.canteen_collection,
+                expenses: d.expenses,
+                easypaisa: d.easypaisa || 0,
+                discount: d.discount || 0,
+                closingCash: d.closing_cash,
+                gameBalance: d.game_balance || 0,
+                canteenBalance: d.canteen_balance || 0
+            };
+        }
     });
+
+    // 🔥 BUTTON AUTO UPDATE
+    const btn = document.getElementById("shiftCloseBtn");
+
+    if (!shift1) {
+        btn.innerText = "Shift 1 Close";
+    }
+    else if (!shift2) {
+        btn.innerText = "Shift 2 Close";
+    }
+    else {
+        btn.innerText = "Day Close";
+    }
+
+    console.log("🔥 REALTIME SHIFTS:", shift1, shift2);
+
+});
 }
 
 let editTargetId = null;
@@ -2971,17 +2945,25 @@ function openHistory(id) {
     // 🔥 SHIFT FILTER
     // =====================================================
 
-const shift1History =
-    historyList;
-const shift2History = [];
+    const shift1History =
+        historyList.filter(
+            h => Number(h.shiftNumber || 1) === 1
+        );
+
+    const shift2History =
+        historyList.filter(
+            h => Number(h.shiftNumber || 1) === 2
+        );
+
     // =====================================================
     // 🔥 SUMMARY
     // =====================================================
 
-const shift1Game =
-    shift1History.length;
+    const shift1Game =
+        shift1History.length;
 
-const shift2Game = 0;
+    const shift2Game =
+        shift2History.length;
 
   // =====================================================
 // 🎱 FRAME / CENTURY SUMMARY
@@ -3018,13 +3000,29 @@ const shift1Frames =
         h => getPlayType(h) === "frame"
     );
 
+const shift2Frames =
+    shift2History.filter(
+        h => getPlayType(h) === "frame"
+    );
+
 const shift1Century =
     shift1History.filter(
         h => getPlayType(h) === "century"
     );
 
+const shift2Century =
+    shift2History.filter(
+        h => getPlayType(h) === "century"
+    );
+
 const shift1FrameAmount =
     shift1Frames.reduce(
+        (sum, h) => sum + getAmount(h),
+        0
+    );
+
+const shift2FrameAmount =
+    shift2Frames.reduce(
         (sum, h) => sum + getAmount(h),
         0
     );
@@ -3143,8 +3141,14 @@ const isPaid = (h) =>
 const shift1PaidFrames =
     shift1Frames.filter(isPaid);
 
+const shift2PaidFrames =
+    shift2Frames.filter(isPaid);
+
 const shift1UnpaidFrames =
     shift1Frames.filter(h => !isPaid(h));
+
+const shift2UnpaidFrames =
+    shift2Frames.filter(h => !isPaid(h));
 
 
 // ---------- CENTURY ----------
@@ -3152,8 +3156,14 @@ const shift1UnpaidFrames =
 const shift1PaidCentury =
     shift1Century.filter(isPaid);
 
+const shift2PaidCentury =
+    shift2Century.filter(isPaid);
+
 const shift1UnpaidCentury =
     shift1Century.filter(h => !isPaid(h));
+
+const shift2UnpaidCentury =
+    shift2Century.filter(h => !isPaid(h));
 
 
 // =====================================================
@@ -3222,8 +3232,11 @@ const countFrames = (list) =>
 const s1FrameCount =
     countFrames(shift1Frames);
 
+const s2FrameCount =
+    countFrames(shift2Frames);
+
 const totalFrameCount =
-    countFrames(shift1Frames);
+    s1FrameCount + s2FrameCount;
 
 // =====================================================
 // 💰 FRAME AMOUNTS
@@ -3232,8 +3245,11 @@ const totalFrameCount =
 const s1FrameAmount =
     amountOf(shift1Frames);
 
+const s2FrameAmount =
+    amountOf(shift2Frames);
+
 const totalFrameAmount =
-    amountOf(shift1Frames);
+    s1FrameAmount + s2FrameAmount;
 
 
 // =====================================================
@@ -3285,14 +3301,20 @@ const totalCenturySeconds =
 const s1PaidFrameCount =
     countFrames(shift1PaidFrames);
 
+const s2PaidFrameCount =
+    countFrames(shift2PaidFrames);
+
 const totalPaidFrameCount =
-    s1PaidFrameCount;
+    s1PaidFrameCount + s2PaidFrameCount;
 
 const s1PaidFrameAmount =
     amountOf(shift1PaidFrames);
 
+const s2PaidFrameAmount =
+    amountOf(shift2PaidFrames);
+
 const totalPaidFrameAmount =
-    s1PaidFrameAmount;
+    s1PaidFrameAmount + s2PaidFrameAmount;
 
 
 // =====================================================
@@ -3302,20 +3324,29 @@ const totalPaidFrameAmount =
 const s1PaidCenturyCount =
     shift1PaidCentury.length;
 
+const s2PaidCenturyCount =
+    shift2PaidCentury.length;
+
 const totalPaidCenturyCount =
-    s1PaidCenturyCount;
+    s1PaidCenturyCount + s2PaidCenturyCount;
 
 const s1PaidCenturyAmount =
     amountOf(shift1PaidCentury);
 
+const s2PaidCenturyAmount =
+    amountOf(shift2PaidCentury);
+
 const totalPaidCenturyAmount =
-    s1PaidCenturyAmount;
+    s1PaidCenturyAmount + s2PaidCenturyAmount;
 
 const s1PaidCenturySeconds =
     secondsOf(shift1PaidCentury);
 
+const s2PaidCenturySeconds =
+    secondsOf(shift2PaidCentury);
+
 const totalPaidCenturySeconds =
-    s1PaidCenturySeconds;
+    s1PaidCenturySeconds + s2PaidCenturySeconds;
 
 
 // =====================================================
@@ -3325,14 +3356,21 @@ const totalPaidCenturySeconds =
 const s1UnpaidFrameCount =
     countFrames(shift1UnpaidFrames);
 
+const s2UnpaidFrameCount =
+    countFrames(shift2UnpaidFrames);
+
 const totalUnpaidFrameCount =
-    s1UnpaidFrameCount;
+    s1UnpaidFrameCount + s2UnpaidFrameCount;
 
 const s1UnpaidFrameAmount =
     amountOf(shift1UnpaidFrames);
 
+const s2UnpaidFrameAmount =
+    amountOf(shift2UnpaidFrames);
+
 const totalUnpaidFrameAmount =
-    s1UnpaidFrameAmount;
+    s1UnpaidFrameAmount + s2UnpaidFrameAmount;
+
 
 // =====================================================
 // 🔴 UNPAID CENTURIES
@@ -3341,20 +3379,30 @@ const totalUnpaidFrameAmount =
 const s1UnpaidCenturyCount =
     shift1UnpaidCentury.length;
 
+const s2UnpaidCenturyCount =
+    shift2UnpaidCentury.length;
+
 const totalUnpaidCenturyCount =
-    s1UnpaidCenturyCount;
+    s1UnpaidCenturyCount + s2UnpaidCenturyCount;
 
 const s1UnpaidCenturyAmount =
     amountOf(shift1UnpaidCentury);
 
+const s2UnpaidCenturyAmount =
+    amountOf(shift2UnpaidCentury);
+
 const totalUnpaidCenturyAmount =
-    s1UnpaidCenturyAmount;
+    s1UnpaidCenturyAmount + s2UnpaidCenturyAmount;
 
 const s1UnpaidCenturySeconds =
     secondsOf(shift1UnpaidCentury);
 
+const s2UnpaidCenturySeconds =
+    secondsOf(shift2UnpaidCentury);
+
 const totalUnpaidCenturySeconds =
-    s1UnpaidCenturySeconds;
+    s1UnpaidCenturySeconds +
+    s2UnpaidCenturySeconds;
 
 
 // =====================================================
@@ -3495,6 +3543,11 @@ setText(
 );
 
 setText(
+    "historyShift2PaidFrame",
+    s2PaidFrameCount
+);
+
+setText(
     "historyTotalPaidFrame",
     totalPaidFrameCount
 );
@@ -3502,6 +3555,11 @@ setText(
 setText(
     "historyShift1PaidFrameAmount",
     `Rs. ${s1PaidFrameAmount.toLocaleString()}`
+);
+
+setText(
+    "historyShift2PaidFrameAmount",
+    `Rs. ${s2PaidFrameAmount.toLocaleString()}`
 );
 
 setText(
@@ -3520,6 +3578,11 @@ setText(
 );
 
 setText(
+    "historyShift2PaidCentury",
+    s2PaidCenturyCount
+);
+
+setText(
     "historyTotalPaidCentury",
     totalPaidCenturyCount
 );
@@ -3530,6 +3593,11 @@ setText(
 );
 
 setText(
+    "historyShift2PaidCenturyAmount",
+    `Rs. ${s2PaidCenturyAmount.toLocaleString()}`
+);
+
+setText(
     "historyTotalPaidCenturyAmount",
     `Rs. ${totalPaidCenturyAmount.toLocaleString()}`
 );
@@ -3537,6 +3605,11 @@ setText(
 setText(
     "historyShift1PaidCenturyTime",
     formatSummaryTime(s1PaidCenturySeconds)
+);
+
+setText(
+    "historyShift2PaidCenturyTime",
+    formatSummaryTime(s2PaidCenturySeconds)
 );
 
 setText(
@@ -3555,6 +3628,11 @@ setText(
 );
 
 setText(
+    "historyShift2UnpaidFrame",
+    s2UnpaidFrameCount
+);
+
+setText(
     "historyTotalUnpaidFrame",
     totalUnpaidFrameCount
 );
@@ -3562,6 +3640,11 @@ setText(
 setText(
     "historyShift1UnpaidFrameAmount",
     `Rs. ${s1UnpaidFrameAmount.toLocaleString()}`
+);
+
+setText(
+    "historyShift2UnpaidFrameAmount",
+    `Rs. ${s2UnpaidFrameAmount.toLocaleString()}`
 );
 
 setText(
@@ -3580,6 +3663,11 @@ setText(
 );
 
 setText(
+    "historyShift2UnpaidCentury",
+    s2UnpaidCenturyCount
+);
+
+setText(
     "historyTotalUnpaidCentury",
     totalUnpaidCenturyCount
 );
@@ -3590,6 +3678,11 @@ setText(
 );
 
 setText(
+    "historyShift2UnpaidCenturyAmount",
+    `Rs. ${s2UnpaidCenturyAmount.toLocaleString()}`
+);
+
+setText(
     "historyTotalUnpaidCenturyAmount",
     `Rs. ${totalUnpaidCenturyAmount.toLocaleString()}`
 );
@@ -3597,6 +3690,11 @@ setText(
 setText(
     "historyShift1UnpaidCenturyTime",
     formatSummaryTime(s1UnpaidCenturySeconds)
+);
+
+setText(
+    "historyShift2UnpaidCenturyTime",
+    formatSummaryTime(s2UnpaidCenturySeconds)
 );
 
 setText(
@@ -4817,36 +4915,28 @@ oldT.checkoutPlayerNumber = null;
  ******************************************************/
 function bindShiftButtons() {
 
-    // 🔥 ONE SHIFT ONLY
-    document.getElementById("shiftCloseBtn").onclick =
-        openShiftSummary;
+    // 🔥 SHIFT START TRACKER
+    document.getElementById("shiftCloseBtn").onclick = openShiftSummary;
 
     document.getElementById("confirmShiftCloseBtn").onclick = () => {
 
-        const btn =
-            document.getElementById("shiftCloseBtn");
+        let btn = document.getElementById("shiftCloseBtn");
 
-        // DAY CLOSE
-        if (
-            btn.innerText
-                .trim()
-                .includes("Day")
-        ) {
-
+        if (btn.innerText.includes("Day")) {
             closeDay();
-            return;
         }
-
-        // ONE SHIFT CLOSE
-        closeShift1();
+        else if (btn.innerText.includes("1")) {
+            closeShift1();
+        }
+        else {
+            closeShift2();
+        }
     };
 
-    document.getElementById(
-        "cancelShiftSummaryBtn"
-    ).onclick =
+    document.getElementById("cancelShiftSummaryBtn").onclick =
         () => hidePopup("shiftSummaryPopup");
-
     hidePopup("shiftSummaryPopup");
+
 }
 
 /******************************************************
@@ -5622,6 +5712,36 @@ async function openShiftSummary() {
 
     }
 
+
+    /* =================================================
+       SHIFT 2
+    ================================================= */
+
+    else {
+
+        title.innerText =
+            "SHIFT 2 SNAPSHOT";
+
+        document.getElementById(
+            "confirmShiftCloseBtn"
+        ).innerText =
+            "Close Shift";
+
+
+        startMs =
+            shift2?.startMs ||
+            shift1?.endMs ||
+            Number(
+                window.currentDayId
+            ) ||
+            now;
+
+
+        shiftNumber = 2;
+
+    }
+
+
     body.innerHTML =
         buildRassonSnapshot(
             startMs,
@@ -5636,272 +5756,117 @@ async function openShiftSummary() {
 }
 
 /******************************************************
- * ONE SHIFT CLOSE
- * Running games remain active
+ * SHIFT 1 CLOSE (running tables allowed)
  ******************************************************/
 async function closeShift1() {
+  const q = query(
+    collection(window.db, "shifts"),
+    where("branch", "==", BRANCH),
+    where("shift_number", "==", 1),
+    where("day_id", "==", window.currentDayId) // 🔥 MAIN FIX
+);
 
-    // ==========================================
-    // CHECK CURRENT DAY SHIFT
-    // ==========================================
+const snap = await getDocs(q);
 
-    const q = query(
-        collection(window.db, "shifts"),
-        where("branch", "==", BRANCH),
-        where("shift_number", "==", 1),
-        where("day_id", "==", window.currentDayId)
-    );
+if (!snap.empty) {
+    alert("Shift 1 already closed ❌");
+    return;
+}
 
-    const snap = await getDocs(q);
 
-    if (!snap.empty) {
+let now = Date.now();
 
-        alert("Shift already closed ❌");
-        return;
-    }
+// 🔥 FORCE SAFE TIME
+let endMs = now;
 
+// 🔥 SHIFT 1 START = CURRENT OPERATIONAL DAY START
+let startMs = Number(window.currentDayId) || 0;
 
-    // ==========================================
-    // CURRENT TIME
-    // ==========================================
+// Safety fallback
+if (!startMs || startMs < 1000000000000) {
+    startMs = now;
+}
 
-    const now = Date.now();
+// ❗ HARD PROTECTION
+if (!endMs || endMs < 100000) {
+    endMs = Date.now();
+}
 
-    let startMs =
-        Number(window.currentDayId) || 0;
+// ❗ DOUBLE SAFETY
+if (!startMs || startMs <= 0) {
+    startMs = endMs - 1000;
+}
 
-    if (
-        !startMs ||
-        startMs < 1000000000000
-    ) {
-        startMs = now;
-    }
+// 🔥 STEP 1: FIRST REBUILD HISTORY
+await rebuildHistoryFromSessions();
 
 
-    // ==========================================
-    // REBUILD HISTORY FIRST
-    // ==========================================
-
-    await rebuildHistoryFromSessions();
-
-
-    // ==========================================
-    // LIVE SHIFT SNAPSHOT
-    // ==========================================
-
-    const shiftData =
-        calculateShiftSnapshot(
-            startMs,
-            now
-        );
-
-
-    // ==========================================
-    // KEEP RUNNING TABLES RUNNING
-    // ==========================================
-
-    const runningTables =
-        tables
-            .filter(t => t.isRunning)
-            .map(t => ({
-
-                table_id: t.name,
-
-                player1Name:
-                    t.player1Name || "",
-
-                player2Name:
-                    t.player2Name || "",
-
-                checkoutPlayer:
-                    t.checkoutPlayer || "",
-
-                checkoutPlayerNumber:
-                    t.checkoutPlayerNumber || null,
-
-                checkinTime:
-                    t.checkinTime || null,
-
-                selectedPlayType:
-                    t.selectedPlayType || "",
-
-                selectedRate:
-                    Number(t.selectedRate || 0),
-
-                playSeconds:
-                    Number(t.playSeconds || 0),
-
-                liveAmount:
-                    Number(t.liveAmount || 0),
-
-                canteenTotal:
-                    Number(t.canteenTotal || 0),
-
-                canteenItems:
-                    { ...(t.canteenItems || {}) },
-
-                carriedFromDay:
-                    window.currentDayId,
-
-                carriedAt:
-                    now,
-
-                isRunning: true
-
-            }));
-
-
-    // ==========================================
-    // SAVE ONE SHIFT
-    // ==========================================
-
-    const docRef =
-        await addDoc(
-            collection(window.db, "shifts"),
-            {
-
-                branch: BRANCH,
-
-                day_id:
-                    window.currentDayId,
-
-                shift_number: 1,
-
-                shift_closed: true,
-
-                shift_close_ms:
-                    now,
-
-                open_time:
-                    new Date(startMs)
-                        .toLocaleString(
-                            "en-PK",
-                            {
-                                timeZone:
-                                    "Asia/Karachi"
-                            }
-                        ),
-
-                close_time:
-                    new Date(now)
-                        .toLocaleString(
-                            "en-PK",
-                            {
-                                timeZone:
-                                    "Asia/Karachi"
-                            }
-                        ),
-
-                start_ms:
-                    startMs,
-
-                end_ms:
-                    now,
-
-                game_total:
-                    shiftData.gameTotal || 0,
-
-                canteen_total:
-                    shiftData.canteenTotal || 0,
-
-                game_collection:
-                    shiftData.gameCollection || 0,
-
-                canteen_collection:
-                    shiftData.canteenCollection || 0,
-
-                game_balance:
-                    shiftData.gameBalance || 0,
-
-                canteen_balance:
-                    shiftData.canteenBalance || 0,
-
-                expenses:
-                    shiftData.expenses || 0,
-
-                easypaisa:
-                    shiftData.easypaisa || 0,
-
-                discount:
-                    shiftData.discount || 0,
-
-                closing_cash:
-                    shiftData.closingCash || 0,
-
-                carry_forward_games:
-                    runningTables,
-
-                created_at:
-                    new Date().toISOString()
-            }
-        );
-
-
-    if (!docRef?.id) {
-
-        alert("Shift save failed ❌");
-        return;
-    }
-
-
-    // ==========================================
-    // UPDATE LOCAL STATE
-    // ==========================================
+// 🔥 STEP 3: CALCULATE
+let shiftData = calculateShiftSnapshot(startMs, endMs);
 
     shift1 = {
-
         shift: 1,
-
-        openTime:
-            new Date(startMs)
-                .toLocaleString(
-                    "en-PK",
-                    {
-                        timeZone:
-                            "Asia/Karachi"
-                    }
-                ),
-
-        closeTime:
-            new Date(now)
-                .toLocaleString(
-                    "en-PK",
-                    {
-                        timeZone:
-                            "Asia/Karachi"
-                    }
-                ),
-
-        startMs,
-        endMs: now,
-
-        shiftClosed: true,
-
-        shiftCloseMs: now,
-
+        openTime: new Date(startMs).toLocaleString('en-PK', { timeZone: 'Asia/Karachi' }),
+        closeTime: new Date(endMs).toLocaleString('en-PK', { timeZone: 'Asia/Karachi' }),
+        startMs: startMs,
+        endMs: endMs,
         ...shiftData
     };
 
+    
 
-    // ==========================================
-    // BUTTON → DAY CLOSE
-    // ==========================================
-
-    document.getElementById(
-        "shiftCloseBtn"
-    ).innerText = "Day Close";
-
-
+    document.getElementById("shiftCloseBtn").innerText = "Shift 2 Close";
     hidePopup("shiftSummaryPopup");
 
 
-    alert(
-        "Shift closed successfully ✅\n\n" +
-        "Running games will continue until Day Close."
-    );
+  console.log("🔥 SHIFT1 SAVE CHECK:", {
+    startMs,
+    endMs
+});
 
+// ✅ BACKEND SAVE
 
-    loadShiftsFromFirebase();
+// 🔥 FIREBASE SAVE SHIFT 1
+// 🔥 FIREBASE SAVE SHIFT 1
+const docRef = await addDoc(collection(window.db, "shifts"), {
+    tables: tables.map(t => ({
+        table_id: t.name,
+        total: t.history.reduce((sum, h) => sum + (h.total || 0), 0)
+    })),
+    shift_number: 1,
+    branch: BRANCH,
+
+    day_id: window.currentDayId,
+
+    open_time: shift1.openTime,
+    close_time: shift1.closeTime,
+
+    start_ms: shift1.startMs,
+    end_ms: shift1.endMs,
+
+    game_total: shiftData.gameTotal,
+    canteen_total: shiftData.canteenTotal,
+
+    game_collection: shiftData.gameCollection,
+    canteen_collection: shiftData.canteenCollection,
+
+    expenses: shiftData.expenses,
+easypaisa: shiftData.easypaisa,
+
+discount: shiftData.discount || 0,
+
+closing_cash: shiftData.closingCash,
+
+    created_at: new Date().toISOString()
+});
+
+// ✅ CHECK AFTER SAVE (YAHAN LAGAO)
+if (!docRef?.id) {
+    alert("Shift1 save failed ❌");
+    return;
+}
+alert("Shift 1 closed successfully ✅");
+  loadShiftsFromFirebase();
 }
 
 
@@ -6049,6 +6014,111 @@ unpaidBills.forEach(bill => {
     return;
 }
 
+console.log(
+    "✅ SHIFT 2 CLOSE — No unpaid completed bills"
+);
+
+
+    let now = Date.now();
+
+    // Shift1 snapshot required
+    let s1 = shift1 || {};
+
+    let startMs = shift1?.endMs;
+
+// 🔥 HARD FIX (NO FAIL SYSTEM)
+if (!startMs) {
+
+    console.log("⚠️ shift1 missing → forcing reload");
+
+    // ✅ STEP 1: reload shifts
+    loadShiftsFromFirebase();
+
+    startMs = shift1?.endMs;
+
+    // ✅ STEP 2: STILL MISSING → WAIT + FETCH
+    if (!startMs) {
+
+        await new Promise(res => setTimeout(res, 800)); // 🔥 WAIT
+
+        const q = query(
+            collection(window.db, "shifts"),
+            where("branch", "==", BRANCH),
+            where("shift_number", "==", 1),
+            where("day_id", "==", window.currentDayId)
+        );
+
+        const snap = await getDocs(q);
+
+        snap.forEach(doc => {
+            const d = doc.data();
+            startMs = d.end_ms;
+        });
+    }
+
+    if (!startMs) {
+    console.log("🔥 FALLBACK ACTIVATED");
+
+    // 🔥 NEVER FAIL SYSTEM
+    startMs = Date.now() - (60 * 60 * 1000); // 1 hour back
+}
+}
+    let endMs = now;
+
+    
+    let shiftData = calculateShiftSnapshot(startMs, endMs);
+
+    shift2 = {
+        shift: 2,
+        openTime: new Date(startMs).toLocaleString('en-PK', { timeZone: 'Asia/Karachi' }),
+        closeTime: new Date(endMs).toLocaleString('en-PK', { timeZone: 'Asia/Karachi' }),
+        startMs: startMs,
+        endMs: endMs,
+        ...shiftData
+    };
+
+    
+
+    document.getElementById("shiftCloseBtn").innerText = "Day Close";
+    hidePopup("shiftSummaryPopup");
+
+// ✅ BACKEND SAVE
+
+// 🔥 FIREBASE SAVE SHIFT 2
+await addDoc(collection(window.db, "shifts"), {
+    tables: tables.map(t => ({
+        table_id: t.name,
+        total: t.history.reduce((sum, h) => sum + (h.total || 0), 0)
+    })),
+    shift_number: 2,
+    branch: BRANCH,
+
+    day_id: window.currentDayId,
+
+    open_time: shift2.openTime,
+    close_time: shift2.closeTime,
+    start_ms: shift2.startMs,
+    end_ms: shift2.endMs,
+
+    game_total: shiftData.gameTotal,
+canteen_total: shiftData.canteenTotal,
+
+game_collection: shiftData.gameCollection,
+canteen_collection: shiftData.canteenCollection,
+
+expenses: shiftData.expenses,
+easypaisa: shiftData.easypaisa,
+
+discount: shiftData.discount || 0,
+
+closing_cash: shiftData.closingCash,
+
+    created_at: new Date().toISOString()
+});
+
+alert("Shift 2 closed successfully ✅");
+  loadShiftsFromFirebase();
+}
 
 
 
@@ -6057,40 +6127,33 @@ unpaidBills.forEach(bill => {
  ******************************************************/
 async function closeDay() {
 
-    const today =
-        new Date().toLocaleDateString("en-CA");
-
+   const today = new Date().toLocaleDateString("en-CA"); // ✅ FIX
     let s1 = shift1;
+    let s2 = shift2;
 
-    if (!s1) {
-
-        alert(
-            "Please close Shift before Day Close."
-        );
-
+    if (!s1 || !s2) {
+        alert("Please close Shift 1 and Shift 2 before Day Close.");
         return;
     }
 
     // --------------- BUILD COMBINED SUMMARY --------------------
-let combined = {
-    gameTotal: s1.gameTotal || 0,
+    let combined = {
+        gameTotal: (s1.gameTotal || 0) + (s2.gameTotal || 0),
+        canteenTotal: (s1.canteenTotal || 0) + (s2.canteenTotal || 0),
 
-    canteenTotal: s1.canteenTotal || 0,
+        gameCollection: (s1.gameCollection || 0) + (s2.gameCollection || 0),
+        canteenCollection: (s1.canteenCollection || 0) + (s2.canteenCollection || 0),
 
-    gameCollection: s1.gameCollection || 0,
+        gameBalance: (s1.gameBalance || 0) + (s2.gameBalance || 0),
+        canteenBalance: (s1.canteenBalance || 0) + (s2.canteenBalance || 0),
 
-    canteenCollection: s1.canteenCollection || 0,
-
-    gameBalance: s1.gameBalance || 0,
-
-    canteenBalance: s1.canteenBalance || 0,
-
-    expenses: s1.expenses || 0,
-
-    discount: s1.discount || 0,
-
-    easypaisa: s1.easypaisa || 0
-};
+        expenses: (s1.expenses || 0) + (s2.expenses || 0),
+        
+      
+        discount:(s1.discount || 0)+(s2.discount || 0),
+      
+        easypaisa: (s1.easypaisa || 0) + (s2.easypaisa || 0),
+    };
 
     combined.closingCash =
     (combined.gameCollection + combined.canteenCollection)
@@ -6099,59 +6162,11 @@ let combined = {
 
 
     // 🔥🔥🔥 STEP 1: SAVE SNAPSHOT BEFORE RESET (MAIN FIX)
-const tablesSnapshot = tables.map(t => ({
-
+    const tablesSnapshot = tables.map(t => ({
     table_id: t.name,
-
-    history: (t.history || []).map(h => ({
-        ...h
-    })),
-
-    // 🔥 RUNNING GAME AT DAY CLOSE
-    runningGame: t.isRunning === true
-        ? {
-            player1Name: t.player1Name || "",
-            player2Name: t.player2Name || "",
-
-            checkoutPlayer:
-                t.checkoutPlayer || "",
-
-            checkoutPlayerNumber:
-                t.checkoutPlayerNumber || null,
-
-            checkinTime:
-                t.checkinTime || null,
-
-            selectedPlayType:
-                t.selectedPlayType || "",
-
-            selectedRate:
-                Number(t.selectedRate || 0),
-
-            playSeconds:
-                Number(t.playSeconds || 0),
-
-            liveAmount:
-                Number(t.liveAmount || 0),
-
-            canteenTotal:
-                Number(t.canteenTotal || 0),
-
-            canteenItems:
-                { ...(t.canteenItems || {}) },
-
-            carriedFromDay:
-                window.currentDayId,
-
-            carriedAt:
-                Date.now()
-        }
-        : null
+    history: t.history.map(h => ({ ...h }))
 }));
 
-  
-
-  
 
     // 🔥🔥🔥 STEP 2: FIREBASE SAVE (PEHLE SAVE KARO)
     try {
@@ -6167,6 +6182,7 @@ const tablesSnapshot = tables.map(t => ({
 
 // 🔥 SAFE DATA CLEAN (VERY IMPORTANT)
 const safeShift1 = JSON.parse(JSON.stringify(s1 || {}));
+const safeShift2 = JSON.parse(JSON.stringify(s2 || {}));
 const safeTables = JSON.parse(JSON.stringify(tablesSnapshot || {}));
 const safeCombined = JSON.parse(JSON.stringify(combined || {}));
 
@@ -6231,11 +6247,12 @@ if (alreadyClosed) {
 await addDoc(collection(window.db, "days"), {
     tables: safeTables,
     date: today,
-    day_id: window.currentDayId,
+    day_id: window.currentDayId, // 🔥 ADD THIS
     branch: BRANCH,
     shift: "day",
 
     shift1: safeShift1,
+    shift2: safeShift2,
     combined: safeCombined,
 
     created_at: new Date().toISOString()
@@ -6243,16 +6260,14 @@ await addDoc(collection(window.db, "days"), {
 
 // 🔥 FINAL SAFE DATA (DIRECT FROM SHIFT OBJECTS)
 let printData = {
-    gameTotal: s1?.gameTotal || 0,
-    canteenTotal: s1?.canteenTotal || 0,
+    gameTotal: (s1?.gameTotal || 0) + (s2?.gameTotal || 0),
+    canteenTotal: (s1?.canteenTotal || 0) + (s2?.canteenTotal || 0),
 
-    gameCollection: s1?.gameCollection || 0,
-    canteenCollection: s1?.canteenCollection || 0,
+    gameCollection: (s1?.gameCollection || 0) + (s2?.gameCollection || 0),
+    canteenCollection: (s1?.canteenCollection || 0) + (s2?.canteenCollection || 0),
 
-    expenses: s1?.expenses || 0,
-    easypaisa: s1?.easypaisa || 0,
-
-    discount: s1?.discount || 0
+    expenses: (s1?.expenses || 0) + (s2?.expenses || 0),
+  easypaisa: (s1?.easypaisa || 0) + (s2?.easypaisa || 0),
 };
 
 printData.closingCash =
@@ -6271,6 +6286,7 @@ printDayHistoryThermal({
     tables: safeTables,
 
     shift1: shift1,
+    shift2: shift2,
 
     combined: {
         gameTotal: printData.gameTotal,
@@ -6279,14 +6295,17 @@ printDayHistoryThermal({
         gameCollection: printData.gameCollection,
         canteenCollection: printData.canteenCollection,
 
-gameBalance:
-    shift1?.gameBalance || 0,
+        gameBalance:
+            (shift1?.gameBalance || 0) +
+            (shift2?.gameBalance || 0),
 
-canteenBalance:
-    shift1?.canteenBalance || 0,
+        canteenBalance:
+            (shift1?.canteenBalance || 0) +
+            (shift2?.canteenBalance || 0),
 
-discount:
-    s1?.discount || 0,
+        discount:
+            (s1?.discount || 0) +
+            (s2?.discount || 0),
 
         expenses:
             printData.expenses,
@@ -6342,183 +6361,59 @@ for (const d of snap.docs) {
 
 
 // ======================================================
-// 🔥 DAY CLOSE → CARRY FORWARD ALL REQUIRED SESSIONS
+// 🔥 FIND ALL CURRENTLY RUNNING SESSIONS
 // ======================================================
 
-const shiftCloseMs =
-    Number(s1.shiftCloseMs || s1.endMs || 0);
-
-const dayCloseMs = Date.now();
-
-const sessionsQuery = query(
+const runningSessionsQuery = query(
     collection(window.db, "sessions"),
-    where("branch", "==", BRANCH)
+    where("branch", "==", BRANCH),
+    where("end_time", "==", null)
 );
 
-const sessionsSnap =
-    await getDocs(sessionsQuery);
+const runningSessionsSnap =
+    await getDocs(runningSessionsQuery);
 
 
 // ======================================================
-// 🔥 MOVE SESSIONS TO NEW DAY
-//
-// CASE 1:
-// New check-in happened AFTER Shift Close
-//
-// CASE 2:
-// Game was already running at Shift Close
-// and checkout happened AFTER Shift Close
-// or is STILL running at Day Close.
+// 🔥 MOVE RUNNING SESSIONS → NEW DAY
 // ======================================================
 
-for (const sessionDoc of sessionsSnap.docs) {
+for (const sessionDoc of runningSessionsSnap.docs) {
 
-    const sessionData =
-        sessionDoc.data();
+    const sessionData = sessionDoc.data();
 
-    // ------------------------------------------
-    // Ignore deleted sessions
-    // ------------------------------------------
-
-    if (
-        sessionData.is_deleted === true
-    ) {
+    // Deleted session ignore
+    if (sessionData.is_deleted === true) {
         continue;
     }
-
-
-    // ------------------------------------------
-    // Only CURRENT OLD DAY sessions
-    // ------------------------------------------
-
-    if (
-        String(sessionData.day_id) !==
-        String(oldDayId)
-    ) {
-        continue;
-    }
-
-
-    // ------------------------------------------
-    // Session start
-    // ------------------------------------------
-
-    const sessionStart =
-        new Date(
-            sessionData.start_time
-        ).getTime();
-
-
-    if (
-        !Number.isFinite(sessionStart)
-    ) {
-        continue;
-    }
-
-
-    // ------------------------------------------
-    // Session end
-    // ------------------------------------------
-
-    let sessionEnd = null;
-
-    if (sessionData.end_time) {
-
-        sessionEnd =
-            new Date(
-                sessionData.end_time
-            ).getTime();
-
-        if (
-            !Number.isFinite(sessionEnd)
-        ) {
-            sessionEnd = null;
-        }
-    }
-
-
-    // ------------------------------------------
-    // NEW CHECK-IN AFTER SHIFT CLOSE
-    // ------------------------------------------
-
-    const newAfterShift =
-        sessionStart > shiftCloseMs &&
-        sessionStart <= dayCloseMs;
-
-
-    // ------------------------------------------
-    // GAME WAS RUNNING ACROSS SHIFT CLOSE
-    //
-    // Started before/equal Shift Close
-    // AND:
-    // - still running
-    // OR
-    // - checked out after Shift Close
-    // ------------------------------------------
-
-    const crossedShift =
-        sessionStart <= shiftCloseMs &&
-        (
-            sessionEnd === null ||
-            sessionEnd > shiftCloseMs
-        );
-
-
-    // ------------------------------------------
-    // Only carry required sessions
-    // ------------------------------------------
-
-    if (
-        !newAfterShift &&
-        !crossedShift
-    ) {
-        continue;
-    }
-
 
     console.log(
-        "🔥 DAY CLOSE → CARRY SESSION:",
-        sessionDoc.id,
+        "🔥 DAY CLOSE → CARRY FORWARD:",
         sessionData.table_id,
-        sessionData.start_time,
-        sessionData.end_time
+        sessionData.start_time
     );
 
 
-    // ------------------------------------------
-    // MOVE SESSION TO NEW DAY
-    // ------------------------------------------
-
     await updateDoc(
-        doc(
-            window.db,
-            "sessions",
-            sessionDoc.id
-        ),
+        doc(window.db, "sessions", sessionDoc.id),
         {
 
             // NEW DAY
             day_id: newDayId,
 
-            // ONE SHIFT ONLY
+            // NEW DAY = SHIFT 1
             shift_number: 1,
 
-            // Keep original check-in time
-            start_time:
-                sessionData.start_time,
+            // 🔥 ORIGINAL CHECK-IN TIME SAME
+            start_time: sessionData.start_time,
 
-            // Keep actual checkout time
-            end_time:
-                sessionData.end_time || null,
+            // 🔥 STILL RUNNING
+            end_time: null,
 
-            // Carry-forward information
+            // Information for debugging/history
             carried_forward: true,
-
-            carried_from_day_id:
-                oldDayId,
-
-            carried_at:
-                new Date().toISOString()
+            carried_from_day_id: oldDayId,
+            carried_at: new Date().toISOString()
         }
     );
 }
@@ -6770,60 +6665,72 @@ const shiftsQ = query(
         const shiftsSnap = await getDocs(shiftsQ);
 
         let latestShift1 = null;
+        let latestShift2 = null;
 
         shiftsSnap.forEach(docSnap => {
 
             const d = docSnap.data();
 
-if (d.shift_number === 1) {
-    latestShift1 = d;
-}
+            if (d.shift_number === 1) {
+                latestShift1 = d;
+            }
+
+            if (d.shift_number === 2) {
+                latestShift2 = d;
+            }
         });
 
-if (!latestShift1) {
-    console.log("⚠️ Shift data missing");
-    return;
-}
+        if (!latestShift1 || !latestShift2) {
+            console.log("⚠️ Shift data missing");
+            return;
+        }
 
-const newShift1 =
-    calculateShiftSnapshot(
-        latestShift1.start_ms,
-        latestShift1.end_ms
-    );
+        // 🔥 RECALCULATE
+        const newShift1 = calculateShiftSnapshot(
+            latestShift1.start_ms,
+            latestShift1.end_ms
+        );
+
+        const newShift2 = calculateShiftSnapshot(
+            latestShift2.start_ms,
+            latestShift2.end_ms
+        );
 
         // 🔥 COMBINED
-const combined = {
+        const combined = {
 
-    gameTotal:
-        newShift1.gameTotal || 0,
+            gameTotal:
+                newShift1.gameTotal + newShift2.gameTotal,
 
-    canteenTotal:
-        newShift1.canteenTotal || 0,
+            canteenTotal:
+                newShift1.canteenTotal + newShift2.canteenTotal,
 
-    gameCollection:
-        newShift1.gameCollection || 0,
+            gameCollection:
+                newShift1.gameCollection + newShift2.gameCollection,
 
-    canteenCollection:
-        newShift1.canteenCollection || 0,
+            canteenCollection:
+                newShift1.canteenCollection + newShift2.canteenCollection,
 
-    gameBalance:
-        newShift1.gameBalance || 0,
+            gameBalance:
+                newShift1.gameBalance + newShift2.gameBalance,
 
-    canteenBalance:
-        newShift1.canteenBalance || 0,
+            canteenBalance:
+                newShift1.canteenBalance + newShift2.canteenBalance,
 
-    expenses:
-        newShift1.expenses || 0,
+            expenses:
+                newShift1.expenses + newShift2.expenses,
 
-    easypaisa:
-        newShift1.easypaisa || 0,
-
-    discount:
-        newShift1.discount || 0,
-
-    closingCash:
-        newShift1.closingCash || 0
-};
+            easypaisa:
+            newShift1.easypaisa + newShift2.easypaisa,
+            
+            discount:
+            (newShift1.discount || 0)
+            +
+            (newShift2.discount || 0),
+            
+            closingCash:
+            newShift1.closingCash + newShift2.closingCash
+        };
 
         // 🔥 TABLE SNAPSHOT
         const tablesSnapshot = tables.map(t => ({
@@ -6840,20 +6747,30 @@ const combined = {
 
                     tables: tablesSnapshot,
 
-shift1: {
-    ...latestShift1,
-    ...newShift1
-},
+                    shift1: {
+                        ...latestShift1,
+                        ...newShift1
+                    },
 
-combined
+                    shift2: {
+                        ...latestShift2,
+                        ...newShift2
+                    },
+
+                    combined
                 }
             );
 
           // 🔥 UPDATE LIVE SHIFT VARIABLES
-shift1 = {
-    ...shift1,
-    ...newShift1
-};
+                shift1 = {
+                      ...shift1,
+                      ...newShift1
+                              };
+
+                shift2 = {
+                      ...shift2,
+                      ...newShift2
+                              };
         });
 
         console.log("✅ Day history updated");
@@ -8216,11 +8133,16 @@ function loadSelectedTableHistory() {
     };
 
 
-const shift1History =
-    history;
+    const shift1History =
+        history.filter(
+            h => inShift(h, selectedDay.shift1)
+        );
 
 
-const shift2History = [];
+    const shift2History =
+        history.filter(
+            h => inShift(h, selectedDay.shift2)
+        );
 
 
     /* ==================================================
@@ -8878,7 +8800,30 @@ function renderHistoryPage() {
 
     let history = [...t.history];
 
+    // ==========================================
+    // SHIFT FILTER
+    // ==========================================
 
+    const shiftSelect =
+        document.getElementById("tableHistoryShiftSelect");
+
+    const selectedShift =
+        shiftSelect ? shiftSelect.value : "all";
+
+    if (selectedShift === "1") {
+
+        history =
+            history.filter(
+                h => Number(h.shiftNumber) === 1
+            );
+
+    } else if (selectedShift === "2") {
+
+        history =
+            history.filter(
+                h => Number(h.shiftNumber) === 2
+            );
+    }
 
     // ==========================================
     // LATEST FIRST
@@ -12308,4 +12253,3 @@ document.addEventListener(
 
     }
 );
-}
