@@ -19,6 +19,22 @@ let warningAudio = null;
 let audioUnlocked = false;
 
 
+// ======================================================
+// 🔥 PENDING DAY CLOSE
+// Shift Close ke baad old day ka ID yahan rahega
+// jab tak actual Day Close nahi hota.
+// ======================================================
+
+window.pendingDayCloseId =
+    Number(localStorage.getItem("pendingDayCloseId")) || null;
+
+window.pendingDayCloseStartMs =
+    Number(localStorage.getItem("pendingDayCloseStartMs")) || null;
+
+window.pendingShiftCloseMs =
+    Number(localStorage.getItem("pendingShiftCloseMs")) || null;
+
+
 /******************************************************
  * GLOBAL MONEY FORMATTER
  ******************************************************/
@@ -5679,8 +5695,11 @@ async function openShiftSummary() {
 
     const now = Date.now();
 
-    const startMs =
-        Number(window.currentDayId) || now;
+const startMs =
+    Number(
+        window.pendingDayCloseStartMs ||
+        window.currentDayId
+    ) || now;
 
     const endMs =
         now;
@@ -5743,435 +5762,333 @@ async function openShiftSummary() {
     );
 }
 /******************************************************
- * SHIFT 1 CLOSE (running tables allowed)
+ * 🔥 SHIFT 1 CLOSE
+ *
+ * IMPORTANT:
+ * Shift Close = NEW OPERATIONAL DAY START
+ *
+ * Old day remains OPEN for:
+ * EasyPaisa + Expenses
+ *
+ * Running sessions move to new day.
  ******************************************************/
 async function closeShift() {
-  const q = query(
-    collection(window.db, "shifts"),
-    where("branch", "==", BRANCH),
-    where("shift_number", "==", 1),
-    where("day_id", "==", window.currentDayId) // 🔥 MAIN FIX
-);
 
-const snap = await getDocs(q);
+    const oldDayId =
+        Number(window.currentDayId);
 
-if (!snap.empty) {
-    alert("Shift 1 already closed ❌");
-    return;
-}
-
-// ======================================================
-// 🔴 SHIFT CLOSE — UNPAID BILLS CHECK
-// ======================================================
-
-const unpaidBillsQuery = query(
-    collection(window.db, "sessions"),
-    where("branch", "==", BRANCH),
-    where("day_id", "==", window.currentDayId)
-);
-
-const unpaidBillsSnap =
-    await getDocs(unpaidBillsQuery);
-
-const unpaidBills = [];
-
-unpaidBillsSnap.forEach(docSnap => {
-
-    const data = docSnap.data();
-
-    // Deleted session ignore
-    if (data.is_deleted === true) {
+    if (!oldDayId) {
+        alert("Current day ID missing ❌");
         return;
     }
 
-    // Running game ka bill abhi complete nahi hua
-    if (!data.end_time) {
-        return;
-    }
 
-    // Paid bill ignore
-    if (data.paid === true) {
-        return;
-    }
-
-    const total =
-        Number(
-            data.total_bill_amount ??
-            (
-                Number(
-                    data.final_game_amount ??
-                    data.final_amount ??
-                    0
-                ) +
-                Number(
-                    data.canteen_total ??
-                    data.canteen_amount ??
-                    0
-                )
-            )
-        );
-
-    const paid =
-        Number(
-            data.paid_amount ??
-            data.amount_paid ??
-            data.paidAmount ??
-            0
-        );
-
-    const remaining =
-        Number(
-            data.remaining_payment ??
-            Math.max(0, total - paid)
-        );
-
-    // Fully paid
-    if (remaining <= 0) {
-        return;
-    }
-
-    unpaidBills.push({
-
-        tableId:
-            data.table_id ??
-            data.tableId ??
-            "Unknown",
-
-        player1:
-            data.player1_name ??
-            data.player1Name ??
-            "Player 1",
-
-        player2:
-            data.player2_name ??
-            data.player2Name ??
-            "Player 2",
-
-        total,
-        paid,
-        remaining
-
-    });
-
-});
-
-
-// ======================================================
-// 🔴 UNPAID BILL MILA → SHIFT CLOSE BLOCK
-// ======================================================
-
-if (unpaidBills.length > 0) {
-
-    let message =
-        "SHIFT CLOSE BLOCKED ❌\n\n" +
-        "Pehle tamam unpaid bills clear karein:\n\n";
-
-    unpaidBills.forEach((bill, index) => {
-
-        message +=
-            `${index + 1}. Table ${bill.tableId}\n` +
-            `${bill.player1} VS ${bill.player2}\n` +
-            `Total: Rs. ${bill.total.toLocaleString("en-PK")}\n` +
-            `Paid: Rs. ${bill.paid.toLocaleString("en-PK")}\n` +
-            `Remaining: Rs. ${bill.remaining.toLocaleString("en-PK")}\n\n`;
-
-    });
-
-    alert(message);
-
-    return;
-}
-
-console.log(
-    "✅ SHIFT CLOSE — No unpaid bills"
-);
-  
-
-  
-
-let now = Date.now();
-
-// 🔥 FORCE SAFE TIME
-let endMs = now;
-
-// 🔥 SHIFT 1 START = CURRENT OPERATIONAL DAY START
-let startMs = Number(window.currentDayId) || 0;
-
-// Safety fallback
-if (!startMs || startMs < 1000000000000) {
-    startMs = now;
-}
-
-// ❗ HARD PROTECTION
-if (!endMs || endMs < 100000) {
-    endMs = Date.now();
-}
-
-// ❗ DOUBLE SAFETY
-if (!startMs || startMs <= 0) {
-    startMs = endMs - 1000;
-}
-
-// 🔥 STEP 1: FIRST REBUILD HISTORY
-await rebuildHistoryFromSessions();
-
-
-// 🔥 STEP 3: CALCULATE
-let shiftData = calculateShiftSnapshot(startMs, endMs);
-
-    shift1 = {
-        shift: 1,
-        openTime: new Date(startMs).toLocaleString('en-PK', { timeZone: 'Asia/Karachi' }),
-        closeTime: new Date(endMs).toLocaleString('en-PK', { timeZone: 'Asia/Karachi' }),
-        startMs: startMs,
-        endMs: endMs,
-        ...shiftData
-    };
-
-    
-
-    document.getElementById("shiftCloseBtn").innerText = "Day Close";
-    hidePopup("shiftSummaryPopup");
-
-
-  console.log("🔥 SHIFT1 SAVE CHECK:", {
-    startMs,
-    endMs
-});
-
-// ✅ BACKEND SAVE
-
-// 🔥 FIREBASE SAVE SHIFT 1
-// 🔥 FIREBASE SAVE SHIFT 1
-const docRef = await addDoc(collection(window.db, "shifts"), {
-    tables: tables.map(t => ({
-        table_id: t.name,
-        total: t.history.reduce((sum, h) => sum + (h.total || 0), 0)
-    })),
-    shift_number: 1,
-    branch: BRANCH,
-
-    day_id: window.currentDayId,
-
-    open_time: shift1.openTime,
-    close_time: shift1.closeTime,
-
-    start_ms: shift1.startMs,
-    end_ms: shift1.endMs,
-
-    game_total: shiftData.gameTotal,
-    canteen_total: shiftData.canteenTotal,
-
-    game_collection: shiftData.gameCollection,
-    canteen_collection: shiftData.canteenCollection,
-
-    expenses: shiftData.expenses,
-easypaisa: shiftData.easypaisa,
-
-discount: shiftData.discount || 0,
-
-closing_cash: shiftData.closingCash,
-
-    created_at: new Date().toISOString()
-});
-
-// ✅ CHECK AFTER SAVE (YAHAN LAGAO)
-if (!docRef?.id) {
-    alert("Shift1 save failed ❌");
-    return;
-}
-alert("Shift closed successfully ✅");
-  loadShiftsFromFirebase();
-}
-
-/******************************************************
- * DAY CLOSE — SINGLE SHIFT
- ******************************************************/
-async function closeDay() {
-
-    const today =
-        new Date().toLocaleDateString("en-CA");
-
-    const s1 = shift1;
-
-    if (!s1) {
-        alert(
-            "Please close the shift before Day Close."
-        );
-        return;
-    }
-
-    // 🔥 CURRENT SHIFT DATA
-    const combined = {
-
-        gameTotal:
-            s1.gameTotal || 0,
-
-        canteenTotal:
-            s1.canteenTotal || 0,
-
-        gameCollection:
-            s1.gameCollection || 0,
-
-        canteenCollection:
-            s1.canteenCollection || 0,
-
-        gameBalance:
-            s1.gameBalance || 0,
-
-        canteenBalance:
-            s1.canteenBalance || 0,
-
-        expenses:
-            s1.expenses || 0,
-
-        easypaisa:
-            s1.easypaisa || 0,
-
-        discount:
-            s1.discount || 0
-    };
-
-
-    combined.closingCash =
-        (
-            combined.gameCollection +
-            combined.canteenCollection
-        )
-        - combined.expenses
-        - combined.easypaisa;
-
-
-    // 🔥 TABLE SNAPSHOT
-    const safeTables =
-        tables.map(t => ({
-            table_id: t.name,
-            history: t.history.map(h => ({
-                ...h
-            }))
-        }));
-
-
-    // 🔥 SAVE DAY HISTORY
-    await addDoc(
-        collection(window.db, "days"),
-        {
-            tables: safeTables,
-
-            date: today,
-
-            day_id:
-                window.currentDayId,
-
-            branch:
-                BRANCH,
-
-            shift:
-                "day",
-
-            shift1:
-                s1,
-
-            combined:
-                combined,
-
-            created_at:
-                new Date().toISOString()
-        }
+    // ==================================================
+    // 🔒 CHECK SHIFT 1 ALREADY CLOSED
+    // ==================================================
+
+    const q = query(
+        collection(window.db, "shifts"),
+        where("branch", "==", BRANCH),
+        where("shift_number", "==", 1),
+        where("day_id", "==", oldDayId)
     );
 
+    const snap =
+        await getDocs(q);
 
-    // 🔥 RESET SHIFT
-    shift1 = null;
+    if (!snap.empty) {
+
+        alert(
+            "Shift 1 already closed ❌"
+        );
+
+        return;
+    }
 
 
-    // 🔥 NEW DAY
+    // ==================================================
+    // 🔴 UNPAID BILLS CHECK
+    // ==================================================
+
+    const unpaidBillsQuery =
+        query(
+            collection(window.db, "sessions"),
+            where("branch", "==", BRANCH),
+            where("day_id", "==", oldDayId)
+        );
+
+    const unpaidBillsSnap =
+        await getDocs(unpaidBillsQuery);
+
+    const unpaidBills = [];
+
+    unpaidBillsSnap.forEach(docSnap => {
+
+        const data =
+            docSnap.data();
+
+        if (data.is_deleted === true) {
+            return;
+        }
+
+        // Running game ignore
+        if (!data.end_time) {
+            return;
+        }
+
+        if (data.paid === true) {
+            return;
+        }
+
+        const total =
+            Number(
+                data.total_bill_amount ??
+                (
+                    Number(
+                        data.final_game_amount ??
+                        data.final_amount ??
+                        0
+                    ) +
+                    Number(
+                        data.canteen_total ??
+                        data.canteen_amount ??
+                        0
+                    )
+                )
+            );
+
+        const paid =
+            Number(
+                data.paid_amount ??
+                data.amount_paid ??
+                data.paidAmount ??
+                0
+            );
+
+        if (total > paid) {
+
+            unpaidBills.push({
+                id: docSnap.id,
+                table: data.table_id || "",
+                player1: data.player1Name || "",
+                player2: data.player2Name || "",
+                balance: total - paid
+            });
+
+        }
+
+    });
+
+
+    if (unpaidBills.length > 0) {
+
+        alert(
+            "Unpaid bills exist. Please clear them before closing Shift 1 ❌"
+        );
+
+        return;
+    }
+
+
+    // ==================================================
+    // ⏱ SHIFT CLOSE TIME
+    // ==================================================
+
+    const now =
+        Date.now();
+
+    let startMs =
+        Number(oldDayId);
+
+    if (!startMs || startMs < 1000000000000) {
+        startMs = now;
+    }
+
+
+    // ==================================================
+    // 🔥 REBUILD OLD DAY HISTORY
+    // ==================================================
+
+    await rebuildHistoryFromSessions();
+
+
+    // ==================================================
+    // 🔥 CALCULATE SHIFT 1 SNAPSHOT
+    // ==================================================
+
+    const shiftData =
+        calculateShiftSnapshot(
+            startMs,
+            now
+        );
+
+
+    shift1 = {
+
+        shift: 1,
+
+        openTime:
+            new Date(startMs).toLocaleString(
+                "en-PK",
+                {
+                    timeZone:
+                        "Asia/Karachi"
+                }
+            ),
+
+        closeTime:
+            new Date(now).toLocaleString(
+                "en-PK",
+                {
+                    timeZone:
+                        "Asia/Karachi"
+                }
+            ),
+
+        startMs:
+            startMs,
+
+        endMs:
+            now,
+
+        ...shiftData
+
+    };
+
+
+    // ==================================================
+    // 🔥 SAVE SHIFT 1
+    // ==================================================
+
+    const docRef =
+        await addDoc(
+            collection(
+                window.db,
+                "shifts"
+            ),
+            {
+
+                tables:
+                    tables.map(t => ({
+                        table_id:
+                            t.name,
+
+                        total:
+                            t.history.reduce(
+                                (sum, h) =>
+                                    sum +
+                                    Number(
+                                        h.total || 0
+                                    ),
+                                0
+                            )
+                    })),
+
+                shift_number:
+                    1,
+
+                branch:
+                    BRANCH,
+
+                // 🔥 THIS BELONGS TO OLD DAY
+                day_id:
+                    oldDayId,
+
+                open_time:
+                    shift1.openTime,
+
+                close_time:
+                    shift1.closeTime,
+
+                start_ms:
+                    shift1.startMs,
+
+                end_ms:
+                    shift1.endMs,
+
+                game_total:
+                    shiftData.gameTotal,
+
+                canteen_total:
+                    shiftData.canteenTotal,
+
+                game_collection:
+                    shiftData.gameCollection,
+
+                canteen_collection:
+                    shiftData.canteenCollection,
+
+                expenses:
+                    shiftData.expenses,
+
+                easypaisa:
+                    shiftData.easypaisa,
+
+                discount:
+                    shiftData.discount || 0,
+
+                closing_cash:
+                    shiftData.closingCash,
+
+                created_at:
+                    new Date().toISOString()
+
+            }
+        );
+
+
+    if (!docRef?.id) {
+
+        alert(
+            "Shift 1 save failed ❌"
+        );
+
+        return;
+    }
+
+
+    // ==================================================
+    // 🔥 NOW CREATE NEW OPERATIONAL DAY
+    // ==================================================
+
     const newDayId =
         Date.now();
 
-  // ======================================================
-// 🔥 DAY CLOSE → RUNNING GAMES CARRY FORWARD
-// ======================================================
 
-// OLD DAY ID
-const oldDayId =
-    window.currentDayId;
+    // ==================================================
+    // 🔥 REMEMBER OLD DAY FOR DAY CLOSE
+    // ==================================================
 
-// 🔥 FIND ONLY CURRENT-DAY RUNNING SESSIONS
-const runningSessionsQuery =
-    query(
-        collection(window.db, "sessions"),
+    window.pendingDayCloseId =
+        oldDayId;
 
-        // SAME BRANCH
-        where("branch", "==", BRANCH),
+    window.pendingDayCloseStartMs =
+        startMs;
 
-        // 🔥 VERY IMPORTANT:
-        // ONLY OLD/CURRENT DAY SESSIONS
-        where("day_id", "==", oldDayId),
+    window.pendingShiftCloseMs =
+        now;
 
-        // ONLY STILL RUNNING
-        where("end_time", "==", null)
+
+    localStorage.setItem(
+        "pendingDayCloseId",
+        String(oldDayId)
     );
 
-const runningSessionsSnap =
-    await getDocs(runningSessionsQuery);
-
-
-// MOVE RUNNING SESSIONS TO NEW DAY
-for (
-    const sessionDoc of runningSessionsSnap.docs
-) {
-
-    const sessionData =
-        sessionDoc.data();
-
-    // Deleted session ignore
-    if (sessionData.is_deleted === true) {
-        continue;
-    }
-
-    console.log(
-        "🔥 DAY CLOSE → CARRY FORWARD:",
-        sessionData.table_id,
-        sessionData.start_time
+    localStorage.setItem(
+        "pendingDayCloseStartMs",
+        String(startMs)
     );
 
-    await updateDoc(
-        doc(
-            window.db,
-            "sessions",
-            sessionDoc.id
-        ),
-        {
-
-            // NEW DAY
-            day_id:
-                newDayId,
-
-            // NEW DAY = SHIFT 1
-            shift_number:
-                1,
-
-            // ORIGINAL CHECK-IN SAME
-            start_time:
-                sessionData.start_time,
-
-            // GAME STILL RUNNING
-            end_time:
-                null,
-
-            // DEBUG / TRACKING
-            carried_forward:
-                true,
-
-            carried_from_day_id:
-                oldDayId,
-
-            carried_at:
-                new Date().toISOString()
-        }
+    localStorage.setItem(
+        "pendingShiftCloseMs",
+        String(now)
     );
-}
+
+
+    // ==================================================
+    // 🔥 FIND CENTRAL CURRENT DAY
+    // ==================================================
 
     const systemQ =
         query(
@@ -6195,6 +6112,10 @@ for (
         await getDocs(systemQ);
 
 
+    // ==================================================
+    // 🔥 UPDATE CENTRAL DAY → NEW DAY
+    // ==================================================
+
     for (
         const d of systemSnap.docs
     ) {
@@ -6206,18 +6127,766 @@ for (
                 d.id
             ),
             {
+
                 day_id:
                     newDayId,
 
                 created_at:
-                    new Date().toISOString()
+                    new Date().toISOString(),
+
+                // 🔥 OLD DAY STILL WAITING FOR DAY CLOSE
+                pending_day_close:
+                    true,
+
+                pending_day_close_id:
+                    oldDayId,
+
+                pending_day_close_start_ms:
+                    startMs,
+
+                shift_closed_at:
+                    now
+
             }
         );
+
     }
 
 
+    // ==================================================
+    // 🔥 MOVE ONLY OLD-DAY RUNNING SESSIONS
+    // ==================================================
+
+    const runningSessionsQuery =
+        query(
+            collection(
+                window.db,
+                "sessions"
+            ),
+
+            where(
+                "branch",
+                "==",
+                BRANCH
+            ),
+
+            where(
+                "day_id",
+                "==",
+                oldDayId
+            ),
+
+            where(
+                "end_time",
+                "==",
+                null
+            )
+        );
+
+
+    const runningSessionsSnap =
+        await getDocs(
+            runningSessionsQuery
+        );
+
+
+    for (
+        const sessionDoc
+        of runningSessionsSnap.docs
+    ) {
+
+        const sessionData =
+            sessionDoc.data();
+
+
+        if (
+            sessionData.is_deleted === true
+        ) {
+            continue;
+        }
+
+
+        await updateDoc(
+            doc(
+                window.db,
+                "sessions",
+                sessionDoc.id
+            ),
+            {
+
+                // 🔥 NEW OPERATIONAL DAY
+                day_id:
+                    newDayId,
+
+                // 🔥 NEW DAY = SHIFT 1
+                shift_number:
+                    1,
+
+                // 🔥 ORIGINAL CHECK-IN
+                start_time:
+                    sessionData.start_time,
+
+                // 🔥 STILL RUNNING
+                end_time:
+                    null,
+
+                carried_forward:
+                    true,
+
+                carried_from_day_id:
+                    oldDayId,
+
+                carried_at:
+                    new Date().toISOString()
+
+            }
+        );
+
+
+        console.log(
+            "🔥 SHIFT CLOSE → CARRIED:",
+            sessionData.table_id,
+            oldDayId,
+            "→",
+            newDayId
+        );
+
+    }
+
+
+    // ==================================================
+    // 🔥 CURRENT OPERATIONAL DAY = NEW DAY
+    // ==================================================
+
     window.currentDayId =
         newDayId;
+
+
+    // ==================================================
+    // 🔥 RESET LOCAL SHIFT STATE
+    // ==================================================
+
+    shift1 =
+        null;
+
+
+    // ==================================================
+    // 🔥 KEEP RUNNING TABLES RUNNING
+    // ==================================================
+
+    tables.forEach(t => {
+
+        if (t.isRunning) {
+
+            // DO NOT RESET
+            // timer continues
+
+            return;
+        }
+
+        // Free table stays free
+        t.history = [];
+
+    });
+
+
+    // ==================================================
+    // 🔥 UI
+    // ==================================================
+
+    document.getElementById(
+        "shiftCloseBtn"
+    ).innerText =
+        "Day Close";
+
+
+    hidePopup(
+        "shiftSummaryPopup"
+    );
+
+
+    renderTables();
+
+
+    alert(
+        "Shift 1 closed ✅ New operational day started."
+    );
+
+
+    await loadShiftsFromFirebase();
+
+}
+
+/******************************************************
+ * 🔥 DAY CLOSE
+ *
+ * IMPORTANT:
+ * New operational day was already created at Shift Close.
+ *
+ * Day Close ONLY finalizes the OLD day.
+ *
+ * It DOES NOT:
+ * - create another day
+ * - move running games
+ * - reset running tables
+ ******************************************************/
+async function closeDay() {
+
+    const oldDayId =
+        Number(
+            window.pendingDayCloseId
+        );
+
+
+    // ==================================================
+    // 🔒 OLD DAY MUST EXIST
+    // ==================================================
+
+    if (!oldDayId) {
+
+        alert(
+            "No pending day is waiting for Day Close ❌"
+        );
+
+        return;
+    }
+
+
+    const oldDayStartMs =
+        Number(
+            window.pendingDayCloseStartMs
+        );
+
+
+    const shiftClosedMs =
+        Number(
+            window.pendingShiftCloseMs
+        );
+
+
+    const now =
+        Date.now();
+
+
+    // ==================================================
+    // 🔒 CHECK DAY NOT ALREADY CLOSED
+    // ==================================================
+
+    const existingDayQuery =
+        query(
+            collection(
+                window.db,
+                "days"
+            ),
+
+            where(
+                "branch",
+                "==",
+                BRANCH
+            ),
+
+            where(
+                "day_id",
+                "==",
+                oldDayId
+            )
+        );
+
+
+    const existingDaySnap =
+        await getDocs(
+            existingDayQuery
+        );
+
+
+    if (!existingDaySnap.empty) {
+
+        alert(
+            "This day is already closed ❌"
+        );
+
+        return;
+    }
+
+
+    // ==================================================
+    // 🔥 GET SHIFT 1 SNAPSHOT
+    // ==================================================
+
+    const shiftQuery =
+        query(
+            collection(
+                window.db,
+                "shifts"
+            ),
+
+            where(
+                "branch",
+                "==",
+                BRANCH
+            ),
+
+            where(
+                "day_id",
+                "==",
+                oldDayId
+            ),
+
+            where(
+                "shift_number",
+                "==",
+                1
+            )
+        );
+
+
+    const shiftSnap =
+        await getDocs(
+            shiftQuery
+        );
+
+
+    if (shiftSnap.empty) {
+
+        alert(
+            "Shift 1 record not found ❌"
+        );
+
+        return;
+    }
+
+
+    let savedShift =
+        null;
+
+
+    shiftSnap.forEach(d => {
+
+        if (!savedShift) {
+
+            savedShift = {
+                id: d.id,
+                ...d.data()
+            };
+
+        }
+
+    });
+
+
+    // ==================================================
+    // 🔥 CALCULATE ONLY EASYPAISA + EXPENSES
+    // ADDED AFTER SHIFT CLOSE
+    //
+    // New games are NOT included here.
+    // ==================================================
+
+    let extraExpenses = 0;
+
+    let extraEasyPaisa = 0;
+
+
+    // ==================================================
+    // 🔥 EXPENSES AFTER SHIFT CLOSE
+    // ==================================================
+
+    if (
+        Array.isArray(
+            firebaseExpenses
+        )
+    ) {
+
+        extraExpenses =
+            firebaseExpenses
+                .filter(e => {
+
+                    let time = 0;
+
+
+                    if (
+                        e.created_at?.seconds
+                    ) {
+
+                        time =
+                            e.created_at.seconds *
+                            1000;
+
+                    }
+                    else if (
+                        e.created_at
+                    ) {
+
+                        time =
+                            new Date(
+                                e.created_at
+                            ).getTime();
+
+                    }
+
+
+                    return (
+                        time >
+                        shiftClosedMs
+                        &&
+                        time <=
+                        now
+                    );
+
+                })
+                .reduce(
+                    (
+                        sum,
+                        e
+                    ) =>
+                        sum +
+                        Number(
+                            e.amount || 0
+                        ),
+                    0
+                );
+
+    }
+
+
+    // ==================================================
+    // 🔥 EASYPAISA AFTER SHIFT CLOSE
+    // ==================================================
+
+    if (
+        Array.isArray(
+            firebaseEasy
+        )
+    ) {
+
+        extraEasyPaisa =
+            firebaseEasy
+                .filter(e => {
+
+                    let time = 0;
+
+
+                    if (
+                        e.created_at?.seconds
+                    ) {
+
+                        time =
+                            e.created_at.seconds *
+                            1000;
+
+                    }
+                    else if (
+                        e.created_at
+                    ) {
+
+                        time =
+                            new Date(
+                                e.created_at
+                            ).getTime();
+
+                    }
+
+
+                    return (
+                        time >
+                        shiftClosedMs
+                        &&
+                        time <=
+                        now
+                    );
+
+                })
+                .reduce(
+                    (
+                        sum,
+                        e
+                    ) =>
+                        sum +
+                        Number(
+                            e.amount || 0
+                        ),
+                    0
+                );
+
+    }
+
+
+    // ==================================================
+    // 🔥 OLD DAY FINAL ACCOUNTING
+    // ==================================================
+
+    const finalExpenses =
+        Number(
+            savedShift.expenses || 0
+        ) +
+        extraExpenses;
+
+
+    const finalEasyPaisa =
+        Number(
+            savedShift.easypaisa || 0
+        ) +
+        extraEasyPaisa;
+
+
+    const finalClosingCash =
+        (
+            Number(
+                savedShift.gameCollection || 0
+            )
+            +
+            Number(
+                savedShift.canteenCollection || 0
+            )
+        )
+        -
+        finalExpenses
+        -
+        finalEasyPaisa;
+
+
+    // ==================================================
+    // 🔥 FINAL COMBINED SNAPSHOT
+    // ==================================================
+
+    const finalCombined = {
+
+        gameTotal:
+            Number(
+                savedShift.game_total || 0
+            ),
+
+        canteenTotal:
+            Number(
+                savedShift.canteen_total || 0
+            ),
+
+        gameCollection:
+            Number(
+                savedShift.game_collection || 0
+            ),
+
+        canteenCollection:
+            Number(
+                savedShift.canteen_collection || 0
+            ),
+
+        gameBalance:
+            Number(
+                savedShift.game_total || 0
+            ) -
+            Number(
+                savedShift.game_collection || 0
+            ),
+
+        canteenBalance:
+            Number(
+                savedShift.canteen_total || 0
+            ) -
+            Number(
+                savedShift.canteen_collection || 0
+            ),
+
+        expenses:
+            finalExpenses,
+
+        easypaisa:
+            finalEasyPaisa,
+
+        discount:
+            Number(
+                savedShift.discount || 0
+            ),
+
+        closingCash:
+            finalClosingCash
+
+    };
+
+
+    // ==================================================
+    // 🔥 DAY SNAPSHOT
+    //
+    // IMPORTANT:
+    // Current tables may contain NEW DAY games.
+    //
+    // Therefore DO NOT save current tables.history
+    // as old day history.
+    //
+    // Old-day session history is reconstructed separately.
+    // ==================================================
+
+    await rebuildSpecificDayHistory(
+        oldDayId
+    );
+
+
+    const safeTables =
+        tables.map(t => ({
+
+            table_id:
+                t.name,
+
+            history:
+                Array.isArray(
+                    t.history
+                )
+                    ? t.history.map(
+                        h => ({
+                            ...h
+                        })
+                    )
+                    : []
+
+        }));
+
+
+    // ==================================================
+    // 🔥 SAVE OLD DAY
+    // ==================================================
+
+    await addDoc(
+        collection(
+            window.db,
+            "days"
+        ),
+        {
+
+            tables:
+                safeTables,
+
+            date:
+                new Date(
+                    oldDayStartMs
+                ).toLocaleDateString(
+                    "en-CA"
+                ),
+
+            // 🔥 OLD DAY ID
+            day_id:
+                oldDayId,
+
+            branch:
+                BRANCH,
+
+            shift:
+                "day",
+
+            shift1:
+                savedShift,
+
+            combined:
+                finalCombined,
+
+            day_closed_at:
+                new Date().toISOString(),
+
+            created_at:
+                new Date().toISOString()
+
+        }
+    );
+
+
+    // ==================================================
+    // 🔥 MARK CURRENT SYSTEM DAY
+    //
+    // DO NOT CREATE NEW DAY HERE.
+    // New day is already active.
+    // ==================================================
+
+    const systemQ =
+        query(
+            collection(
+                window.db,
+                "system"
+            ),
+
+            where(
+                "branch",
+                "==",
+                BRANCH
+            ),
+
+            where(
+                "type",
+                "==",
+                "current_day"
+            )
+        );
+
+
+    const systemSnap =
+        await getDocs(
+            systemQ
+        );
+
+
+    for (
+        const d of systemSnap.docs
+    ) {
+
+        await updateDoc(
+            doc(
+                window.db,
+                "system",
+                d.id
+            ),
+            {
+
+                pending_day_close:
+                    false,
+
+                pending_day_close_id:
+                    null,
+
+                pending_day_close_start_ms:
+                    null,
+
+                shift_closed_at:
+                    null,
+
+                day_closed_at:
+                    new Date().toISOString()
+
+            }
+        );
+
+    }
+
+
+    // ==================================================
+    // 🔥 CLEAR PENDING OLD DAY
+    // ==================================================
+
+    window.pendingDayCloseId =
+        null;
+
+    window.pendingDayCloseStartMs =
+        null;
+
+    window.pendingShiftCloseMs =
+        null;
+
+
+    localStorage.removeItem(
+        "pendingDayCloseId"
+    );
+
+    localStorage.removeItem(
+        "pendingDayCloseStartMs"
+    );
+
+    localStorage.removeItem(
+        "pendingShiftCloseMs"
+    );
+
+
+    // ==================================================
+    // 🔥 CURRENT DAY REMAINS NEW DAY
+    // ==================================================
+
+    // DO NOT CHANGE:
+    // window.currentDayId
 
 
     document.getElementById(
@@ -6231,9 +6900,13 @@ for (
     );
 
 
+    renderTables();
+
+
     alert(
-        "Day closed successfully ✅ New day started."
+        "Day closed successfully ✅"
     );
+
 }
 
 
