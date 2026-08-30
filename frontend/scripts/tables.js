@@ -142,24 +142,7 @@ onSnapshot(q, (snapshot) => {
             };
         }
 
-        if (d.shift_number === 2 && !shift2) {
-            shift2 = {
-                openTime: d.open_time,
-                closeTime: d.close_time,
-                startMs: Number(d.start_ms) || 0,
-                endMs: Number(d.end_ms) || 0,
-                gameTotal: d.game_total,
-                canteenTotal: d.canteen_total,
-                gameCollection: d.game_collection,
-                canteenCollection: d.canteen_collection,
-                expenses: d.expenses,
-                easypaisa: d.easypaisa || 0,
-                discount: d.discount || 0,
-                closingCash: d.closing_cash,
-                gameBalance: d.game_balance || 0,
-                canteenBalance: d.canteen_balance || 0
-            };
-        }
+
     });
 
 // 🔥 SINGLE SHIFT BUTTON
