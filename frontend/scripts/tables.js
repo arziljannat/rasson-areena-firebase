@@ -106,7 +106,6 @@ function getItemStock(item) {
 let tables = [];
 
 let shift1 = null;   // ✅ ADD
-let shift2 = null;   // ✅ ADD
 function loadShiftsFromFirebase() {
 
 const q = query(
