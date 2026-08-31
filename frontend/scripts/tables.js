@@ -4454,10 +4454,10 @@ function openBillFromHistory(tableId, sessionId) {
 openHistory(tableId);
 
 // PRINT BILL
-printThermalBill(
-    tableId,
-    h
-);
+// printThermalBill(
+//     tableId,
+//     h
+// );
 
 console.log(
     "✅ BILL PAID + PRINTED:",
@@ -4531,8 +4531,8 @@ if (startDiff < 5000 && endDiff < 5000) {
     // ✅ UI UPDATE
     openHistory(tableId);
 
-    // ✅ PRINT
-    printThermalBill(tableId, h);
+// ✅ PRINT
+// printThermalBill(tableId, h);
 };
 
 // 🔥 CANTEEN LIST
