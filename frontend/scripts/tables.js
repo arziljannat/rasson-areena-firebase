@@ -5789,12 +5789,19 @@ async function openShiftSummary() {
 
 else {
 
-    // 🔥 DAY CLOSE = ABHI TAK KA COMPLETE DAY
-    // Shift Close ke baad ki Expense / EasyPaisa
-    // bhi include hongi.
+    // 🔥 DAY CLOSE SNAPSHOT
+    // OLD DAY SIRF SHIFT CLOSE TAK
+    //
+    // Shift Close ke BAAD checkout hone wala
+    // koi bhi game OLD DAY mein count nahi hoga.
+    // Woh Day Close ke baad NEW DAY mein move hoga.
 
     const dayCloseEndMs =
-        Date.now();
+        Number(
+            shift1.endMs ||
+            shift1.end_ms ||
+            now
+        );
 
     title.innerText =
         "DAY CLOSE";
