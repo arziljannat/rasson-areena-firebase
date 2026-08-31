@@ -5787,34 +5787,34 @@ async function openShiftSummary() {
     // OLD DAY CLOSE SNAPSHOT
     // =================================================
 
-    else {
+else {
 
-        const dayCloseEndMs =
-            Number(
-                shift1.endMs ||
-                shift1.end_ms ||
-                now
-            );
+    // 🔥 DAY CLOSE = ABHI TAK KA COMPLETE DAY
+    // Shift Close ke baad ki Expense / EasyPaisa
+    // bhi include hongi.
 
-        title.innerText =
-            "DAY CLOSE";
+    const dayCloseEndMs =
+        Date.now();
 
-        if (confirmBtn) {
+    title.innerText =
+        "DAY CLOSE";
 
-            confirmBtn.innerText =
-                "Day Close";
+    if (confirmBtn) {
 
-        }
-
-        body.innerHTML =
-            buildRassonSnapshot(
-                startMs,
-                dayCloseEndMs,
-                null,
-                null
-            );
+        confirmBtn.innerText =
+            "Day Close";
 
     }
+
+    body.innerHTML =
+        buildRassonSnapshot(
+            startMs,
+            dayCloseEndMs,
+            null,
+            null
+        );
+
+}
 
 
     showPopup(
@@ -6353,11 +6353,11 @@ console.log(
 
 expenses:
     Number(s1.expenses || 0) +
-    postShiftExpenses,
+    Number(postShiftExpenses || 0),
 
 easypaisa:
     Number(s1.easypaisa || 0) +
-    postShiftEasyPaisa,
+    Number(postShiftEasyPaisa || 0),
 
         discount:
             s1.discount || 0
