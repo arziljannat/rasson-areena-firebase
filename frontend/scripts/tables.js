@@ -5057,7 +5057,8 @@ function getSnapshotTableData(
     table,
     startMs,
     endMs,
-    shiftNumber = null
+    shiftNumber = null,
+    snapshotDayId = null
 ) {
 
     let frames = 0;
@@ -5074,17 +5075,48 @@ function getSnapshotTableData(
         const checkout =
             Number(h.checkout || 0);
 
-        if (
-            checkout < startMs ||
-            checkout > endMs
-        ) {
-            return;
+
+        // =================================================
+        // 🔥 DAY SNAPSHOT MODE
+        //
+        // New day mein moved session ka checkout
+        // technically previous clock period mein ho sakta hai.
+        //
+        // Isliye new-day snapshot mein DAY ID use karo.
+        // =================================================
+
+        if (snapshotDayId !== null) {
+
+            if (
+                String(h.dayId || "").trim() !==
+                String(snapshotDayId || "").trim()
+            ) {
+                return;
+            }
+
+        }
+
+        // =================================================
+        // 🔥 NORMAL TIME MODE
+        //
+        // Shift 1 / old Day Close
+        // =================================================
+
+        else {
+
+            if (
+                checkout < startMs ||
+                checkout > endMs
+            ) {
+                return;
+            }
+
         }
 
 
-        /*
-         * Shift filtering
-         */
+        // =================================================
+        // SHIFT FILTER
+        // =================================================
 
         if (
             shiftNumber !== null &&
@@ -5117,24 +5149,29 @@ function getSnapshotTableData(
             ).toLowerCase();
 
 
-if (type === "century") {
+        if (type === "century") {
 
-    centuries++;
-    centuryAmount += amount;
-    centuryTime += seconds;
+            centuries++;
 
-} else {
+            centuryAmount += amount;
 
-    frames += getFrameCount(h);
-    frameAmount += amount;
-    frameTime += seconds;
+            centuryTime += seconds;
 
-}
+        } else {
+
+            frames += getFrameCount(h);
+
+            frameAmount += amount;
+
+            frameTime += seconds;
+
+        }
 
     });
 
 
     return {
+
         frames,
         frameAmount,
         frameTime,
@@ -5142,6 +5179,7 @@ if (type === "century") {
         centuries,
         centuryAmount,
         centuryTime
+
     };
 }
 
@@ -5154,7 +5192,8 @@ function getSnapshotRoomAmount(
     room,
     startMs,
     endMs,
-    shiftNumber = null
+    shiftNumber = null,
+    snapshotDayId = null
 ) {
 
     let total = 0;
@@ -5166,13 +5205,40 @@ function getSnapshotRoomAmount(
             Number(h.checkout || 0);
 
 
-        if (
-            checkout < startMs ||
-            checkout > endMs
-        ) {
-            return;
+        // =================================================
+        // 🔥 DAY SNAPSHOT MODE
+        // =================================================
+
+        if (snapshotDayId !== null) {
+
+            if (
+                String(h.dayId || "").trim() !==
+                String(snapshotDayId || "").trim()
+            ) {
+                return;
+            }
+
         }
 
+        // =================================================
+        // 🔥 NORMAL TIME MODE
+        // =================================================
+
+        else {
+
+            if (
+                checkout < startMs ||
+                checkout > endMs
+            ) {
+                return;
+            }
+
+        }
+
+
+        // =================================================
+        // SHIFT FILTER
+        // =================================================
 
         if (
             shiftNumber !== null &&
@@ -5203,7 +5269,8 @@ function getSnapshotRoomAmount(
 function buildRassonSnapshot(
     startMs,
     endMs,
-    shiftNumber = null
+    shiftNumber = null,
+    snapshotDayId = null
 ) {
 
     let html = "";
@@ -5250,13 +5317,14 @@ function buildRassonSnapshot(
 
     normalTables.forEach(t => {
 
-        const data =
-            getSnapshotTableData(
-                t,
-                startMs,
-                endMs,
-                shiftNumber
-            );
+const data =
+    getSnapshotTableData(
+        t,
+        startMs,
+        endMs,
+        shiftNumber,
+        snapshotDayId
+    );
 
 
         totalFrames += data.frames;
@@ -5396,13 +5464,13 @@ function buildRassonSnapshot(
 
         rooms.forEach(room => {
 
-            const amount =
-                getSnapshotRoomAmount(
-                    room,
-                    startMs,
-                    endMs,
-                    shiftNumber
-                );
+getSnapshotRoomAmount(
+    room,
+    startMs,
+    endMs,
+    shiftNumber,
+    snapshotDayId
+);
 
 
             html += `
@@ -11151,6 +11219,10 @@ t.history.push({
 
     // 🔥 VERY IMPORTANT
     sessionId: sessionId,
+
+    // 🔥 DAY OWNERSHIP
+    dayId:
+        s.day_id || null,
 
     // 🔥 SHIFT
     shiftNumber:
