@@ -5464,13 +5464,14 @@ const data =
 
         rooms.forEach(room => {
 
-getSnapshotRoomAmount(
-    room,
-    startMs,
-    endMs,
-    shiftNumber,
-    snapshotDayId
-);
+const amount =
+    getSnapshotRoomAmount(
+        room,
+        startMs,
+        endMs,
+        shiftNumber,
+        snapshotDayId
+    );
 
 
             html += `
