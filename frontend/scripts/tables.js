@@ -121,56 +121,142 @@ function getItemStock(item) {
  ******************************************************/
 let tables = [];
 
-let shift1 = null;   // ✅ ADD
+let shift1 = null;
+
 function loadShiftsFromFirebase() {
 
-const q = query(
-    collection(window.db, "shifts"),
-    where("branch", "==", BRANCH),
-    where("day_id", "==", window.currentDayId)
-);
+    const displayDayId =
+        window.pendingDayCloseId ||
+        window.currentDayId;
 
-onSnapshot(q, (snapshot) => {
+    if (!displayDayId) {
+        console.warn("⚠️ SHIFT LOAD: day id missing");
+        return;
+    }
 
-    shift1 = null;
+    const q = query(
+        collection(window.db, "shifts"),
+        where("branch", "==", BRANCH),
+        where("day_id", "==", displayDayId)
+    );
 
-    snapshot.forEach(docSnap => {
-        const d = docSnap.data();
+    onSnapshot(q, (snapshot) => {
 
-        if (d.shift_number === 1 && !shift1) {
-            shift1 = {
-                openTime: d.open_time,
-                closeTime: d.close_time,
-                startMs: Number(d.start_ms) || 0,
-                endMs: Number(d.end_ms) || 0,
-                gameTotal: d.game_total,
-                canteenTotal: d.canteen_total,
-                gameCollection: d.game_collection,
-                canteenCollection: d.canteen_collection,
-                expenses: d.expenses,
-                easypaisa: d.easypaisa || 0,
-                discount: d.discount || 0,
-                closingCash: d.closing_cash,
-                gameBalance: d.game_balance || 0,
-               canteenBalance: d.canteen_balance || 0
-            };
+        shift1 = null;
+
+        snapshot.forEach(docSnap => {
+
+            const d = docSnap.data();
+
+            if (
+                d.shift_number === 1 &&
+                !shift1
+            ) {
+
+                shift1 = {
+
+                    openTime:
+                        d.open_time,
+
+                    closeTime:
+                        d.close_time,
+
+                    startMs:
+                        Number(d.start_ms) || 0,
+
+                    endMs:
+                        Number(d.end_ms) || 0,
+
+                    gameTotal:
+                        d.game_total,
+
+                    canteenTotal:
+                        d.canteen_total,
+
+                    gameCollection:
+                        d.game_collection,
+
+                    canteenCollection:
+                        d.canteen_collection,
+
+                    expenses:
+                        d.expenses,
+
+                    easypaisa:
+                        d.easypaisa || 0,
+
+                    discount:
+                        d.discount || 0,
+
+                    closingCash:
+                        d.closing_cash,
+
+                    gameBalance:
+                        d.game_balance || 0,
+
+                    canteenBalance:
+                        d.canteen_balance || 0
+
+                };
+
+            }
+
+        });
+
+
+        const btn =
+            document.getElementById(
+                "shiftCloseBtn"
+            );
+
+        if (!btn) return;
+
+
+        // =========================================
+        // 🔥 SHIFT CLOSE KE BAAD
+        // =========================================
+
+        if (
+            window.pendingDayCloseId
+        ) {
+
+            btn.innerText =
+                "Day Close";
+
+        }
+
+        // =========================================
+        // 🔥 NORMAL NEW DAY
+        // =========================================
+
+        else if (!shift1) {
+
+            btn.innerText =
+                "Shift 1 Close";
+
+        }
+
+        // =========================================
+        // 🔥 SHIFT 1 CLOSED
+        // =========================================
+
+        else {
+
+            btn.innerText =
+                "Day Close";
+
         }
 
 
+        console.log(
+            "🔥 REALTIME SHIFT:",
+            shift1,
+            "DISPLAY DAY:",
+            displayDayId
+        );
+
     });
 
-// 🔥 SINGLE SHIFT BUTTON
-const btn = document.getElementById("shiftCloseBtn");
-
-if (!shift1) {
-    btn.innerText = "Shift Close";
-} else {
-    btn.innerText = "Day Close";
-}
-
-    console.log("🔥 REALTIME SHIFT:", shift1);
-
-});
 }
 
 let editTargetId = null;
@@ -5705,30 +5791,33 @@ const startMs =
         now;
 
 
-    // =================================================
-    // 🔥 STEP 1 — SHIFT NOT CLOSED YET
-    // =================================================
+// =================================================
+// 🔥 STEP 1 — SHIFT NOT CLOSED YET
+// =================================================
 
-    if (!shift1) {
+if (
+    !window.pendingDayCloseId &&
+    !shift1
+) {
 
-        title.innerText =
-            "SHIFT SNAPSHOT";
+    title.innerText =
+        "SHIFT SNAPSHOT";
 
-        if (confirmBtn) {
+    if (confirmBtn) {
 
-            confirmBtn.innerText =
-                "Close Shift";
-
-        }
-
-        body.innerHTML =
-            buildRassonSnapshot(
-                startMs,
-                endMs,
-                1
-            );
+        confirmBtn.innerText =
+            "Close Shift";
 
     }
+
+    body.innerHTML =
+        buildRassonSnapshot(
+            startMs,
+            endMs,
+            1
+        );
+
+}
 
 
     // =================================================
@@ -5773,6 +5862,23 @@ const startMs =
  * Running sessions move to new day.
  ******************************************************/
 async function closeShift() {
+
+    // ==================================================
+    // 🔒 DAY CLOSE PENDING HAI
+    // SHIFT 1 DOBARA CLOSE NAHI HOGI
+    // ==================================================
+
+    if (
+        window.pendingDayCloseId
+    ) {
+
+        alert(
+            "Shift 1 already closed.\nDay Close is pending ❌"
+        );
+
+        return;
+    }
+
 
     const oldDayId =
         Number(window.currentDayId);
