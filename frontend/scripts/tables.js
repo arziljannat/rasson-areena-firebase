@@ -6639,22 +6639,6 @@ async function closeDay() {
         Date.now();
 
 
-    const oldDayStartMs =
-        Number(
-            window.pendingDayCloseStartMs
-        );
-
-
-    const shiftClosedMs =
-        Number(
-            window.pendingShiftCloseMs
-        );
-
-
-    const now =
-        Date.now();
-
-
     // ==================================================
     // 🔒 CHECK DAY NOT ALREADY CLOSED
     // ==================================================
