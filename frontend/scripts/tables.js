@@ -6100,6 +6100,81 @@ async function closeDay() {
         return;
     }
 
+  // ==================================================
+// 🔥 POST SHIFT-CLOSE EXPENSE + EASYPAISA
+// Shift Close ke baad Day Close tak ki entries
+// isi OLD DAY mein include hongi.
+// ==================================================
+
+const dayCloseEndMs =
+    Date.now();
+
+const postShiftExpenses =
+    firebaseExpenses
+        .filter(e => {
+
+            let time = 0;
+
+            if (e.created_at?.seconds) {
+                time =
+                    e.created_at.seconds * 1000;
+            } else if (e.created_at) {
+                time =
+                    new Date(
+                        e.created_at
+                    ).getTime();
+            }
+
+            return (
+                time > shiftCloseEndMs &&
+                time <= dayCloseEndMs
+            );
+        })
+        .reduce(
+            (sum, e) =>
+                sum + Number(e.amount || 0),
+            0
+        );
+
+
+const postShiftEasyPaisa =
+    firebaseEasy
+        .filter(e => {
+
+            let time = 0;
+
+            if (e.created_at?.seconds) {
+                time =
+                    e.created_at.seconds * 1000;
+            } else if (e.created_at) {
+                time =
+                    new Date(
+                        e.created_at
+                    ).getTime();
+            }
+
+            return (
+                time > shiftCloseEndMs &&
+                time <= dayCloseEndMs
+            );
+        })
+        .reduce(
+            (sum, e) =>
+                sum + Number(e.amount || 0),
+            0
+        );
+
+
+console.log(
+    "🔥 POST SHIFT-CLOSE MONEY:",
+    {
+        shiftCloseEndMs,
+        dayCloseEndMs,
+        postShiftExpenses,
+        postShiftEasyPaisa
+    }
+);
+
     // ==================================================
     // 🔥 CREATE NEW DAY ID
     // ==================================================
@@ -6276,11 +6351,13 @@ async function closeDay() {
         canteenBalance:
             s1.canteenBalance || 0,
 
-        expenses:
-            s1.expenses || 0,
+expenses:
+    Number(s1.expenses || 0) +
+    postShiftExpenses,
 
-        easypaisa:
-            s1.easypaisa || 0,
+easypaisa:
+    Number(s1.easypaisa || 0) +
+    postShiftEasyPaisa,
 
         discount:
             s1.discount || 0
