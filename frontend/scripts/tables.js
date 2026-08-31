@@ -5986,6 +5986,7 @@ alert("Shift closed successfully ✅");
 
 /******************************************************
  * DAY CLOSE — SINGLE SHIFT
+ * 🔥 FINAL FIX — POST SHIFT-CLOSE GAMES
  ******************************************************/
 async function closeDay() {
 
@@ -6001,7 +6002,181 @@ async function closeDay() {
         return;
     }
 
-    // 🔥 CURRENT SHIFT DATA
+    // ==================================================
+    // 🔥 IMPORTANT
+    // SHIFT CLOSE TIME SAVE KARO
+    // shift1 ko reset karne se PEHLE
+    // ==================================================
+
+    const oldDayId =
+        window.currentDayId;
+
+    const shiftCloseEndMs =
+        Number(s1.endMs || 0);
+
+    if (!shiftCloseEndMs) {
+        alert(
+            "Shift close time not found ❌"
+        );
+        return;
+    }
+
+    // ==================================================
+    // 🔥 CREATE NEW DAY ID
+    // ==================================================
+
+    const newDayId =
+        Date.now();
+
+    console.log(
+        "🔥 DAY CLOSE:",
+        {
+            oldDayId,
+            shiftCloseEndMs,
+            newDayId
+        }
+    );
+
+
+    // ==================================================
+    // 🔥 FIND ALL COMPLETED SESSIONS
+    // AFTER SHIFT CLOSE
+    //
+    // These sessions belong to NEW DAY.
+    // ==================================================
+
+    const sessionsQ =
+        query(
+            collection(
+                window.db,
+                "sessions"
+            ),
+            where(
+                "branch",
+                "==",
+                BRANCH
+            )
+        );
+
+    const sessionsSnap =
+        await getDocs(
+            sessionsQ
+        );
+
+
+    for (
+        const sessionDoc
+        of sessionsSnap.docs
+    ) {
+
+        const s =
+            sessionDoc.data();
+
+
+        // Deleted session ignore
+        if (
+            s.is_deleted === true
+        ) {
+            continue;
+        }
+
+
+        // Running session abhi
+        // new day mein move nahi karna
+        if (
+            !s.end_time
+        ) {
+            continue;
+        }
+
+
+        const checkoutMs =
+            new Date(
+                s.end_time
+            ).getTime();
+
+
+        if (
+            !checkoutMs ||
+            isNaN(checkoutMs)
+        ) {
+            continue;
+        }
+
+
+        // ==================================================
+        // 🔥 ONLY POST-SHIFT-CLOSE CHECKOUTS
+        // ==================================================
+
+        if (
+            checkoutMs >
+            shiftCloseEndMs
+        ) {
+
+            await updateDoc(
+                doc(
+                    window.db,
+                    "sessions",
+                    sessionDoc.id
+                ),
+                {
+                    day_id:
+                        newDayId
+                }
+            );
+
+
+            console.log(
+                "✅ SESSION MOVED TO NEW DAY:",
+                {
+                    sessionId:
+                        sessionDoc.id,
+
+                    table:
+                        s.table_id,
+
+                    checkout:
+                        s.end_time,
+
+                    newDayId
+                }
+            );
+        }
+    }
+
+
+    // ==================================================
+    // 🔥 DAY SNAPSHOT
+    // IMPORTANT:
+    // Rebuild AFTER moving sessions
+    // ==================================================
+
+    await rebuildHistoryFromSessions();
+
+
+    // ==================================================
+    // 🔥 CURRENT DAY HISTORY SNAPSHOT
+    // ==================================================
+
+    const safeTables =
+        tables.map(t => ({
+
+            table_id:
+                t.name,
+
+            history:
+                t.history.map(h => ({
+                    ...h
+                }))
+
+        }));
+
+
+    // ==================================================
+    // 🔥 COMBINED ACCOUNTING
+    // OLD SHIFT ACCOUNTING SAME RAHEGI
+    // ==================================================
+
     const combined = {
 
         gameTotal:
@@ -6030,6 +6205,7 @@ async function closeDay() {
 
         discount:
             s1.discount || 0
+
     };
 
 
@@ -6038,30 +6214,31 @@ async function closeDay() {
             combined.gameCollection +
             combined.canteenCollection
         )
-        - combined.expenses
-        - combined.easypaisa;
+        -
+        combined.expenses
+        -
+        combined.easypaisa;
 
 
-    // 🔥 TABLE SNAPSHOT
-    const safeTables =
-        tables.map(t => ({
-            table_id: t.name,
-            history: t.history.map(h => ({
-                ...h
-            }))
-        }));
+    // ==================================================
+    // 🔥 SAVE OLD DAY
+    // ==================================================
 
-
-    // 🔥 SAVE DAY HISTORY
     await addDoc(
-        collection(window.db, "days"),
+        collection(
+            window.db,
+            "days"
+        ),
         {
-            tables: safeTables,
 
-            date: today,
+            tables:
+                safeTables,
+
+            date:
+                today,
 
             day_id:
-                window.currentDayId,
+                oldDayId,
 
             branch:
                 BRANCH,
@@ -6077,112 +6254,14 @@ async function closeDay() {
 
             created_at:
                 new Date().toISOString()
+
         }
     );
 
 
-    // 🔥 RESET SHIFT
-    shift1 = null;
-
-
-// ======================================================
-// 🔥 DAY CLOSE — MOVE POST-SHIFT-CLOSE SESSIONS TO NEW DAY
-// ======================================================
-//
-// Shift Close ke baad aur Day Close se pehle jo games
-// checkout hue hain, unko NEW DAY ka day_id milega.
-//
-// Ismein:
-// 1. Shift Close ke baad new check-in + checkout
-// 2. Shift Close se pehle running/carry-forward +
-//    Shift Close ke baad checkout
-// dono included hain.
-//
-// Old Shift accounting/snapshot ko touch nahi karta.
-// ======================================================
-
-const shiftCloseEndMs =
-    Number(shift1?.endMs || 0);
-
-if (shiftCloseEndMs > 0) {
-
-    const sessionsQ = query(
-        collection(window.db, "sessions"),
-        where("branch", "==", BRANCH)
-    );
-
-    const sessionsSnap =
-        await getDocs(sessionsQ);
-
-    const newDayForSessions =
-        Date.now();
-
-    for (const sessionDoc of sessionsSnap.docs) {
-
-        const s =
-            sessionDoc.data();
-
-        // Deleted session ignore
-        if (s.is_deleted === true) {
-            continue;
-        }
-
-        // Running session abhi checkout nahi hua
-        // usko yahan move nahi karna
-        if (!s.end_time) {
-            continue;
-        }
-
-        const checkoutMs =
-            new Date(s.end_time).getTime();
-
-        if (!checkoutMs || isNaN(checkoutMs)) {
-            continue;
-        }
-
-        // 🔥 ONLY:
-        // Shift Close ke BAAD checkout hua session
-        if (checkoutMs > shiftCloseEndMs) {
-
-            await updateDoc(
-                doc(
-                    window.db,
-                    "sessions",
-                    sessionDoc.id
-                ),
-                {
-                    day_id:
-                        newDayForSessions
-                }
-            );
-
-            console.log(
-                "✅ MOVED TO NEW DAY:",
-                sessionDoc.id,
-                s.table_id,
-                new Date(checkoutMs).toLocaleString(
-                    "en-PK",
-                    {
-                        timeZone:
-                            "Asia/Karachi"
-                    }
-                )
-            );
-        }
-    }
-
-    // 🔥 SAME ID NEW DAY KE LIYE USE HOGI
-    window._pendingNewDayId =
-        newDayForSessions;
-}
-
-
-  
-
-    // 🔥 NEW DAY
-const newDayId =
-    window._pendingNewDayId ||
-    Date.now();
+    // ==================================================
+    // 🔥 NOW START NEW DAY
+    // ==================================================
 
     const systemQ =
         query(
@@ -6202,12 +6281,16 @@ const newDayId =
             )
         );
 
+
     const systemSnap =
-        await getDocs(systemQ);
+        await getDocs(
+            systemQ
+        );
 
 
     for (
-        const d of systemSnap.docs
+        const d
+        of systemSnap.docs
     ) {
 
         await updateDoc(
@@ -6217,18 +6300,46 @@ const newDayId =
                 d.id
             ),
             {
+
                 day_id:
                     newDayId,
 
                 created_at:
                     new Date().toISOString()
+
             }
         );
+
     }
 
 
+    // ==================================================
+    // 🔥 GLOBAL CURRENT DAY
+    // ==================================================
+
     window.currentDayId =
         newDayId;
+
+
+    // ==================================================
+    // 🔥 RESET SHIFT
+    // ==================================================
+
+    shift1 =
+        null;
+
+
+    // ==================================================
+    // 🔥 REBUILD NEW DAY HISTORY
+    //
+    // This is CRITICAL.
+    // Moved sessions now have newDayId.
+    // ==================================================
+
+    await rebuildHistoryFromSessions();
+
+
+    renderTables();
 
 
     document.getElementById(
@@ -6242,11 +6353,19 @@ const newDayId =
     );
 
 
+    console.log(
+        "✅ DAY CLOSED SUCCESSFULLY",
+        {
+            oldDayId,
+            newDayId
+        }
+    );
+
+
     alert(
         "Day closed successfully ✅ New day started."
     );
 }
-
 
 
 /******************************************************
