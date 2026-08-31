@@ -6085,9 +6085,104 @@ async function closeDay() {
     shift1 = null;
 
 
-    // 🔥 NEW DAY
-    const newDayId =
+// ======================================================
+// 🔥 DAY CLOSE — MOVE POST-SHIFT-CLOSE SESSIONS TO NEW DAY
+// ======================================================
+//
+// Shift Close ke baad aur Day Close se pehle jo games
+// checkout hue hain, unko NEW DAY ka day_id milega.
+//
+// Ismein:
+// 1. Shift Close ke baad new check-in + checkout
+// 2. Shift Close se pehle running/carry-forward +
+//    Shift Close ke baad checkout
+// dono included hain.
+//
+// Old Shift accounting/snapshot ko touch nahi karta.
+// ======================================================
+
+const shiftCloseEndMs =
+    Number(shift1?.endMs || 0);
+
+if (shiftCloseEndMs > 0) {
+
+    const sessionsQ = query(
+        collection(window.db, "sessions"),
+        where("branch", "==", BRANCH)
+    );
+
+    const sessionsSnap =
+        await getDocs(sessionsQ);
+
+    const newDayForSessions =
         Date.now();
+
+    for (const sessionDoc of sessionsSnap.docs) {
+
+        const s =
+            sessionDoc.data();
+
+        // Deleted session ignore
+        if (s.is_deleted === true) {
+            continue;
+        }
+
+        // Running session abhi checkout nahi hua
+        // usko yahan move nahi karna
+        if (!s.end_time) {
+            continue;
+        }
+
+        const checkoutMs =
+            new Date(s.end_time).getTime();
+
+        if (!checkoutMs || isNaN(checkoutMs)) {
+            continue;
+        }
+
+        // 🔥 ONLY:
+        // Shift Close ke BAAD checkout hua session
+        if (checkoutMs > shiftCloseEndMs) {
+
+            await updateDoc(
+                doc(
+                    window.db,
+                    "sessions",
+                    sessionDoc.id
+                ),
+                {
+                    day_id:
+                        newDayForSessions
+                }
+            );
+
+            console.log(
+                "✅ MOVED TO NEW DAY:",
+                sessionDoc.id,
+                s.table_id,
+                new Date(checkoutMs).toLocaleString(
+                    "en-PK",
+                    {
+                        timeZone:
+                            "Asia/Karachi"
+                    }
+                )
+            );
+        }
+    }
+
+    // 🔥 SAME ID NEW DAY KE LIYE USE HOGI
+    window._pendingNewDayId =
+        newDayForSessions;
+}
+
+
+  
+
+    // 🔥 NEW DAY
+const newDayId =
+    window._pendingNewDayId ||
+    Date.now();
 
     const systemQ =
         query(
