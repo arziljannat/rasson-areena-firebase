@@ -6763,6 +6763,96 @@ async function refreshCurrentDayHistory(dayId = null) {
                 latestShift1.end_ms
             );
 
+
+      // ==================================================
+// 🔥 PRESERVE POST-SHIFT EXPENSE + EASYPAISA
+// Shift Close ke baad ki entries OLD DAY mein rahengi
+// Refresh ke baad bhi kabhi disappear nahi hongi.
+// ==================================================
+
+const refreshNowMs = Date.now();
+
+const postShiftExpenses =
+    firebaseExpenses
+        .filter(e => {
+
+            let time = 0;
+
+            if (e.created_at?.seconds) {
+                time =
+                    e.created_at.seconds * 1000;
+            } else if (e.created_at) {
+                time =
+                    new Date(
+                        e.created_at
+                    ).getTime();
+            }
+
+            return (
+                time > Number(latestShift1.end_ms || 0) &&
+                time <= refreshNowMs
+            );
+        })
+        .reduce(
+            (sum, e) =>
+                sum + Number(e.amount || 0),
+            0
+        );
+
+
+const postShiftEasyPaisa =
+    firebaseEasy
+        .filter(e => {
+
+            let time = 0;
+
+            if (e.created_at?.seconds) {
+                time =
+                    e.created_at.seconds * 1000;
+            } else if (e.created_at) {
+                time =
+                    new Date(
+                        e.created_at
+                    ).getTime();
+            }
+
+            return (
+                time > Number(latestShift1.end_ms || 0) &&
+                time <= refreshNowMs
+            );
+        })
+        .reduce(
+            (sum, e) =>
+                sum + Number(e.amount || 0),
+            0
+        );
+
+
+// 🔥 FINAL OLD DAY ACCOUNTING
+const refreshedCombined = {
+
+    ...newShift1,
+
+    expenses:
+        Number(newShift1.expenses || 0) +
+        Number(postShiftExpenses || 0),
+
+    easypaisa:
+        Number(newShift1.easypaisa || 0) +
+        Number(postShiftEasyPaisa || 0)
+
+};
+
+refreshedCombined.closingCash =
+    (
+        Number(refreshedCombined.gameCollection || 0) +
+        Number(refreshedCombined.canteenCollection || 0)
+    )
+    -
+    Number(refreshedCombined.expenses || 0)
+    -
+    Number(refreshedCombined.easypaisa || 0);
+
         // 🔥 TABLE SNAPSHOT
         const tablesSnapshot =
             tables.map(t => ({
