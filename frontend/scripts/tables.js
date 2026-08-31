@@ -6438,10 +6438,157 @@ async function closeShift() {
  ******************************************************/
 async function closeDay() {
 
-    const oldDayId =
+    // ==================================================
+    // 🔥 RECOVER PENDING DAY CLOSE
+    // Source priority:
+    // 1. Memory
+    // 2. LocalStorage
+    // 3. Firebase CENTRAL DAY
+    // ==================================================
+
+    let oldDayId =
         Number(
             window.pendingDayCloseId
+        ) || 0;
+
+
+    // ==================================================
+    // 🔥 LOCALSTORAGE FALLBACK
+    // ==================================================
+
+    if (!oldDayId) {
+
+        oldDayId =
+            Number(
+                localStorage.getItem(
+                    "pendingDayCloseId"
+                )
+            ) || 0;
+
+    }
+
+
+    // ==================================================
+    // 🔥 FIREBASE FALLBACK
+    // ==================================================
+
+    if (!oldDayId) {
+
+        console.warn(
+            "⚠️ Pending Day missing locally. Recovering from Firebase..."
         );
+
+        const systemQ =
+            query(
+                collection(
+                    window.db,
+                    "system"
+                ),
+
+                where(
+                    "branch",
+                    "==",
+                    BRANCH
+                ),
+
+                where(
+                    "type",
+                    "==",
+                    "current_day"
+                )
+            );
+
+
+        const systemSnap =
+            await getDocs(
+                systemQ
+            );
+
+
+        if (!systemSnap.empty) {
+
+            systemSnap.forEach(
+                docSnap => {
+
+                    const d =
+                        docSnap.data();
+
+                    if (
+                        d.pending_day_close === true &&
+                        d.pending_day_close_id
+                    ) {
+
+                        oldDayId =
+                            Number(
+                                d.pending_day_close_id
+                            );
+
+                        window.pendingDayCloseId =
+                            oldDayId;
+
+
+                        window.pendingDayCloseStartMs =
+                            Number(
+                                d.pending_day_close_start_ms
+                            ) || null;
+
+
+                        window.pendingShiftCloseMs =
+                            Number(
+                                d.shift_closed_at
+                            ) || null;
+
+
+                        // 🔥 RESTORE LOCAL CACHE
+                        localStorage.setItem(
+                            "pendingDayCloseId",
+                            String(
+                                oldDayId
+                            )
+                        );
+
+
+                        if (
+                            window.pendingDayCloseStartMs
+                        ) {
+
+                            localStorage.setItem(
+                                "pendingDayCloseStartMs",
+                                String(
+                                    window.pendingDayCloseStartMs
+                                )
+                            );
+
+                        }
+
+
+                        if (
+                            window.pendingShiftCloseMs
+                        ) {
+
+                            localStorage.setItem(
+                                "pendingShiftCloseMs",
+                                String(
+                                    window.pendingShiftCloseMs
+                                )
+                            );
+
+                        }
+
+
+                        console.log(
+                            "🔥 PENDING DAY RECOVERED FROM FIREBASE:",
+                            oldDayId
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+    }
 
 
     // ==================================================
@@ -6456,6 +6603,40 @@ async function closeDay() {
 
         return;
     }
+
+
+    console.log(
+        "🔥 DAY CLOSE OLD DAY ID:",
+        oldDayId
+    );
+
+
+    const oldDayStartMs =
+        Number(
+            window.pendingDayCloseStartMs
+        ) ||
+        Number(
+            localStorage.getItem(
+                "pendingDayCloseStartMs"
+            )
+        ) ||
+        oldDayId;
+
+
+    const shiftClosedMs =
+        Number(
+            window.pendingShiftCloseMs
+        ) ||
+        Number(
+            localStorage.getItem(
+                "pendingShiftCloseMs"
+            )
+        ) ||
+        0;
+
+
+    const now =
+        Date.now();
 
 
     const oldDayStartMs =
