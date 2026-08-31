@@ -5750,15 +5750,15 @@ async function openShiftSummary() {
     const startMs =
         Number(window.currentDayId) || now;
 
-    const endMs =
-        now;
-
 
     // =================================================
     // 🔥 STEP 1 — SHIFT NOT CLOSED YET
     // =================================================
 
     if (!shift1) {
+
+        const endMs =
+            now;
 
         title.innerText =
             "SHIFT SNAPSHOT";
@@ -5774,7 +5774,8 @@ async function openShiftSummary() {
             buildRassonSnapshot(
                 startMs,
                 endMs,
-                1
+                1,
+                null
             );
 
     }
@@ -5782,9 +5783,17 @@ async function openShiftSummary() {
 
     // =================================================
     // 🔥 STEP 2 — SHIFT ALREADY CLOSED
+    // OLD DAY CLOSE SNAPSHOT
     // =================================================
 
     else {
+
+        const dayCloseEndMs =
+            Number(
+                shift1.endMs ||
+                shift1.end_ms ||
+                now
+            );
 
         title.innerText =
             "DAY CLOSE";
@@ -5799,7 +5808,8 @@ async function openShiftSummary() {
         body.innerHTML =
             buildRassonSnapshot(
                 startMs,
-                endMs,
+                dayCloseEndMs,
+                null,
                 null
             );
 
