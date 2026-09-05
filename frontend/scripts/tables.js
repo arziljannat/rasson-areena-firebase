@@ -3856,10 +3856,10 @@ setText(
                     </td>
 
 
-                    <td>
+<td>
 
     ${
-        ROLE === "admin" && h.paid !== true
+        h.paid !== true
 
         ? `
             <input
