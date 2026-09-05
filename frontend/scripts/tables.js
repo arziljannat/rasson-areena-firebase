@@ -3927,7 +3927,7 @@ setText(
         };
     }
 
-  // =====================================================
+// =====================================================
 // 💰 PAY SELECTED UNPAID BILLS
 // =====================================================
 
@@ -3938,131 +3938,119 @@ const payBtn =
 
 if (payBtn) {
 
-    if (ROLE === "admin") {
+    payBtn.classList.remove("hidden");
 
-        payBtn.classList.remove("hidden");
+    payBtn.onclick = async () => {
 
-        payBtn.onclick = async () => {
+        const checks =
+            document.querySelectorAll(
+                ".historyPayCheck:checked"
+            );
 
-            const checks =
-                document.querySelectorAll(
-                    ".historyPayCheck:checked"
+        if (checks.length === 0) {
+
+            alert(
+                "Please select unpaid bills first ❌"
+            );
+
+            return;
+        }
+
+        const selectedIds =
+            Array.from(checks)
+                .map(
+                    check =>
+                        String(
+                            check.dataset.sessionId
+                        )
                 );
 
-            if (checks.length === 0) {
+        const selectedBills =
+            t.history.filter(
+                h =>
+                    selectedIds.includes(
+                        String(h.sessionId)
+                    ) &&
+                    h.paid !== true
+            );
 
-                alert(
-                    "Please select unpaid bills first ❌"
-                );
+        if (selectedBills.length === 0) {
 
-                return;
-            }
+            alert(
+                "No unpaid bills selected ❌"
+            );
 
-            const selectedIds =
-                Array.from(checks)
-                    .map(
-                        check =>
-                            String(
-                                check.dataset.sessionId
-                            )
-                    );
+            return;
+        }
 
-            const selectedBills =
-                t.history.filter(
-                    h =>
-                        selectedIds.includes(
-                            String(h.sessionId)
-                        ) &&
-                        h.paid !== true
-                );
+        const totalAmount =
+            selectedBills.reduce(
+                (sum, h) =>
+                    sum +
+                    Number(
+                        h.total ??
+                        (
+                            Number(h.amount || 0) +
+                            Number(h.canteenAmount || 0)
+                        )
+                    ),
+                0
+            );
 
-            if (selectedBills.length === 0) {
+        const ok =
+            confirm(
+                `Pay ${selectedBills.length} bills?\n\n` +
+                `Total: Rs. ${totalAmount.toLocaleString("en-PK")}`
+            );
 
-                alert(
-                    "No unpaid bills selected ❌"
-                );
+        if (!ok) return;
 
-                return;
-            }
+        try {
 
-            const totalAmount =
-                selectedBills.reduce(
-                    (sum, h) =>
-                        sum +
-                        Number(
-                            h.total ??
-                            (
-                                Number(h.amount || 0) +
-                                Number(h.canteenAmount || 0)
-                            )
-                        ),
-                    0
-                );
+            const paidTime =
+                new Date().toISOString();
 
-            const ok =
-                confirm(
-                    `Pay ${selectedBills.length} bills?\n\n` +
-                    `Total: Rs. ${totalAmount.toLocaleString("en-PK")}`
-                );
+            for (
+                const sessionId
+                of selectedIds
+            ) {
 
-            if (!ok) return;
-
-            try {
-
-                const paidTime =
-                    new Date().toISOString();
-
-                for (
-                    const sessionId
-                    of selectedIds
-                ) {
-
-                    await updateDoc(
-                        doc(
-                            window.db,
-                            "sessions",
-                            sessionId
-                        ),
-                        {
-                            paid: true,
-                            paid_time: paidTime
-                        }
-                    );
-                }
-
-                // 🔥 REFRESH FIREBASE HISTORY
-                await rebuildHistoryFromSessions();
-
-                // 🔥 REFRESH TABLE UI
-                renderTables();
-
-                // 🔥 REOPEN HISTORY
-                openHistory(id);
-
-                alert(
-                    `${selectedBills.length} bills paid successfully ✅`
-                );
-
-            } catch (error) {
-
-                console.error(
-                    "❌ BULK PAYMENT ERROR:",
-                    error
-                );
-
-                alert(
-                    "Bulk payment save failed ❌"
+                await updateDoc(
+                    doc(
+                        window.db,
+                        "sessions",
+                        sessionId
+                    ),
+                    {
+                        paid: true,
+                        paid_time: paidTime
+                    }
                 );
             }
-        };
 
-    } else {
+            await rebuildHistoryFromSessions();
 
-        payBtn.classList.add("hidden");
+            renderTables();
 
-    }
+            openHistory(id);
+
+            alert(
+                `${selectedBills.length} bills paid successfully ✅`
+            );
+
+        } catch (error) {
+
+            console.error(
+                "❌ BULK PAYMENT ERROR:",
+                error
+            );
+
+            alert(
+                "Bulk payment save failed ❌"
+            );
+        }
+    };
 }
-
     // =====================================================
     // DELETE BUTTON
     // =====================================================
