@@ -3855,6 +3855,26 @@ setText(
 
                     </td>
 
+
+                    <td>
+
+    ${
+        ROLE === "admin" && h.paid !== true
+
+        ? `
+            <input
+                type="checkbox"
+                class="historyPayCheck"
+                data-session-id="${sessionId}"
+                data-table-id="${String(id)}"
+            >
+          `
+
+        : "-"
+    }
+
+</td>
+
                     <td>
 
                         ${
@@ -3906,6 +3926,142 @@ setText(
 
         };
     }
+
+  // =====================================================
+// 💰 PAY SELECTED UNPAID BILLS
+// =====================================================
+
+const payBtn =
+    document.getElementById(
+        "paySelectedHistoryBtn"
+    );
+
+if (payBtn) {
+
+    if (ROLE === "admin") {
+
+        payBtn.classList.remove("hidden");
+
+        payBtn.onclick = async () => {
+
+            const checks =
+                document.querySelectorAll(
+                    ".historyPayCheck:checked"
+                );
+
+            if (checks.length === 0) {
+
+                alert(
+                    "Please select unpaid bills first ❌"
+                );
+
+                return;
+            }
+
+            const selectedIds =
+                Array.from(checks)
+                    .map(
+                        check =>
+                            String(
+                                check.dataset.sessionId
+                            )
+                    );
+
+            const selectedBills =
+                t.history.filter(
+                    h =>
+                        selectedIds.includes(
+                            String(h.sessionId)
+                        ) &&
+                        h.paid !== true
+                );
+
+            if (selectedBills.length === 0) {
+
+                alert(
+                    "No unpaid bills selected ❌"
+                );
+
+                return;
+            }
+
+            const totalAmount =
+                selectedBills.reduce(
+                    (sum, h) =>
+                        sum +
+                        Number(
+                            h.total ??
+                            (
+                                Number(h.amount || 0) +
+                                Number(h.canteenAmount || 0)
+                            )
+                        ),
+                    0
+                );
+
+            const ok =
+                confirm(
+                    `Pay ${selectedBills.length} bills?\n\n` +
+                    `Total: Rs. ${totalAmount.toLocaleString("en-PK")}`
+                );
+
+            if (!ok) return;
+
+            try {
+
+                const paidTime =
+                    new Date().toISOString();
+
+                for (
+                    const sessionId
+                    of selectedIds
+                ) {
+
+                    await updateDoc(
+                        doc(
+                            window.db,
+                            "sessions",
+                            sessionId
+                        ),
+                        {
+                            paid: true,
+                            paid_time: paidTime
+                        }
+                    );
+                }
+
+                // 🔥 REFRESH FIREBASE HISTORY
+                await rebuildHistoryFromSessions();
+
+                // 🔥 REFRESH TABLE UI
+                renderTables();
+
+                // 🔥 REOPEN HISTORY
+                openHistory(id);
+
+                alert(
+                    `${selectedBills.length} bills paid successfully ✅`
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "❌ BULK PAYMENT ERROR:",
+                    error
+                );
+
+                alert(
+                    "Bulk payment save failed ❌"
+                );
+            }
+        };
+
+    } else {
+
+        payBtn.classList.add("hidden");
+
+    }
+}
 
     // =====================================================
     // DELETE BUTTON
@@ -9009,6 +9165,9 @@ function renderHistoryPage() {
                >
                     UNPAID
                </button>`;
+
+
+      
 
         // -------------------------------
         // ROW
