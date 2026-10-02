@@ -222,9 +222,21 @@ let deleteTargetId = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
 
+    // 🔥 TOP BUTTONS — bind immediately, before any async Firebase work.
+    // This keeps the buttons independent from initCurrentDay() and
+    // realtime listeners. The original popup functions remain unchanged.
+    bindShiftButtons();
+    bindHistoryButtons();
+
+    // 🔥 Make the functions globally callable for Player History and
+    // any existing inline page actions.
+    window.openShiftSummary = openShiftSummary;
+    window.openDayHistory = openDayHistory;
+    window.openTableHistory = openTableHistory;
+
+    // 🔥 Now initialize the central day.
     await initCurrentDay();
 
-    // 🔥 HARD CHECK
     if (!window.currentDayId) {
         alert("Day system failed ❌");
         return;
@@ -232,20 +244,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     console.log("✅ DAY READY:", window.currentDayId);
 
-    // 🔥 TOP BUTTONS FIRST — do not wait for realtime listeners.
-    bindShiftButtons();
-    bindHistoryButtons();
-
-    // 🔥 Make the navigation functions directly callable.
-    window.openShiftSummary = openShiftSummary;
-    window.openDayHistory = openDayHistory;
-    window.openTableHistory = openTableHistory;
-
-    // 🔥 Re-bind after the first render tick as a safety net.
-    setTimeout(() => {
-        bindShiftButtons();
-        bindHistoryButtons();
-    }, 0);
+    // 🔥 Re-apply button state after day initialization.
+    applyShiftButtonState();
 
     // 🔥 Realtime listeners AFTER UI buttons are ready.
     loadShiftsFromFirebase();
