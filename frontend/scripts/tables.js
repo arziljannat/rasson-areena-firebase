@@ -5940,10 +5940,21 @@ const gameCollection =
 
 async function openShiftSummary() {
 
+    // 🔥 OPEN IMMEDIATELY — do not wait for Firebase/history rebuild.
+    showPopup("shiftSummaryPopup");
+
     const body =
         document.getElementById(
             "shiftSummaryBody"
         );
+
+    if (body) {
+        body.innerHTML = `
+            <div style="padding:30px;text-align:center;color:#00ffcc;">
+                Loading Shift Snapshot...
+            </div>
+        `;
+    }
 
     const title =
         document.getElementById(
@@ -7224,6 +7235,20 @@ function bindHistoryButtons() {
  ******************************************************/
 async function openDayHistory() {
 
+  // 🔥 OPEN IMMEDIATELY — Firebase data can load after popup appears.
+  showPopup("dayHistoryPopup");
+
+  const snapshotBox =
+      document.getElementById("dayHistorySnapshot");
+
+  if (snapshotBox) {
+      snapshotBox.innerHTML = `
+          <div style="padding:30px;text-align:center;color:#00ffcc;">
+              Loading Day History...
+          </div>
+      `;
+  }
+
   const forceRefreshDay =
     localStorage.getItem("forceRefreshClosedDay");
 
@@ -8044,17 +8069,32 @@ tables.sort((a, b) => {
 /******************************************************
  * 🟢 OPEN TABLE HISTORY POPUP
  ******************************************************/
-function openTableHistory() {
+async function openTableHistory() {
+
+  // 🔥 OPEN IMMEDIATELY — do not wait for Firebase.
+  showPopup("tableHistoryPopup");
+
+  const body =
+      document.getElementById("tableHistoryBody");
+
+  if (body) {
+      body.innerHTML = `
+          <tr>
+              <td colspan="11" style="text-align:center;padding:30px;">
+                  Loading Table History...
+              </td>
+          </tr>
+      `;
+  }
 
   if (!window._daysData || window._daysData.length === 0) {
-    openDayHistory();
+    await openDayHistory();
+  }
 
-    setTimeout(() => {
-        openTableHistory();
-    }, 1000);
-
+  if (!window._daysData || window._daysData.length === 0) {
+    console.warn("⚠️ TABLE HISTORY: no day data available");
     return;
-}
+  }
 
     let dateSel = document.getElementById("tableHistoryDateSelect");
     dateSel.innerHTML = "";
