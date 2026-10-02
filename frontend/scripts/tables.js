@@ -75,15 +75,8 @@ let firebaseExpenses = [];
 let firebaseEasy = [];
 // 🔥 AUTO REFRESH FUNCTION
 async function autoRefreshUI() {
-    try {
-        loadShiftsFromFirebase();
-
-        if (tables && tables.length > 0) {
-            renderTables();
-        }
-    } catch (error) {
-        console.error("❌ AUTO REFRESH ERROR:", error);
-    }
+    loadShiftsFromFirebase();
+    renderTables();
 }
 
 const BRANCH =
@@ -112,105 +105,56 @@ function getItemStock(item) {
  ******************************************************/
 let tables = [];
 
-let shift1 = null;
-let shift2 = null;
-let shiftsUnsubscribe = null;
-
-function applyShiftButtonState() {
-
-    const btn = document.getElementById("shiftCloseBtn");
-
-    if (!btn) return;
-
-    btn.innerText = shift1 ? "Day Close" : "Shift Close";
-    btn.disabled = false;
-    btn.style.display = "";
-
-    console.log("🔘 SHIFT BUTTON:", btn.innerText);
-}
-
+let shift1 = null;   // ✅ ADD
 function loadShiftsFromFirebase() {
 
-    if (!window.currentDayId) {
-        console.warn("⏳ CURRENT DAY NOT READY");
-        return;
-    }
+const q = query(
+    collection(window.db, "shifts"),
+    where("branch", "==", BRANCH),
+    where("day_id", "==", window.currentDayId)
+);
 
-    if (typeof shiftsUnsubscribe === "function") {
-        shiftsUnsubscribe();
-        shiftsUnsubscribe = null;
-    }
+onSnapshot(q, (snapshot) => {
 
-    const q = query(
-        collection(window.db, "shifts"),
-        where("branch", "==", BRANCH),
-        where("day_id", "==", Number(window.currentDayId))
-    );
+    shift1 = null;
 
-    shiftsUnsubscribe = onSnapshot(
-        q,
-        (snapshot) => {
+    snapshot.forEach(docSnap => {
+        const d = docSnap.data();
 
-            shift1 = null;
-            shift2 = null;
-
-            snapshot.forEach(docSnap => {
-
-                const d = docSnap.data();
-
-                const shiftData = {
-                    id: docSnap.id,
-                    shift: Number(d.shift_number) || 0,
-                    shiftNumber: Number(d.shift_number) || 0,
-
-                    openTime: d.open_time || "",
-                    closeTime: d.close_time || "",
-
-                    startMs: Number(d.start_ms) || 0,
-                    endMs: Number(d.end_ms) || 0,
-
-                    gameTotal: Number(d.game_total) || 0,
-                    canteenTotal: Number(d.canteen_total) || 0,
-
-                    gameCollection: Number(d.game_collection) || 0,
-                    canteenCollection: Number(d.canteen_collection) || 0,
-
-                    gameBalance: Number(d.game_balance) || 0,
-                    canteenBalance: Number(d.canteen_balance) || 0,
-
-                    expenses: Number(d.expenses) || 0,
-                    easypaisa: Number(d.easypaisa) || 0,
-                    discount: Number(d.discount) || 0,
-
-                    closingCash: Number(d.closing_cash) || 0,
-
-                    branch: d.branch || BRANCH,
-                    dayId:
-                        Number(d.day_id) ||
-                        Number(window.currentDayId) ||
-                        0
-                };
-
-                if (shiftData.shiftNumber === 1 && !shift1) {
-                    shift1 = shiftData;
-                }
-
-                if (shiftData.shiftNumber === 2 && !shift2) {
-                    shift2 = shiftData;
-                }
-            });
-
-            applyShiftButtonState();
-
-            console.log("🔥 CURRENT DAY:", window.currentDayId);
-            console.log("🔥 SHIFT 1:", shift1);
-            console.log("🔥 SHIFT 2:", shift2);
-        },
-        error => {
-            console.error("❌ SHIFT REALTIME ERROR:", error);
-            applyShiftButtonState();
+        if (d.shift_number === 1 && !shift1) {
+            shift1 = {
+                openTime: d.open_time,
+                closeTime: d.close_time,
+                startMs: Number(d.start_ms) || 0,
+                endMs: Number(d.end_ms) || 0,
+                gameTotal: d.game_total,
+                canteenTotal: d.canteen_total,
+                gameCollection: d.game_collection,
+                canteenCollection: d.canteen_collection,
+                expenses: d.expenses,
+                easypaisa: d.easypaisa || 0,
+                discount: d.discount || 0,
+                closingCash: d.closing_cash,
+                gameBalance: d.game_balance || 0,
+               canteenBalance: d.canteen_balance || 0
+            };
         }
-    );
+
+
+    });
+
+// 🔥 SINGLE SHIFT BUTTON
+const btn = document.getElementById("shiftCloseBtn");
+
+if (!shift1) {
+    btn.innerText = "Shift Close";
+} else {
+    btn.innerText = "Day Close";
+}
+
+    console.log("🔥 REALTIME SHIFT:", shift1);
+
+});
 }
 
 let editTargetId = null;
@@ -222,21 +166,9 @@ let deleteTargetId = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
 
-    // 🔥 TOP BUTTONS — bind immediately, before any async Firebase work.
-    // This keeps the buttons independent from initCurrentDay() and
-    // realtime listeners. The original popup functions remain unchanged.
-    bindShiftButtons();
-    bindHistoryButtons();
-
-    // 🔥 Make the functions globally callable for Player History and
-    // any existing inline page actions.
-    window.openShiftSummary = openShiftSummary;
-    window.openDayHistory = openDayHistory;
-    window.openTableHistory = openTableHistory;
-
-    // 🔥 Now initialize the central day.
     await initCurrentDay();
 
+    // 🔥 HARD CHECK
     if (!window.currentDayId) {
         alert("Day system failed ❌");
         return;
@@ -244,12 +176,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     console.log("✅ DAY READY:", window.currentDayId);
 
-    // 🔥 Re-apply button state after day initialization.
-    applyShiftButtonState();
-
-    // 🔥 Realtime listeners AFTER UI buttons are ready.
     loadShiftsFromFirebase();
-
     listenExpensesRealtime();
     listenEasyRealtime();
     listenInventoryRealtime();
@@ -258,6 +185,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     listenHistoryRealtime();
 
     bindAddTablePopup();
+    bindShiftButtons();
+    bindHistoryButtons();
 
     setTimeout(() => {
         restoreTimers();
@@ -402,33 +331,30 @@ history: []
     };
 });
 
-if (!tables || tables.length === 0) {
-    console.log("⛔ Tables not ready yet");
-    return;
-}
+setTimeout(async () => {
 
-console.log("✅ TABLES READY:", tables.length);
+    // 🔥 IMPORTANT
+    if (!tables || tables.length === 0) {
+        console.log("⛔ Tables not ready yet");
+        return;
+    }
 
-rebuildHistoryFromSessions()
-    .then(() => {
+    console.log("✅ TABLES READY:", tables.length);
 
-        console.log(
-            "✅ HISTORY COUNTS:",
-            tables.map(t => ({
-                table: t.name,
-                history: t.history.length
-            }))
-        );
+    await rebuildHistoryFromSessions();
 
-        renderTables();
+    // 🔥 DEBUG
+    console.log(
+        "✅ HISTORY COUNTS:",
+        tables.map(t => ({
+            table: t.name,
+            history: t.history.length
+        }))
+    );
 
-    })
-    .catch(error => {
+    renderTables();
 
-        console.error("❌ HISTORY REBUILD ERROR:", error);
-        renderTables();
-
-    });
+}, 800);
 });
 }
 
@@ -473,7 +399,8 @@ const q = query(
         });
 
         console.log("🔥 FIREBASE EXPENSES:", firebaseExpenses);
-
+      // 🔥 AUTO REFRESH DAY HISTORY
+refreshCurrentDayHistory();
     });
 }
 
@@ -5117,8 +5044,6 @@ function bindShiftButtons() {
         shiftCloseBtn.onclick =
             openShiftSummary;
 
-        applyShiftButtonState();
-
     }
 
 
@@ -5940,21 +5865,10 @@ const gameCollection =
 
 async function openShiftSummary() {
 
-    // 🔥 OPEN IMMEDIATELY — do not wait for Firebase/history rebuild.
-    showPopup("shiftSummaryPopup");
-
     const body =
         document.getElementById(
             "shiftSummaryBody"
         );
-
-    if (body) {
-        body.innerHTML = `
-            <div style="padding:30px;text-align:center;color:#00ffcc;">
-                Loading Shift Snapshot...
-            </div>
-        `;
-    }
 
     const title =
         document.getElementById(
@@ -7235,20 +7149,6 @@ function bindHistoryButtons() {
  ******************************************************/
 async function openDayHistory() {
 
-  // 🔥 OPEN IMMEDIATELY — Firebase data can load after popup appears.
-  showPopup("dayHistoryPopup");
-
-  const snapshotBox =
-      document.getElementById("dayHistorySnapshot");
-
-  if (snapshotBox) {
-      snapshotBox.innerHTML = `
-          <div style="padding:30px;text-align:center;color:#00ffcc;">
-              Loading Day History...
-          </div>
-      `;
-  }
-
   const forceRefreshDay =
     localStorage.getItem("forceRefreshClosedDay");
 
@@ -8069,32 +7969,17 @@ tables.sort((a, b) => {
 /******************************************************
  * 🟢 OPEN TABLE HISTORY POPUP
  ******************************************************/
-async function openTableHistory() {
-
-  // 🔥 OPEN IMMEDIATELY — do not wait for Firebase.
-  showPopup("tableHistoryPopup");
-
-  const body =
-      document.getElementById("tableHistoryBody");
-
-  if (body) {
-      body.innerHTML = `
-          <tr>
-              <td colspan="11" style="text-align:center;padding:30px;">
-                  Loading Table History...
-              </td>
-          </tr>
-      `;
-  }
+function openTableHistory() {
 
   if (!window._daysData || window._daysData.length === 0) {
-    await openDayHistory();
-  }
+    openDayHistory();
 
-  if (!window._daysData || window._daysData.length === 0) {
-    console.warn("⚠️ TABLE HISTORY: no day data available");
+    setTimeout(() => {
+        openTableHistory();
+    }, 1000);
+
     return;
-  }
+}
 
     let dateSel = document.getElementById("tableHistoryDateSelect");
     dateSel.innerHTML = "";
@@ -9400,9 +9285,6 @@ else {
 window.checkIn = checkIn;
 window.checkOut = checkOut;
 window.openHistory = openHistory;
-window.openShiftSummary = openShiftSummary;
-window.openDayHistory = openDayHistory;
-window.openTableHistory = openTableHistory;
 window.editTable = editTable;
 window.deleteTableOpen = deleteTableOpen;
 window.openCanteen = openCanteen;
