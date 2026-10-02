@@ -232,10 +232,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     console.log("✅ DAY READY:", window.currentDayId);
 
-    // Bind the button first so it is usable immediately.
+    // 🔥 TOP BUTTONS FIRST — do not wait for realtime listeners.
     bindShiftButtons();
+    bindHistoryButtons();
 
-    // Load shift state after the current day is ready.
+    // 🔥 Make the navigation functions directly callable.
+    window.openShiftSummary = openShiftSummary;
+    window.openDayHistory = openDayHistory;
+    window.openTableHistory = openTableHistory;
+
+    // 🔥 Re-bind after the first render tick as a safety net.
+    setTimeout(() => {
+        bindShiftButtons();
+        bindHistoryButtons();
+    }, 0);
+
+    // 🔥 Realtime listeners AFTER UI buttons are ready.
     loadShiftsFromFirebase();
 
     listenExpensesRealtime();
@@ -246,8 +258,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     listenHistoryRealtime();
 
     bindAddTablePopup();
-    bindShiftButtons();
-    bindHistoryButtons();
 
     setTimeout(() => {
         restoreTimers();
@@ -9350,6 +9360,9 @@ else {
 window.checkIn = checkIn;
 window.checkOut = checkOut;
 window.openHistory = openHistory;
+window.openShiftSummary = openShiftSummary;
+window.openDayHistory = openDayHistory;
+window.openTableHistory = openTableHistory;
 window.editTable = editTable;
 window.deleteTableOpen = deleteTableOpen;
 window.openCanteen = openCanteen;
