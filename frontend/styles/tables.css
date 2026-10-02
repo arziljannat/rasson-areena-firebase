@@ -6724,3 +6724,66 @@ body * {
     flex: 0 0 auto !important;
 }
 
+
+
+/* =========================================================
+   🔥 TABLE HISTORY — SESSION AREA MUST STAY VISIBLE
+   The popup contains large summary cards. Keep the popup
+   scrollable and reserve a real viewport for session rows.
+========================================================= */
+
+#tableHistoryPopup {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+}
+
+#tableHistoryPopup .table-history-popup-box {
+    height: auto !important;
+    min-height: 90vh !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 20px auto !important;
+}
+
+#tableHistoryPopup .table-history-details-title {
+    display: block !important;
+    flex: 0 0 auto !important;
+    min-height: 45px !important;
+    visibility: visible !important;
+}
+
+#tableHistoryPopup .table-history-details-wrapper {
+    display: block !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    min-height: 260px !important;
+    max-height: 420px !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    visibility: visible !important;
+}
+
+#tableHistoryPopup .table-history-details-wrapper .history-table {
+    display: table !important;
+    width: 100% !important;
+    min-width: 1100px !important;
+    visibility: visible !important;
+}
+
+#tableHistoryPopup .table-history-details-wrapper .history-table tbody {
+    display: table-row-group !important;
+    visibility: visible !important;
+}
+
+#tableHistoryPopup .table-history-details-wrapper .history-table tbody tr {
+    display: table-row !important;
+    visibility: visible !important;
+}
+
+#tableHistoryPopup .table-history-details-wrapper .history-table th,
+#tableHistoryPopup .table-history-details-wrapper .history-table td {
+    display: table-cell !important;
+    visibility: visible !important;
+}
