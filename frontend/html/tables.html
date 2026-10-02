@@ -18,157 +18,20 @@
 <script src="../scripts/load-navbar.js"></script>
 <script src="../scripts/navbar.js"></script>
 
-<script>
-/* =========================================================
-   RASSON TOP BUTTON BRIDGE — HARD CLICK HANDLER
-   Top navigation must work independently of tables.js
-   realtime listeners and day-history loading.
-========================================================= */
-(function () {
 
-    const functionMap = {
-        shift: "openShiftSummary",
-        day: "openDayHistory",
-        table: "openTableHistory",
-        player: "openPlayerHistory"
-    };
-
-    async function waitForReady(action) {
-
-        let tries = 0;
-
-        while (tries < 150) {
-
-            const fnName = functionMap[action];
-            const fn = window[fnName];
-
-            const dbReady = !!window.db;
-            const dayReady = !!window.currentDayId;
-
-            if (typeof fn === "function" && dbReady && dayReady) {
-                return fn;
-            }
-
-            await new Promise(resolve => setTimeout(resolve, 100));
-            tries++;
-        }
-
-        console.error("❌ TOP ACTION TIMEOUT:", action);
-        return null;
-    }
-
-    window.__rassonTopAction = async function (action) {
-
-        const fnName = functionMap[action];
-
-        if (!fnName) return;
-
-        const fn = await waitForReady(action);
-
-        if (!fn) return;
-
-        try {
-
-            /*
-             * TABLE HISTORY depends on _daysData.
-             * If it is not ready yet, load Day History first.
-             * This is the same data source used by Table History.
-             */
-            if (
-                action === "table" &&
-                (!Array.isArray(window._daysData) ||
-                 window._daysData.length === 0)
-            ) {
-
-                const dayFn =
-                    await waitForReady("day");
-
-                if (!dayFn) return;
-
-                await dayFn();
-
-                /*
-                 * openDayHistory creates _daysData.
-                 * Now call Table History normally.
-                 */
-                const tableFn =
-                    await waitForReady("table");
-
-                if (!tableFn) return;
-
-                await tableFn();
-
-                return;
-            }
-
-            await fn();
-
-        } catch (error) {
-
-            console.error(
-                "❌ TOP BUTTON ACTION ERROR:",
-                action,
-                error
-            );
-
-        }
-    };
-
-    /*
-     * Capture-phase listener:
-     * handles the top buttons before any other page listener.
-     * Add New Table is intentionally excluded.
-     */
-    document.addEventListener(
-        "click",
-        function (event) {
-
-            const button =
-                event.target &&
-                event.target.closest
-                    ? event.target.closest(
-                        "#shiftCloseBtn, #dayHistoryBtn, #tableHistoryBtn, #playerHistoryBtn"
-                      )
-                    : null;
-
-            if (!button) return;
-
-            event.preventDefault();
-            event.stopImmediatePropagation();
-
-            const actionMap = {
-                shiftCloseBtn: "shift",
-                dayHistoryBtn: "day",
-                tableHistoryBtn: "table",
-                playerHistoryBtn: "player"
-            };
-
-            const action =
-                actionMap[button.id];
-
-            if (action) {
-                window.__rassonTopAction(action);
-            }
-
-        },
-        true
-    );
-
-})();
-</script>
 
 <div class="page-top-area">
     <h1 class="tables-heading">Tables Management</h1>
 
     <button id="addTableBtn" class="neon-btn add-table-btn">+ Add New Table</button>
-    <button id="shiftCloseBtn" class="neon-btn add-table-btn" type="button" onclick="window.__rassonTopAction('shift')">Shift 1 Close</button>
-    <button id="dayHistoryBtn" class="neon-btn add-table-btn" type="button" onclick="window.__rassonTopAction('day')">Day History</button>
-    <button id="tableHistoryBtn" class="neon-btn add-table-btn" type="button" onclick="window.__rassonTopAction('table')">Table History</button>
+    <button id="shiftCloseBtn" class="neon-btn add-table-btn" type="button" >Shift 1 Close</button>
+    <button id="dayHistoryBtn" class="neon-btn add-table-btn" type="button" >Day History</button>
+    <button id="tableHistoryBtn" class="neon-btn add-table-btn" type="button" >Table History</button>
 <button
     id="playerHistoryBtn"
     type="button"
     class="neon-btn add-table-btn"
-    onclick="window.__rassonTopAction('player')"
+    
 >
     👤 Player History
 </button>
