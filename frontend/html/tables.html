@@ -18,18 +18,61 @@
 <script src="../scripts/load-navbar.js"></script>
 <script src="../scripts/navbar.js"></script>
 
+<script>
+/* =========================================================
+   RASSON TOP BUTTON BRIDGE
+   These buttons must work even while tables.js is still
+   finishing Firebase/day initialization.
+========================================================= */
+window.__rassonTopAction = function (action) {
+
+    const functionMap = {
+        shift: "openShiftSummary",
+        day: "openDayHistory",
+        table: "openTableHistory",
+        player: "openPlayerHistory"
+    };
+
+    const fnName = functionMap[action];
+
+    if (!fnName) return;
+
+    let tries = 0;
+
+    const run = () => {
+
+        const fn = window[fnName];
+
+        if (typeof fn === "function") {
+            fn();
+            return;
+        }
+
+        tries++;
+
+        if (tries < 100) {
+            setTimeout(run, 100);
+        } else {
+            console.error("❌ RASSON TOP ACTION NOT READY:", fnName);
+        }
+    };
+
+    run();
+};
+</script>
+
 <div class="page-top-area">
     <h1 class="tables-heading">Tables Management</h1>
 
     <button id="addTableBtn" class="neon-btn add-table-btn">+ Add New Table</button>
-    <button id="shiftCloseBtn" class="neon-btn add-table-btn" type="button" onclick="window.openShiftSummary()">Shift 1 Close</button>
-    <button id="dayHistoryBtn" class="neon-btn add-table-btn" type="button" onclick="window.openDayHistory()">Day History</button>
-    <button id="tableHistoryBtn" class="neon-btn add-table-btn" type="button" onclick="window.openTableHistory()">Table History</button>
+    <button id="shiftCloseBtn" class="neon-btn add-table-btn" type="button" onclick="window.__rassonTopAction('shift')">Shift 1 Close</button>
+    <button id="dayHistoryBtn" class="neon-btn add-table-btn" type="button" onclick="window.__rassonTopAction('day')">Day History</button>
+    <button id="tableHistoryBtn" class="neon-btn add-table-btn" type="button" onclick="window.__rassonTopAction('table')">Table History</button>
 <button
     id="playerHistoryBtn"
     type="button"
     class="neon-btn add-table-btn"
-    onclick="window.openPlayerHistory()"
+    onclick="window.__rassonTopAction('player')"
 >
     👤 Player History
 </button>
