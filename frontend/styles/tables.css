@@ -6655,3 +6655,72 @@ body * {
     max-height: 95vh !important;
 
 }
+
+/* =========================================================
+   🔥 HISTORY SESSION TABLE — FINAL VISIBILITY FIX
+   Keep summary cards, but always reserve visible space
+   for the actual session rows below them.
+========================================================= */
+
+#historyPopup .popup-box {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+}
+
+#historyPopup .table-mobile-wrapper {
+    display: block !important;
+    width: 100% !important;
+    min-height: 180px !important;
+    max-height: 420px !important;
+    flex: 1 1 auto !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+
+#historyPopup .history-table {
+    display: table !important;
+    width: 100% !important;
+    min-width: 1100px !important;
+    height: auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    border-collapse: collapse !important;
+}
+
+#historyPopup .history-table thead {
+    display: table-header-group !important;
+}
+
+#historyPopup .history-table tbody {
+    display: table-row-group !important;
+    visibility: visible !important;
+}
+
+#historyPopup .history-table tr {
+    display: table-row !important;
+    visibility: visible !important;
+}
+
+#historyPopup .history-table th,
+#historyPopup .history-table td {
+    display: table-cell !important;
+    visibility: visible !important;
+}
+
+#historyPopup .history-table tbody tr td {
+    color: #ccffee !important;
+    background: rgba(0, 20, 15, 0.35) !important;
+}
+
+#historyPopup .history-table tbody tr:nth-child(even) td {
+    background: rgba(0, 255, 150, 0.06) !important;
+}
+
+/* Buttons stay below the session table */
+#historyPopup .popup-buttons {
+    flex: 0 0 auto !important;
+}
+
