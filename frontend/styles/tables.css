@@ -6787,3 +6787,112 @@ body * {
     display: table-cell !important;
     visibility: visible !important;
 }
+
+
+/* =========================================================
+   TABLE HISTORY — KEEP SESSION DETAILS ON SCREEN
+   The six summary cards are one row on desktop so the
+   SESSION DETAILS section is not pushed below the popup.
+========================================================= */
+
+#tableHistoryPopup .table-history-popup-box {
+    height: 95vh !important;
+    max-height: 95vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+}
+
+#tableHistoryPopup .table-history-summary-counters {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    margin-bottom: 12px !important;
+}
+
+#tableHistoryPopup .table-history-summary-box {
+    min-height: 145px !important;
+    padding: 12px !important;
+}
+
+#tableHistoryPopup .table-history-card-title {
+    font-size: 16px !important;
+    margin-bottom: 8px !important;
+}
+
+#tableHistoryPopup .table-history-card-head span {
+    font-size: 12px !important;
+}
+
+#tableHistoryPopup .table-history-card-values strong {
+    font-size: 23px !important;
+}
+
+#tableHistoryPopup .table-history-card-amount span {
+    font-size: 12px !important;
+}
+
+#tableHistoryPopup .table-history-card-time span {
+    font-size: 11px !important;
+}
+
+#tableHistoryPopup .table-history-details-title {
+    display: block !important;
+    min-height: 42px !important;
+    margin-top: 4px !important;
+    margin-bottom: 6px !important;
+    flex: 0 0 auto !important;
+}
+
+#tableHistoryPopup .table-history-details-wrapper {
+    display: block !important;
+    min-height: 240px !important;
+    max-height: 300px !important;
+    flex: 0 0 300px !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+}
+
+#tableHistoryPopup .table-history-details-wrapper .history-table {
+    display: table !important;
+    width: 100% !important;
+    min-width: 1100px !important;
+    height: auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+#tableHistoryPopup .table-history-details-wrapper .history-table tbody {
+    display: table-row-group !important;
+}
+
+#tableHistoryPopup .table-history-details-wrapper .history-table tr {
+    display: table-row !important;
+}
+
+#tableHistoryPopup .table-history-details-wrapper .history-table th,
+#tableHistoryPopup .table-history-details-wrapper .history-table td {
+    display: table-cell !important;
+    visibility: visible !important;
+}
+
+@media (max-width: 1200px) {
+    #tableHistoryPopup .table-history-summary-counters {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    #tableHistoryPopup .table-history-popup-box {
+        height: 95vh !important;
+        max-height: 95vh !important;
+    }
+}
+
+@media (max-width: 700px) {
+    #tableHistoryPopup .table-history-summary-counters {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    #tableHistoryPopup .table-history-details-wrapper {
+        flex-basis: 260px !important;
+        min-height: 220px !important;
+    }
+}
