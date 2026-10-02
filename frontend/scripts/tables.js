@@ -75,8 +75,15 @@ let firebaseExpenses = [];
 let firebaseEasy = [];
 // 🔥 AUTO REFRESH FUNCTION
 async function autoRefreshUI() {
-    loadShiftsFromFirebase();
-    renderTables();
+    try {
+        loadShiftsFromFirebase();
+
+        if (tables && tables.length > 0) {
+            renderTables();
+        }
+    } catch (error) {
+        console.error("❌ AUTO REFRESH ERROR:", error);
+    }
 }
 
 const BRANCH =
@@ -105,56 +112,95 @@ function getItemStock(item) {
  ******************************************************/
 let tables = [];
 
-let shift1 = null;   // ✅ ADD
+let shift1 = null;
+let shift2 = null;
+let shiftsUnsubscribe = null;
+
 function loadShiftsFromFirebase() {
 
-const q = query(
-    collection(window.db, "shifts"),
-    where("branch", "==", BRANCH),
-    where("day_id", "==", window.currentDayId)
-);
+    if (!window.currentDayId) {
+        console.warn("⏳ CURRENT DAY NOT READY");
+        return;
+    }
 
-onSnapshot(q, (snapshot) => {
+    if (typeof shiftsUnsubscribe === "function") {
+        shiftsUnsubscribe();
+        shiftsUnsubscribe = null;
+    }
 
-    shift1 = null;
+    const q = query(
+        collection(window.db, "shifts"),
+        where("branch", "==", BRANCH),
+        where("day_id", "==", Number(window.currentDayId))
+    );
 
-    snapshot.forEach(docSnap => {
-        const d = docSnap.data();
+    shiftsUnsubscribe = onSnapshot(
+        q,
+        (snapshot) => {
 
-        if (d.shift_number === 1 && !shift1) {
-            shift1 = {
-                openTime: d.open_time,
-                closeTime: d.close_time,
-                startMs: Number(d.start_ms) || 0,
-                endMs: Number(d.end_ms) || 0,
-                gameTotal: d.game_total,
-                canteenTotal: d.canteen_total,
-                gameCollection: d.game_collection,
-                canteenCollection: d.canteen_collection,
-                expenses: d.expenses,
-                easypaisa: d.easypaisa || 0,
-                discount: d.discount || 0,
-                closingCash: d.closing_cash,
-                gameBalance: d.game_balance || 0,
-               canteenBalance: d.canteen_balance || 0
-            };
+            shift1 = null;
+            shift2 = null;
+
+            snapshot.forEach(docSnap => {
+
+                const d = docSnap.data();
+
+                const shiftData = {
+                    id: docSnap.id,
+                    shift: Number(d.shift_number) || 0,
+                    shiftNumber: Number(d.shift_number) || 0,
+
+                    openTime: d.open_time || "",
+                    closeTime: d.close_time || "",
+
+                    startMs: Number(d.start_ms) || 0,
+                    endMs: Number(d.end_ms) || 0,
+
+                    gameTotal: Number(d.game_total) || 0,
+                    canteenTotal: Number(d.canteen_total) || 0,
+
+                    gameCollection: Number(d.game_collection) || 0,
+                    canteenCollection: Number(d.canteen_collection) || 0,
+
+                    gameBalance: Number(d.game_balance) || 0,
+                    canteenBalance: Number(d.canteen_balance) || 0,
+
+                    expenses: Number(d.expenses) || 0,
+                    easypaisa: Number(d.easypaisa) || 0,
+                    discount: Number(d.discount) || 0,
+
+                    closingCash: Number(d.closing_cash) || 0,
+
+                    branch: d.branch || BRANCH,
+                    dayId:
+                        Number(d.day_id) ||
+                        Number(window.currentDayId) ||
+                        0
+                };
+
+                if (shiftData.shiftNumber === 1 && !shift1) {
+                    shift1 = shiftData;
+                }
+
+                if (shiftData.shiftNumber === 2 && !shift2) {
+                    shift2 = shiftData;
+                }
+            });
+
+            const btn = document.getElementById("shiftCloseBtn");
+
+            if (btn) {
+                btn.innerText = shift1 ? "Day Close" : "Shift Close";
+            }
+
+            console.log("🔥 CURRENT DAY:", window.currentDayId);
+            console.log("🔥 SHIFT 1:", shift1);
+            console.log("🔥 SHIFT 2:", shift2);
+        },
+        error => {
+            console.error("❌ SHIFT REALTIME ERROR:", error);
         }
-
-
-    });
-
-// 🔥 SINGLE SHIFT BUTTON
-const btn = document.getElementById("shiftCloseBtn");
-
-if (!shift1) {
-    btn.innerText = "Shift Close";
-} else {
-    btn.innerText = "Day Close";
-}
-
-    console.log("🔥 REALTIME SHIFT:", shift1);
-
-});
+    );
 }
 
 let editTargetId = null;
@@ -331,30 +377,33 @@ history: []
     };
 });
 
-setTimeout(async () => {
+if (!tables || tables.length === 0) {
+    console.log("⛔ Tables not ready yet");
+    return;
+}
 
-    // 🔥 IMPORTANT
-    if (!tables || tables.length === 0) {
-        console.log("⛔ Tables not ready yet");
-        return;
-    }
+console.log("✅ TABLES READY:", tables.length);
 
-    console.log("✅ TABLES READY:", tables.length);
+rebuildHistoryFromSessions()
+    .then(() => {
 
-    await rebuildHistoryFromSessions();
+        console.log(
+            "✅ HISTORY COUNTS:",
+            tables.map(t => ({
+                table: t.name,
+                history: t.history.length
+            }))
+        );
 
-    // 🔥 DEBUG
-    console.log(
-        "✅ HISTORY COUNTS:",
-        tables.map(t => ({
-            table: t.name,
-            history: t.history.length
-        }))
-    );
+        renderTables();
 
-    renderTables();
+    })
+    .catch(error => {
 
-}, 800);
+        console.error("❌ HISTORY REBUILD ERROR:", error);
+        renderTables();
+
+    });
 });
 }
 
@@ -399,8 +448,7 @@ const q = query(
         });
 
         console.log("🔥 FIREBASE EXPENSES:", firebaseExpenses);
-      // 🔥 AUTO REFRESH DAY HISTORY
-refreshCurrentDayHistory();
+
     });
 }
 
