@@ -116,6 +116,19 @@ let shift1 = null;
 let shift2 = null;
 let shiftsUnsubscribe = null;
 
+function applyShiftButtonState() {
+
+    const btn = document.getElementById("shiftCloseBtn");
+
+    if (!btn) return;
+
+    btn.innerText = shift1 ? "Day Close" : "Shift Close";
+    btn.disabled = false;
+    btn.style.display = "";
+
+    console.log("🔘 SHIFT BUTTON:", btn.innerText);
+}
+
 function loadShiftsFromFirebase() {
 
     if (!window.currentDayId) {
@@ -187,11 +200,7 @@ function loadShiftsFromFirebase() {
                 }
             });
 
-            const btn = document.getElementById("shiftCloseBtn");
-
-            if (btn) {
-                btn.innerText = shift1 ? "Day Close" : "Shift Close";
-            }
+            applyShiftButtonState();
 
             console.log("🔥 CURRENT DAY:", window.currentDayId);
             console.log("🔥 SHIFT 1:", shift1);
@@ -199,6 +208,7 @@ function loadShiftsFromFirebase() {
         },
         error => {
             console.error("❌ SHIFT REALTIME ERROR:", error);
+            applyShiftButtonState();
         }
     );
 }
@@ -222,7 +232,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     console.log("✅ DAY READY:", window.currentDayId);
 
+    // Bind the button first so it is usable immediately.
+    bindShiftButtons();
+
+    // Load shift state after the current day is ready.
     loadShiftsFromFirebase();
+
     listenExpensesRealtime();
     listenEasyRealtime();
     listenInventoryRealtime();
@@ -5091,6 +5106,8 @@ function bindShiftButtons() {
 
         shiftCloseBtn.onclick =
             openShiftSummary;
+
+        applyShiftButtonState();
 
     }
 
