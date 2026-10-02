@@ -20,11 +20,11 @@
 
 <script>
 /* =========================================================
-   RASSON TOP BUTTON BRIDGE
-   These buttons must work even while tables.js is still
-   finishing Firebase/day initialization.
+   RASSON TOP BUTTON BRIDGE — HARD CLICK HANDLER
+   Top navigation must work independently of tables.js
+   realtime listeners and day-history loading.
 ========================================================= */
-window.__rassonTopAction = function (action) {
+(function () {
 
     const functionMap = {
         shift: "openShiftSummary",
@@ -33,32 +33,128 @@ window.__rassonTopAction = function (action) {
         player: "openPlayerHistory"
     };
 
-    const fnName = functionMap[action];
+    async function waitForReady(action) {
 
-    if (!fnName) return;
+        let tries = 0;
 
-    let tries = 0;
+        while (tries < 150) {
 
-    const run = () => {
+            const fnName = functionMap[action];
+            const fn = window[fnName];
 
-        const fn = window[fnName];
+            const dbReady = !!window.db;
+            const dayReady = !!window.currentDayId;
 
-        if (typeof fn === "function") {
-            fn();
-            return;
+            if (typeof fn === "function" && dbReady && dayReady) {
+                return fn;
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 100));
+            tries++;
         }
 
-        tries++;
+        console.error("❌ TOP ACTION TIMEOUT:", action);
+        return null;
+    }
 
-        if (tries < 100) {
-            setTimeout(run, 100);
-        } else {
-            console.error("❌ RASSON TOP ACTION NOT READY:", fnName);
+    window.__rassonTopAction = async function (action) {
+
+        const fnName = functionMap[action];
+
+        if (!fnName) return;
+
+        const fn = await waitForReady(action);
+
+        if (!fn) return;
+
+        try {
+
+            /*
+             * TABLE HISTORY depends on _daysData.
+             * If it is not ready yet, load Day History first.
+             * This is the same data source used by Table History.
+             */
+            if (
+                action === "table" &&
+                (!Array.isArray(window._daysData) ||
+                 window._daysData.length === 0)
+            ) {
+
+                const dayFn =
+                    await waitForReady("day");
+
+                if (!dayFn) return;
+
+                await dayFn();
+
+                /*
+                 * openDayHistory creates _daysData.
+                 * Now call Table History normally.
+                 */
+                const tableFn =
+                    await waitForReady("table");
+
+                if (!tableFn) return;
+
+                await tableFn();
+
+                return;
+            }
+
+            await fn();
+
+        } catch (error) {
+
+            console.error(
+                "❌ TOP BUTTON ACTION ERROR:",
+                action,
+                error
+            );
+
         }
     };
 
-    run();
-};
+    /*
+     * Capture-phase listener:
+     * handles the top buttons before any other page listener.
+     * Add New Table is intentionally excluded.
+     */
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            const button =
+                event.target &&
+                event.target.closest
+                    ? event.target.closest(
+                        "#shiftCloseBtn, #dayHistoryBtn, #tableHistoryBtn, #playerHistoryBtn"
+                      )
+                    : null;
+
+            if (!button) return;
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            const actionMap = {
+                shiftCloseBtn: "shift",
+                dayHistoryBtn: "day",
+                tableHistoryBtn: "table",
+                playerHistoryBtn: "player"
+            };
+
+            const action =
+                actionMap[button.id];
+
+            if (action) {
+                window.__rassonTopAction(action);
+            }
+
+        },
+        true
+    );
+
+})();
 </script>
 
 <div class="page-top-area">
